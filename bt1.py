@@ -1,3 +1,5 @@
+from scipy.stats import sem
+import numpy
 import random
 
 from datetime import datetime
@@ -57,7 +59,7 @@ def track(stream_pos, beam_pos, tracking_strategy):
     if tracking_strategy=="static":
         return(beam_pos)
     elif tracking_strategy=="random_shift":
-        if random.rangrange(2)==0:
+        if random.randrange(2)==0:
             return beam_pos+(stream_shift_amount*porm())
         else:
             return(beam_pos)
@@ -110,11 +112,18 @@ def showpos(stream_pos, beam_pos, show_p):
 def run(show_p, tracking_strategy):
   global operator_response_delay
   operator_response_delay=0
-  operator_response_delay_delta=2
-  for p in range(10):
-      print(f'operator_response_delay={operator_response_delay}')
+  n_ord_values_to_try=10
+  ord_delta=2
+  reps=10
+  for p in range(n_ord_values_to_try):
+    results = []
+    for rep in range(reps):
+      #print(f'operator_response_delay={operator_response_delay}')
       run_stream(show_p, tracking_strategy)
-      print(f'============================================\nHits={hits}, Misses={misses}, Win fraction={hits/(hits+misses)}\n')
-      operator_response_delay=operator_response_delay+operator_response_delay_delta
+      frac = hits/(hits+misses)
+      #print(f'============================================\nHits={hits}, Misses={misses}, Win fraction={frac}\n')
+      results=results+[frac]
+    print(f'@ operator_response_delay={operator_response_delay} fraction mean = {numpy.mean(results)}, stderr = {sem(results)}')
+    operator_response_delay=operator_response_delay+ord_delta
 
-run(False,"directed_shift") # "static"
+run(False,"random_shift") # "static" "random_shift" "directed_shift"
