@@ -35,7 +35,8 @@ def run_stream(show_p=False, tracking_strategy="directed"):
     # Decide if the stream is going to shift:
     if random.random() < p_stream_shift:
         stream_pos=trunc2(stream_pos+(stream_shift_amount*porm()))
-        allow_response_cycle=cycle+operator_response_delay
+        if allow_response_cycle==99999999999:
+          allow_response_cycle=cycle+operator_response_delay
     else:
         showpos(stream_pos,beam_pos,show_p)
     if cycle >= allow_response_cycle:
@@ -110,8 +111,8 @@ def showpos(stream_pos, beam_pos, show_p):
 
 def run(show_p, tracking_strategy):
   global operator_response_delay
-  operator_response_delay=0
-  n_ord_values_to_try=20
+  operator_response_delay=1
+  n_ord_values_to_try=50
   ord_delta=1
   reps=100
   print(f'Tracking strategy is {tracking_strategy}')
@@ -121,7 +122,8 @@ def run(show_p, tracking_strategy):
       #print(f'operator_response_delay={operator_response_delay}')
       run_stream(show_p, tracking_strategy)
       frac = hits/(hits+misses)
-      #print(f'============================================\nHits={hits}, Misses={misses}, Win fraction={frac}\n')
+      if show_p:
+        print(f'============================================\nHits={hits}, Misses={misses}, Win fraction={frac}\n')
       results=results+[frac]
     print(f'@ operator_response_delay={operator_response_delay} fraction mean = {numpy.mean(results)}, stderr = {sem(results)}')
     operator_response_delay=operator_response_delay+ord_delta
