@@ -1,3 +1,7 @@
+# Todo:
+#    -- Where exact beam|jet match is tested with ==, replace with a more "perceptually" accurate model
+#    -- Calibate cycles (esp. operator_response_delay) to human reponse times (e.g., 1 cycle == 100ms or whatever)
+
 from scipy.stats import sem
 import numpy
 import random
