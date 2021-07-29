@@ -23,7 +23,7 @@ operator_response_delay=0 # cycles before the operator can respond to a stream s
 
 max_cycles=10000 # If the beam doesn't hit a wall before this, we cut the run off here.
 
-def run_stream(show_p=False, tracking_strategy="directed_shift"):
+def run_stream(show_p=False, tracking_strategy="directed"):
   global hits, misses, max_cycles, operator_response_delay
   hits = 0
   misses = 0
@@ -58,9 +58,9 @@ def trunc2(n):
 def track(stream_pos, beam_pos, tracking_strategy):
     if tracking_strategy=="static":
       return(beam_pos)
-    elif tracking_strategy=="random_shift":
+    elif tracking_strategy=="random":
       return(beam_pos+(stream_shift_amount*porm()))
-    elif tracking_strategy=="directed_shift":
+    elif tracking_strategy=="directed":
       if beam_pos==stream_pos:
         return(beam_pos)
       elif beam_pos>stream_pos:
@@ -113,7 +113,8 @@ def run(show_p, tracking_strategy):
   operator_response_delay=0
   n_ord_values_to_try=10
   ord_delta=2
-  reps=10
+  reps=100
+  print(f'Tracking strategy is {tracking_strategy}')
   for p in range(n_ord_values_to_try):
     results = []
     for rep in range(reps):
@@ -125,4 +126,6 @@ def run(show_p, tracking_strategy):
     print(f'@ operator_response_delay={operator_response_delay} fraction mean = {numpy.mean(results)}, stderr = {sem(results)}')
     operator_response_delay=operator_response_delay+ord_delta
 
-run(False,"random_shift") # "static" "random_shift" "directed_shift"
+run(False,"directed") # "static" "random" "directed"
+run(False,"static") # "static" "random" "directed"
+run(False,"random") # "static" "random" "directed"
