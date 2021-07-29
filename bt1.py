@@ -1,20 +1,35 @@
 import random
 
+from datetime import datetime
+random.seed(datetime.now())
+
 hits=0
 misses=0
 
-max_cycles=10000
-stream_shift_time_slice=100
-stream_p_shift=0.05
-stream_shift_amount=0.01
-beam_shift_amount=0.05*stream_shift_amount
-stream_shift_low_rand_int=stream_shift_time_slice*stream_p_shift
-beam_pos=0.0
+# We have a stream (aka. jet) which shifts around in accord with these
+# params. The stream_shift_time_slice is a bit obscure. The idea is
+# that 
 
+stream_shift_amount=0.01 # Minimal unit of stream shift
+stream_shift_time_slice=100
+stream_p_shift=0.05 # prob. of stream shift per cycle
+
+# This looks complex, but it's simply used to decide if there's a
+# stream shift based on the interger result of random.randrange on
+# stream_shift_time_slice
+
+stream_shift_low_rand_int=int(stream_shift_time_slice*stream_p_shift)
+
+# And the beam, which is under the control of the operator (or automation), which can be
+# shifted in accord with these params:
+
+beam_shift_amount=0.05*stream_shift_amount
 operator_response_delay=0 # cycles
 
+max_cycles=10000 # If the beam doesn't hit a wall before this, we cut the run off here.
+
 def run_stream(show_p=False, tracking_strategy="directed_shift"):
-  global hits, misses, beam_pos
+  global hits, misses, max_cycles
   hits = 0
   misses = 0
   stream_pos = 0.0
@@ -22,12 +37,9 @@ def run_stream(show_p=False, tracking_strategy="directed_shift"):
   allow_response_cycle = 99999999999
   cycle = 1
   while (cycle <= max_cycles) and (abs(stream_pos) < 1.0): # Stop if it hits the wall on either side
+    # Decide if the stream is going to shift:
     if random.randrange(stream_shift_time_slice) < stream_shift_low_rand_int:
-        if 0==random.randrange(2):
-            porm=+1
-        else:
-            porm=-1
-        stream_pos=trunc2(stream_pos+(stream_shift_amount*porm))
+        stream_pos=trunc2(stream_pos+(stream_shift_amount*porm()))
         allow_response_cycle=cycle+operator_response_delay
     else:
         showpos(stream_pos,beam_pos,show_p)
@@ -38,26 +50,30 @@ def run_stream(show_p=False, tracking_strategy="directed_shift"):
     cycle=cycle+1
   print(f'============================================\nHits={hits}, Misses={misses}, Win fraction={hits/(hits+misses)}\n')
 
+# (This is ultra-ugly! There must be a better idiom for this!)
+def porm():
+  if 0==random.randrange(2):
+    return(+1)
+  else:
+    return(-1)
+
+# Both the beam and stream are positional to two decimal digits.
 def trunc2(n):
   return(int(n*100.0)/100.0)
 
 def track(stream_pos, beam_pos, tracking_strategy):
-    if 0==random.randrange(2):
-        porm=+1
-    else:
-        porm=-1
     if tracking_strategy=="static":
         return(beam_pos)
     elif tracking_strategy=="random_shift":
         if random.rangrange(2)==0:
-            return beam_pos+(stream_shift_amount*porm)
+            return beam_pos+(stream_shift_amount*porm())
         else:
             return(beam_pos)
     elif tracking_strategy=="directed_shift":
         if beam_pos==stream_pos:
             return(beam_pos)
         else:
-            return(beam_pos+(beam_shift_amount*porm))
+            return(beam_pos+(beam_shift_amount*porm()))
     else:
             raise Exception('In TRACK: Invalid tracking strategy:', tracking_strategy)
 
