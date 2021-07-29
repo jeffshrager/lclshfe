@@ -18,7 +18,7 @@ p_stream_shift=0.25 # prob. of stream shift per cycle
 # And the beam, which is under the control of the operator (or
 # automation), which can be shifted in accord with these params:
 
-beam_shift_amount=0.11 # You may want to have more or less fine control of the beam vs. the stream's shiftiness
+beam_shift_amount=0.1 # You may want to have more or less fine control of the beam vs. the stream's shiftiness
 operator_response_delay=0 # cycles before the operator can respond to a stream shift
 
 max_cycles=10000 # If the beam doesn't hit a wall before this, we cut the run off here.
@@ -111,8 +111,8 @@ def showpos(stream_pos, beam_pos, show_p):
 def run(show_p, tracking_strategy):
   global operator_response_delay
   operator_response_delay=0
-  n_ord_values_to_try=10
-  ord_delta=2
+  n_ord_values_to_try=20
+  ord_delta=1
   reps=100
   print(f'Tracking strategy is {tracking_strategy}')
   for p in range(n_ord_values_to_try):
@@ -127,5 +127,5 @@ def run(show_p, tracking_strategy):
     operator_response_delay=operator_response_delay+ord_delta
 
 run(False,"directed") # "static" "random" "directed"
-run(False,"static") # "static" "random" "directed"
-run(False,"random") # "static" "random" "directed"
+#run(False,"static") # "static" "random" "directed"
+#run(False,"random") # "static" "random" "directed"
