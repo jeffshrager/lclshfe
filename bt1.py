@@ -8,28 +8,21 @@ misses=0
 
 # We have a stream (aka. jet) which shifts around in accord with these
 # params. The stream_shift_time_slice is a bit obscure. The idea is
-# that 
+# that.
 
-stream_shift_amount=0.01 # Minimal unit of stream shift
-stream_shift_time_slice=100
-stream_p_shift=0.05 # prob. of stream shift per cycle
+stream_shift_amount=0.1 # Minimal unit of stream shift
+p_stream_shift=0.1 # prob. of stream shift per cycle
 
-# This looks complex, but it's simply used to decide if there's a
-# stream shift based on the interger result of random.randrange on
-# stream_shift_time_slice
+# And the beam, which is under the control of the operator (or
+# automation), which can be shifted in accord with these params:
 
-stream_shift_low_rand_int=int(stream_shift_time_slice*stream_p_shift)
-
-# And the beam, which is under the control of the operator (or automation), which can be
-# shifted in accord with these params:
-
-beam_shift_amount=0.05*stream_shift_amount
-operator_response_delay=0 # cycles
+beam_shift_amount=0.11 # You may want to have more or less fine control of the beam vs. the stream's shiftiness
+operator_response_delay=0 # cycles before the operator can respond to a stream shift
 
 max_cycles=10000 # If the beam doesn't hit a wall before this, we cut the run off here.
 
 def run_stream(show_p=False, tracking_strategy="directed_shift"):
-  global hits, misses, max_cycles
+  global hits, misses, max_cycles, operator_response_delay
   hits = 0
   misses = 0
   stream_pos = 0.0
@@ -38,7 +31,7 @@ def run_stream(show_p=False, tracking_strategy="directed_shift"):
   cycle = 1
   while (cycle <= max_cycles) and (abs(stream_pos) < 1.0): # Stop if it hits the wall on either side
     # Decide if the stream is going to shift:
-    if random.randrange(stream_shift_time_slice) < stream_shift_low_rand_int:
+    if random.random() < p_stream_shift:
         stream_pos=trunc2(stream_pos+(stream_shift_amount*porm()))
         allow_response_cycle=cycle+operator_response_delay
     else:
@@ -48,11 +41,10 @@ def run_stream(show_p=False, tracking_strategy="directed_shift"):
     if beam_pos == stream_pos:
         allow_response_cycle=99999999999
     cycle=cycle+1
-  print(f'============================================\nHits={hits}, Misses={misses}, Win fraction={hits/(hits+misses)}\n')
 
 # (This is ultra-ugly! There must be a better idiom for this!)
 def porm():
-  if 0==random.randrange(2):
+  if random.random()<0.5:
     return(+1)
   else:
     return(-1)
@@ -115,11 +107,14 @@ def showpos(stream_pos, beam_pos, show_p):
     if show_p:
         print(f'] s:{stream_pos} b:{beam_pos}')
 
-def run(show_p=False):
+def run(show_p, tracking_strategy):
+  global operator_response_delay
+  operator_response_delay=0
+  operator_response_delay_delta=2
   for p in range(10):
-      global operator_response_delay
-      operator_response_delay=p
       print(f'operator_response_delay={operator_response_delay}')
-      run_stream(show_p)
+      run_stream(show_p, tracking_strategy)
+      print(f'============================================\nHits={hits}, Misses={misses}, Win fraction={hits/(hits+misses)}\n')
+      operator_response_delay=operator_response_delay+operator_response_delay_delta
 
-run(False)
+run(False,"directed_shift") # "static"
