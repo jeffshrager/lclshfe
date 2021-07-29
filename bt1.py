@@ -13,7 +13,7 @@ misses=0
 # that.
 
 stream_shift_amount=0.1 # Minimal unit of stream shift
-p_stream_shift=0.1 # prob. of stream shift per cycle
+p_stream_shift=0.25 # prob. of stream shift per cycle
 
 # And the beam, which is under the control of the operator (or
 # automation), which can be shifted in accord with these params:
@@ -57,19 +57,18 @@ def trunc2(n):
 
 def track(stream_pos, beam_pos, tracking_strategy):
     if tracking_strategy=="static":
-        return(beam_pos)
+      return(beam_pos)
     elif tracking_strategy=="random_shift":
-        if random.randrange(2)==0:
-            return beam_pos+(stream_shift_amount*porm())
-        else:
-            return(beam_pos)
+      return(beam_pos+(stream_shift_amount*porm()))
     elif tracking_strategy=="directed_shift":
-        if beam_pos==stream_pos:
-            return(beam_pos)
-        else:
-            return(beam_pos+(beam_shift_amount*porm()))
+      if beam_pos==stream_pos:
+        return(beam_pos)
+      elif beam_pos>stream_pos:
+        return(beam_pos-beam_shift_amount)
+      else:
+        return(beam_pos+beam_shift_amount)
     else:
-            raise Exception('In TRACK: Invalid tracking strategy:', tracking_strategy)
+      raise Exception('In TRACK: Invalid tracking strategy:', tracking_strategy)
 
 show_width=40
 show_incr=2.0/show_width
