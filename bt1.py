@@ -21,18 +21,18 @@ misses=0
 # (based on acuity) will be reduced. Usually these will be the same.
 
 stream_shift_amount=0.01 # Minimal unit of stream shift
-p_stream_shift=0.95 # prob. of stream shift per cycle
+p_stream_shift=0.99 # prob. of stream shift per cycle
 
 # A crazy ivan is when the stream goes haywire; It should happen very rarely.
 
-p_crazy_ivan=0.001
+p_crazy_ivan=0.000
 crazy_ivan_shift_amount=0.2
 n_crazy_ivans = 0
 
 # And the beam, which is under the control of the operator (or
 # automation), which can be shifted in accord with these params:
 
-beam_shift_amount=0.025 # You may want to have more or less fine control of the beam vs. the stream's shiftiness
+beam_shift_amount=0.01 # You may want to have more or less fine control of the beam vs. the stream's shiftiness
 operator_response_delay=0 # cycles before the operator can respond to a stream shift
 
 max_cycles=10000 # If the beam doesn't hit a wall before this, we cut the run off here.
@@ -51,6 +51,8 @@ def run_stream(show_p=False, tracking_strategy="directed"):
     # Decide if the stream is going to shift:
     if random.random() < p_crazy_ivan:
         n_crazy_ivans = n_crazy_ivans +1
+        if show_p:
+          print(">>>>>>>> CRAZY IVAN <<<<<<<<")
         stream_pos=trunc2(stream_pos+(crazy_ivan_shift_amount*porm()))
         if allow_response_cycle==99999999999:
           allow_response_cycle=cycle+operator_response_delay
@@ -62,7 +64,7 @@ def run_stream(show_p=False, tracking_strategy="directed"):
         showpos(stream_pos,beam_pos,show_p)
     if cycle >= allow_response_cycle:
         beam_pos=trunc2(track(stream_pos,beam_pos,tracking_strategy))
-    if beam_pos == stream_pos:
+    if abs(beam_pos-stream_pos)<acuity: # ??? Should there be a separate acuity for this?
         allow_response_cycle=99999999999
     cycle=cycle+1
 
@@ -119,7 +121,7 @@ def showpos(stream_pos, beam_pos, show_p):
         sp = sp+show_incr
         # We have to go through the motions here in order to update the stats!
         if stream_shown_p and beam_shown_p: 
-            char = ">"
+            char = " "
         # This is a rather obscure way of simply asking if the beam is on the stream:
         elif (not stream_shown_p) and (not beam_shown_p) and (sp >= stream_pos) and (sp >= beam_pos):
             stream_shown_p=True
@@ -136,7 +138,7 @@ def showpos(stream_pos, beam_pos, show_p):
             misses=misses+1
             char="x"
         else:
-            char="<"
+            char=" "
         if show_p:
             print(f'{char}',end="")
         #sp=sp+show_incr
