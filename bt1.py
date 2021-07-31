@@ -16,24 +16,31 @@ misses=0
 # params. The stream_shift_time_slice is a bit obscure. The idea is
 # that.
 
-# Warning: The beam shift 
+# Warning: The stream shift amount should be an integer multiple of
+# the beam_shift_amount, otherwise the liklihood that they overlap
+# (based on acuity) will be reduced. Usually these will be the same.
 
-stream_shift_amount=0.1 # Minimal unit of stream shift
-p_stream_shift=0.25 # prob. of stream shift per cycle
+stream_shift_amount=0.01 # Minimal unit of stream shift
+p_stream_shift=0.95 # prob. of stream shift per cycle
+
+# A crazy ivan is when the stream goes haywire; It should happen very rarely.
 
 p_crazy_ivan=0.001
-crazy_ivan_shift_amount=0.25
+crazy_ivan_shift_amount=0.2
+n_crazy_ivans = 0
 
 # And the beam, which is under the control of the operator (or
 # automation), which can be shifted in accord with these params:
 
-beam_shift_amount=0.1 # You may want to have more or less fine control of the beam vs. the stream's shiftiness
+beam_shift_amount=0.025 # You may want to have more or less fine control of the beam vs. the stream's shiftiness
 operator_response_delay=0 # cycles before the operator can respond to a stream shift
 
 max_cycles=10000 # If the beam doesn't hit a wall before this, we cut the run off here.
 
+acuity=0.01 # The whole scale is -1...+1
+
 def run_stream(show_p=False, tracking_strategy="directed"):
-  global hits, misses, max_cycles, operator_response_delay
+  global hits, misses, max_cycles, operator_response_delay, n_crazy_ivans
   hits = 0
   misses = 0
   stream_pos = 0.0
@@ -42,7 +49,12 @@ def run_stream(show_p=False, tracking_strategy="directed"):
   cycle = 1
   while (cycle <= max_cycles) and (abs(stream_pos) < 1.0): # Stop if it hits the wall on either side
     # Decide if the stream is going to shift:
-    if random.random() < p_stream_shift:
+    if random.random() < p_crazy_ivan:
+        n_crazy_ivans = n_crazy_ivans +1
+        stream_pos=trunc2(stream_pos+(crazy_ivan_shift_amount*porm()))
+        if allow_response_cycle==99999999999:
+          allow_response_cycle=cycle+operator_response_delay
+    elif random.random() < p_stream_shift:
         stream_pos=trunc2(stream_pos+(stream_shift_amount*porm()))
         if allow_response_cycle==99999999999:
           allow_response_cycle=cycle+operator_response_delay
@@ -66,8 +78,6 @@ def trunc2(n):
   return(int(n*100.0)/100.0)
 
 # FFF This should use a model of visual UI-mediated visual acuity, rather than just exact operators.
-
-acuity=0.08 # The whole scale is -1...+1
 
 def track(stream_pos, beam_pos, tracking_strategy):
     if tracking_strategy=="static":
@@ -134,13 +144,14 @@ def showpos(stream_pos, beam_pos, show_p):
         print(f'] s:{stream_pos} b:{beam_pos}')
 
 def run(show_p, tracking_strategy):
-  global operator_response_delay, acuity
+  global operator_response_delay, acuity, n_crazy_ivans
   operator_response_delay=0 # !!! If you're testing the display code, you'll want to set this to 2 or greater !!!
-  n_ord_values_to_try=20
+  n_ord_values_to_try=40
   ord_delta=1
-  reps=10
+  reps=20
   print(f'Tracking strategy is {tracking_strategy}, Acuity = {acuity} stream_shift_amount= {stream_shift_amount}, p_stream_shift={p_stream_shift}, beam_shift_amount={beam_shift_amount}')
   for p in range(n_ord_values_to_try):
+    n_crazy_ivans = 0 # These are counted over all reps and then the mean is display at the end
     results = []
     for rep in range(reps):
       #print(f'operator_response_delay={operator_response_delay}')
@@ -149,7 +160,7 @@ def run(show_p, tracking_strategy):
       if show_p:
         print(f'============================================\nHits={hits}, Misses={misses}, Win fraction={frac}\n')
       results=results+[frac]
-    print(f'@ operator_response_delay={operator_response_delay} fraction mean = {numpy.mean(results)}, stderr = {sem(results)}')
+    print(f'@ operator_response_delay={operator_response_delay} fraction mean = {numpy.mean(results)}, stderr = {sem(results)}, mean n_crazy_ivans = {n_crazy_ivans/reps}')
     operator_response_delay=operator_response_delay+ord_delta
 
 run(False,"directed") # "static" "random" "directed"
