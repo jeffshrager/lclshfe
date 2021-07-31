@@ -16,13 +16,18 @@ misses=0
 # params. The stream_shift_time_slice is a bit obscure. The idea is
 # that.
 
+# Warning: The beam shift 
+
 stream_shift_amount=0.1 # Minimal unit of stream shift
 p_stream_shift=0.25 # prob. of stream shift per cycle
+
+p_crazy_ivan=0.001
+crazy_ivan_shift_amount=0.25
 
 # And the beam, which is under the control of the operator (or
 # automation), which can be shifted in accord with these params:
 
-beam_shift_amount=0.11 # You may want to have more or less fine control of the beam vs. the stream's shiftiness
+beam_shift_amount=0.1 # You may want to have more or less fine control of the beam vs. the stream's shiftiness
 operator_response_delay=0 # cycles before the operator can respond to a stream shift
 
 max_cycles=10000 # If the beam doesn't hit a wall before this, we cut the run off here.
@@ -104,7 +109,7 @@ def showpos(stream_pos, beam_pos, show_p):
         sp = sp+show_incr
         # We have to go through the motions here in order to update the stats!
         if stream_shown_p and beam_shown_p: 
-            char = " "
+            char = ">"
         # This is a rather obscure way of simply asking if the beam is on the stream:
         elif (not stream_shown_p) and (not beam_shown_p) and (sp >= stream_pos) and (sp >= beam_pos):
             stream_shown_p=True
@@ -121,10 +126,10 @@ def showpos(stream_pos, beam_pos, show_p):
             misses=misses+1
             char="x"
         else:
-            char=" "
+            char="<"
         if show_p:
             print(f'{char}',end="")
-        sp=sp+show_incr
+        #sp=sp+show_incr
     if show_p:
         print(f'] s:{stream_pos} b:{beam_pos}')
 
@@ -133,7 +138,7 @@ def run(show_p, tracking_strategy):
   operator_response_delay=0 # !!! If you're testing the display code, you'll want to set this to 2 or greater !!!
   n_ord_values_to_try=20
   ord_delta=1
-  reps=100
+  reps=10
   print(f'Tracking strategy is {tracking_strategy}, Acuity = {acuity} stream_shift_amount= {stream_shift_amount}, p_stream_shift={p_stream_shift}, beam_shift_amount={beam_shift_amount}')
   for p in range(n_ord_values_to_try):
     results = []
@@ -147,6 +152,6 @@ def run(show_p, tracking_strategy):
     print(f'@ operator_response_delay={operator_response_delay} fraction mean = {numpy.mean(results)}, stderr = {sem(results)}')
     operator_response_delay=operator_response_delay+ord_delta
 
-run(True,"directed") # "static" "random" "directed"
+run(False,"directed") # "static" "random" "directed"
 #run(False,"static") # "static" "random" "directed"
 #run(False,"random") # "static" "random" "directed"
