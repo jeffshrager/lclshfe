@@ -22,12 +22,12 @@ default_reps = 20
 # (based on acuity) will be reduced. Usually these will be the same.
 
 stream_shift_amount=0.01 # Minimal unit of stream shift
-p_stream_shift=0.99 # prob. of stream shift per cycle
+p_stream_shift=0.1 # prob. of stream shift per cycle
 
 # A crazy ivan is when the stream goes haywire; It should happen very rarely.
 
-p_crazy_ivan=0.0001 # About 0.0001 gives you one/10k
-crazy_ivan_shift_amount=0.25
+p_crazy_ivan=0.0000 # About 0.0001 gives you one/10k
+crazy_ivan_shift_amount=0.2
 n_crazy_ivans = 0
 
 # And the beam, which is under the control of the operator (or
@@ -42,7 +42,7 @@ default_max_cycles=10000 # If the beam doesn't hit a wall before this, we cut th
 # Whether the beam is physically on target, and whether the operator
 # can SEE that it is! Nb. Whole scale is -1...+1
 
-functional_acuity=0.01 
+functional_acuity=0.01
 physical_acuity=0.01
 
 def run_stream(show_p=False):
@@ -178,4 +178,3 @@ def run(show_p,initial_ord=0):
 # If display is true, we only do one rep and only allow it to run 1000 cycles
 # For testing with display code, you'll want to set this inital_ord to 2 or greater
 run(False, initial_ord=0) 
-
