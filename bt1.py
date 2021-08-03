@@ -25,7 +25,7 @@ p_stream_shift=0.99 # prob. of stream shift per cycle
 
 # A crazy ivan is when the stream goes haywire; It should happen very rarely.
 
-p_crazy_ivan=0.000
+p_crazy_ivan=0.001
 crazy_ivan_shift_amount=0.2
 n_crazy_ivans = 0
 
@@ -141,7 +141,6 @@ def showpos(stream_pos, beam_pos, show_p):
             char=" "
         if show_p:
             print(f'{char}',end="")
-        #sp=sp+show_incr
     if show_p:
         print(f'] s:{stream_pos} b:{beam_pos}')
 
@@ -160,11 +159,9 @@ def run(show_p, tracking_strategy):
       run_stream(show_p, tracking_strategy)
       frac = hits/(hits+misses)
       if show_p:
-        print(f'============================================\nHits={hits}, Misses={misses}, Win fraction={frac}\n')
+        print(f"============================================\nHits={hits}, Misses={misses}, Win fraction={frac}\n")
       results=results+[frac]
-    print(f'@ operator_response_delay={operator_response_delay} fraction mean = {numpy.mean(results)}, stderr = {sem(results)}, mean n_crazy_ivans = {n_crazy_ivans/reps}')
+    print(f"@ operator_response_delay={operator_response_delay} fraction mean = {format(numpy.mean(results),'.2f')}, stderr = {format(sem(results),'.2f')}, mean n_crazy_ivans = {n_crazy_ivans/reps}")
     operator_response_delay=operator_response_delay+ord_delta
 
-run(False,"directed") # "static" "random" "directed"
-#run(False,"static") # "static" "random" "directed"
-#run(False,"random") # "static" "random" "directed"
+run(False,"directed")
