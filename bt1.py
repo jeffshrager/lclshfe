@@ -38,10 +38,15 @@ operator_response_delay=0 # cycles before the operator can respond to a stream s
 
 default_max_cycles=10000 # If the beam doesn't hit a wall before this, we cut the run off here.
 
-acuity=0.01 # The whole scale is -1...+1
+# There are two different and wholly separate senses of acutity:
+# Whether the beam is physically on target, and whether the operator
+# can SEE that it is! Nb. Whole scale is -1...+1
+
+functional_acuity=0.01 
+physical_acuity=0.01
 
 def run_stream(show_p=False):
-  global hits, misses, default_max_cycles, operator_response_delay, n_crazy_ivans
+  global hits, misses, default_max_cycles, operator_response_delay, n_crazy_ivans, functional_acuity
   hits = 0
   misses = 0
   stream_pos = 0.0
@@ -65,13 +70,22 @@ def run_stream(show_p=False):
         stream_pos=trunc2(stream_pos+(stream_shift_amount*porm()))
         if allow_response_cycle==99999999999:
           allow_response_cycle=cycle+operator_response_delay
+    update_stats(stream_pos,beam_pos)
     if show_p:
         showpos(stream_pos,beam_pos,show_p,cycle)
     if cycle >= allow_response_cycle:
         beam_pos=trunc2(track(stream_pos,beam_pos))
-    if abs(beam_pos-stream_pos)<acuity: # ??? Should there be a separate acuity for this?
+    if abs(beam_pos-stream_pos)<functional_acuity: 
         allow_response_cycle=99999999999
     cycle=cycle+1
+
+def update_stats(stream_pos, beam_pos):
+  global physical_acuity, hits, misses
+  delta = abs(beam_pos-stream_pos)
+  if delta<physical_acuity:
+    hits=hits+1
+  else:
+    misses=misses+1
 
 # (This is ultra-ugly! There must be a better idiom for this!)
 def porm():
@@ -87,8 +101,9 @@ def trunc2(n):
 # FFF This should use a model of visual UI-mediated visual acuity, rather than just exact operators.
 
 def track(stream_pos, beam_pos):
+  global functional_acuity
   delta = abs(beam_pos-stream_pos)
-  if delta<acuity:
+  if delta<functional_acuity:
     return(beam_pos)
   # ??? Since the acuity relates to the equality, I don't think we
   # need it in the > and < tests -- they are protected by the ==
@@ -108,7 +123,7 @@ show_width=40
 show_incr=2.0/show_width
 
 def showpos(stream_pos, beam_pos, show_p, cycle):
-    global hits,misses,show_width, show_incr
+    global show_width, show_incr
     if show_p:
         print(f'{cycle}:[',end="")
     beam_shown_p = False
@@ -117,23 +132,18 @@ def showpos(stream_pos, beam_pos, show_p, cycle):
     for i in range(show_width):
         miss = False
         sp = sp+show_incr
-        # We have to go through the motions here in order to update the stats!
         if stream_shown_p and beam_shown_p: 
             char = " "
         # This is a rather obscure way of simply asking if the beam is on the stream:
         elif (not stream_shown_p) and (not beam_shown_p) and (sp >= stream_pos) and (sp >= beam_pos):
             stream_shown_p=True
             beam_shown_p=True
-            hits=hits+1
-            hit=True
             char="*"
         elif (not stream_shown_p) and (sp >= stream_pos):
             stream_shown_p=True
-            misses=misses+1
             char="|"
         elif (not beam_shown_p) and (sp >= beam_pos):
             beam_shown_p=True
-            misses=misses+1
             char="x"
         else:
             char=" "
@@ -143,7 +153,7 @@ def showpos(stream_pos, beam_pos, show_p, cycle):
         print(f'] s:{stream_pos} b:{beam_pos}')
 
 def run(show_p,initial_ord=0):
-  global operator_response_delay, acuity, n_crazy_ivans, default_reps
+  global operator_response_delay, functional_acuity, n_crazy_ivans, default_reps, hits, misses
   operator_response_delay=initial_ord
   n_ord_values_to_try=40
   ord_delta=1
@@ -151,7 +161,7 @@ def run(show_p,initial_ord=0):
     reps = 1
   else:
     reps=default_reps
-  print(f"Acuity = {acuity} stream_shift_amount= {stream_shift_amount}, p_stream_shift={p_stream_shift}, beam_shift_amount={beam_shift_amount}, p_crazy_ivan={p_crazy_ivan}")
+  print(f"Functional Acuity = {functional_acuity} stream_shift_amount= {stream_shift_amount}, p_stream_shift={p_stream_shift}, beam_shift_amount={beam_shift_amount}, p_crazy_ivan={p_crazy_ivan}")
   for p in range(n_ord_values_to_try):
     n_crazy_ivans = 0 # These are counted over all reps and then the mean is display at the end
     results = []
@@ -167,5 +177,5 @@ def run(show_p,initial_ord=0):
 
 # If display is true, we only do one rep and only allow it to run 1000 cycles
 # For testing with display code, you'll want to set this inital_ord to 2 or greater
-run(True, initial_ord=2) 
+run(False, initial_ord=0) 
 
