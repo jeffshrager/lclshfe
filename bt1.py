@@ -11,6 +11,7 @@ random.seed(datetime.now())
 
 hits=0
 misses=0
+default_reps = 20
 
 # We have a stream (aka. jet) which shifts around in accord with these
 # params. The stream_shift_time_slice is a bit obscure. The idea is
@@ -25,8 +26,8 @@ p_stream_shift=0.99 # prob. of stream shift per cycle
 
 # A crazy ivan is when the stream goes haywire; It should happen very rarely.
 
-p_crazy_ivan=0.001
-crazy_ivan_shift_amount=0.2
+p_crazy_ivan=0.0001 # About 0.0001 gives you one/10k
+crazy_ivan_shift_amount=0.25
 n_crazy_ivans = 0
 
 # And the beam, which is under the control of the operator (or
@@ -35,18 +36,22 @@ n_crazy_ivans = 0
 beam_shift_amount=0.01 # You may want to have more or less fine control of the beam vs. the stream's shiftiness
 operator_response_delay=0 # cycles before the operator can respond to a stream shift
 
-max_cycles=10000 # If the beam doesn't hit a wall before this, we cut the run off here.
+default_max_cycles=10000 # If the beam doesn't hit a wall before this, we cut the run off here.
 
 acuity=0.01 # The whole scale is -1...+1
 
-def run_stream(show_p=False, tracking_strategy="directed"):
-  global hits, misses, max_cycles, operator_response_delay, n_crazy_ivans
+def run_stream(show_p=False):
+  global hits, misses, default_max_cycles, operator_response_delay, n_crazy_ivans
   hits = 0
   misses = 0
   stream_pos = 0.0
   beam_pos = 0.0
   allow_response_cycle = 99999999999
   cycle = 1
+  if show_p:
+    max_cycles=1000
+  else:
+    max_cycles=default_max_cycles
   while (cycle <= max_cycles) and (abs(stream_pos) < 1.0): # Stop if it hits the wall on either side
     # Decide if the stream is going to shift:
     if random.random() < p_crazy_ivan:
@@ -60,10 +65,10 @@ def run_stream(show_p=False, tracking_strategy="directed"):
         stream_pos=trunc2(stream_pos+(stream_shift_amount*porm()))
         if allow_response_cycle==99999999999:
           allow_response_cycle=cycle+operator_response_delay
-    else:
-        showpos(stream_pos,beam_pos,show_p)
+    if show_p:
+        showpos(stream_pos,beam_pos,show_p,cycle)
     if cycle >= allow_response_cycle:
-        beam_pos=trunc2(track(stream_pos,beam_pos,tracking_strategy))
+        beam_pos=trunc2(track(stream_pos,beam_pos))
     if abs(beam_pos-stream_pos)<acuity: # ??? Should there be a separate acuity for this?
         allow_response_cycle=99999999999
     cycle=cycle+1
@@ -81,24 +86,17 @@ def trunc2(n):
 
 # FFF This should use a model of visual UI-mediated visual acuity, rather than just exact operators.
 
-def track(stream_pos, beam_pos, tracking_strategy):
-    if tracking_strategy=="static":
-      return(beam_pos)
-    elif tracking_strategy=="random":
-      return(beam_pos+(stream_shift_amount*porm()))
-    elif tracking_strategy=="directed":
-      delta = abs(beam_pos-stream_pos)
-      if delta<acuity:
-        return(beam_pos)
-      # ??? Since the acuity relates to the equality, I don't think we
-      # need it in the > and < tests -- they are protected by the ==
-      # test ???
-      elif beam_pos>stream_pos:
-        return(beam_pos-beam_shift_amount)
-      else:
-        return(beam_pos+beam_shift_amount)
-    else:
-      raise Exception('In TRACK: Invalid tracking strategy:', tracking_strategy)
+def track(stream_pos, beam_pos):
+  delta = abs(beam_pos-stream_pos)
+  if delta<acuity:
+    return(beam_pos)
+  # ??? Since the acuity relates to the equality, I don't think we
+  # need it in the > and < tests -- they are protected by the ==
+  # test ???
+  elif beam_pos>stream_pos:
+    return(beam_pos-beam_shift_amount)
+  else:
+    return(beam_pos+beam_shift_amount)
 
 # The display and hit-counting logic are intertwined. Maybe they
 # shouldn't be. Pretty straight-forward refactoring would pull them
@@ -109,10 +107,10 @@ def track(stream_pos, beam_pos, tracking_strategy):
 show_width=40
 show_incr=2.0/show_width
 
-def showpos(stream_pos, beam_pos, show_p):
-    global hits,misses, show_width, show_incr
+def showpos(stream_pos, beam_pos, show_p, cycle):
+    global hits,misses,show_width, show_incr
     if show_p:
-        print('[',end="")
+        print(f'{cycle}:[',end="")
     beam_shown_p = False
     stream_shown_p = False
     sp = -1.0
@@ -144,24 +142,30 @@ def showpos(stream_pos, beam_pos, show_p):
     if show_p:
         print(f'] s:{stream_pos} b:{beam_pos}')
 
-def run(show_p, tracking_strategy):
-  global operator_response_delay, acuity, n_crazy_ivans
-  operator_response_delay=0 # !!! If you're testing the display code, you'll want to set this to 2 or greater !!!
+def run(show_p,initial_ord=0):
+  global operator_response_delay, acuity, n_crazy_ivans, default_reps
+  operator_response_delay=initial_ord
   n_ord_values_to_try=40
   ord_delta=1
-  reps=20
-  print(f'Tracking strategy is {tracking_strategy}, Acuity = {acuity} stream_shift_amount= {stream_shift_amount}, p_stream_shift={p_stream_shift}, beam_shift_amount={beam_shift_amount}')
+  if show_p:
+    reps = 1
+  else:
+    reps=default_reps
+  print(f"Acuity = {acuity} stream_shift_amount= {stream_shift_amount}, p_stream_shift={p_stream_shift}, beam_shift_amount={beam_shift_amount}, p_crazy_ivan={p_crazy_ivan}")
   for p in range(n_ord_values_to_try):
     n_crazy_ivans = 0 # These are counted over all reps and then the mean is display at the end
     results = []
     for rep in range(reps):
       #print(f'operator_response_delay={operator_response_delay}')
-      run_stream(show_p, tracking_strategy)
+      run_stream(show_p)
       frac = hits/(hits+misses)
       if show_p:
         print(f"============================================\nHits={hits}, Misses={misses}, Win fraction={frac}\n")
       results=results+[frac]
-    print(f"@ operator_response_delay={operator_response_delay} fraction mean = {format(numpy.mean(results),'.2f')}, stderr = {format(sem(results),'.2f')}, mean n_crazy_ivans = {n_crazy_ivans/reps}")
+    print(f"@ ord={operator_response_delay} mean hit fraction = {format(numpy.mean(results),'.2f')} [se={format(sem(results),'.2f')}], crazy_ivans/reps = {n_crazy_ivans/reps}")
     operator_response_delay=operator_response_delay+ord_delta
 
-run(False,"directed")
+# If display is true, we only do one rep and only allow it to run 1000 cycles
+# For testing with display code, you'll want to set this inital_ord to 2 or greater
+run(True, initial_ord=2) 
+
