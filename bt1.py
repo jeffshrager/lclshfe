@@ -5,8 +5,8 @@
 from scipy.stats import sem
 import numpy
 import random
-
-from datetime import datetime
+import time
+from datetime import datetime, date
 random.seed(datetime.now())
 
 hits=0
@@ -153,6 +153,8 @@ def showpos(stream_pos, beam_pos, show_p, cycle):
         print(f'] s:{stream_pos} b:{beam_pos}')
 
 def run(show_p,initial_ord=0):
+  f = open("results/r"+str(time.time())+".tsv", "w")
+  f.write("operator_response_delay\tmean\tsem\tn_crazy_ivans\n")
   global operator_response_delay, functional_acuity, n_crazy_ivans, default_reps, hits, misses
   operator_response_delay=initial_ord
   n_ord_values_to_try=40
@@ -162,18 +164,20 @@ def run(show_p,initial_ord=0):
   else:
     reps=default_reps
   print(f"Functional Acuity = {functional_acuity} stream_shift_amount= {stream_shift_amount}, p_stream_shift={p_stream_shift}, beam_shift_amount={beam_shift_amount}, p_crazy_ivan={p_crazy_ivan}")
+  f.write(f"Functional Acuity = {functional_acuity} stream_shift_amount= {stream_shift_amount}, p_stream_shift={p_stream_shift}, beam_shift_amount={beam_shift_amount}, p_crazy_ivan={p_crazy_ivan}")
   for p in range(n_ord_values_to_try):
     n_crazy_ivans = 0 # These are counted over all reps and then the mean is display at the end
     results = []
     for rep in range(reps):
-      #print(f'operator_response_delay={operator_response_delay}')
       run_stream(show_p)
       frac = hits/(hits+misses)
       if show_p:
         print(f"============================================\nHits={hits}, Misses={misses}, Win fraction={frac}\n")
       results=results+[frac]
-    print(f"@ ord={operator_response_delay} mean hit fraction = {format(numpy.mean(results),'.2f')} [se={format(sem(results),'.2f')}], crazy_ivans/reps = {n_crazy_ivans/reps}")
     operator_response_delay=operator_response_delay+ord_delta
+    print(f"@ ord={operator_response_delay} mean hit fraction = {format(numpy.mean(results),'.2f')} [se={format(sem(results),'.2f')}], crazy_ivans/reps = {n_crazy_ivans/reps}")
+    f.write(f"{operator_response_delay}\t{format(numpy.mean(results),'.2f')}\t{format(sem(results),'.2f')}\t{n_crazy_ivans/reps}\n")
+  f.close()
 
 # If display is true, we only do one rep and only allow it to run 1000 cycles
 # For testing with display code, you'll want to set this inital_ord to 2 or greater
