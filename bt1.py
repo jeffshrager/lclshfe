@@ -164,7 +164,7 @@ def run(show_p,initial_ord=0):
   else:
     reps=default_reps
   print(f"Functional Acuity = {functional_acuity} stream_shift_amount= {stream_shift_amount}, p_stream_shift={p_stream_shift}, beam_shift_amount={beam_shift_amount}, p_crazy_ivan={p_crazy_ivan}")
-  f.write(f"Functional Acuity = {functional_acuity} stream_shift_amount= {stream_shift_amount}, p_stream_shift={p_stream_shift}, beam_shift_amount={beam_shift_amount}, p_crazy_ivan={p_crazy_ivan}")
+  f.write(f"Functional Acuity = {functional_acuity} stream_shift_amount= {stream_shift_amount}, p_stream_shift={p_stream_shift}, beam_shift_amount={beam_shift_amount}, p_crazy_ivan={p_crazy_ivan}\n")
   for p in range(n_ord_values_to_try):
     n_crazy_ivans = 0 # These are counted over all reps and then the mean is display at the end
     results = []
