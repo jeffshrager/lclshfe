@@ -78,7 +78,6 @@ def run_stream(show_p=False):
     if abs(beam_pos-stream_pos)<functional_acuity: 
         allow_response_cycle=99999999999
     cycle=cycle+1
-
 def update_stats(stream_pos, beam_pos):
   global physical_acuity, hits, misses
   delta = abs(beam_pos-stream_pos)
@@ -154,7 +153,6 @@ def showpos(stream_pos, beam_pos, show_p, cycle):
 
 def run(show_p,initial_ord=0):
   f = open("results/r"+str(time.time())+".tsv", "w")
-  f.write("operator_response_delay\tmean\tsem\tn_crazy_ivans\n")
   global operator_response_delay, functional_acuity, n_crazy_ivans, default_reps, hits, misses
   operator_response_delay=initial_ord
   n_ord_values_to_try=40
@@ -163,8 +161,9 @@ def run(show_p,initial_ord=0):
     reps = 1
   else:
     reps=default_reps
-  print(f"Functional Acuity = {functional_acuity} stream_shift_amount= {stream_shift_amount}, p_stream_shift={p_stream_shift}, beam_shift_amount={beam_shift_amount}, p_crazy_ivan={p_crazy_ivan}")
   f.write(f"Functional Acuity = {functional_acuity} stream_shift_amount= {stream_shift_amount}, p_stream_shift={p_stream_shift}, beam_shift_amount={beam_shift_amount}, p_crazy_ivan={p_crazy_ivan}\n")
+  print(f"Functional Acuity = {functional_acuity} stream_shift_amount= {stream_shift_amount}, p_stream_shift={p_stream_shift}, beam_shift_amount={beam_shift_amount}, p_crazy_ivan={p_crazy_ivan}")
+  f.write("operator_response_delay\tmean\tsem\tn_crazy_ivans\n")
   for p in range(n_ord_values_to_try):
     n_crazy_ivans = 0 # These are counted over all reps and then the mean is display at the end
     results = []
