@@ -22,13 +22,13 @@ default_reps = 20
 # (based on acuity) will be reduced. Usually these will be the same.
 
 stream_shift_amount=0.01 # Minimal unit of stream shift
-p_stream_shift=0.1 # prob. of stream shift per cycle
+p_stream_shift=0.15 # prob. of stream shift per cycle
 
 # A crazy ivan is when the stream goes haywire; It should happen very rarely.
 
-p_crazy_ivan=0.0000 # About 0.0001 gives you one/10k
+p_crazy_ivan=0.001 # About 0.0001 gives you one/10k
 crazy_ivan_shift_amount=0.2
-n_crazy_ivans = 0
+n_crazy_ivans = 0 # !!!! YOU DON'T MEAN TO BE CHANGING THIS! IT'S THE P_ ABOVE!!!!
 
 # And the beam, which is under the control of the operator (or
 # automation), which can be shifted in accord with these params:
@@ -45,8 +45,12 @@ default_max_cycles=10000 # If the beam doesn't hit a wall before this, we cut th
 functional_acuity=0.01
 physical_acuity=0.01
 
+# Some debugging stuff
+
+msg = ""
+
 def run_stream(show_p=False):
-  global hits, misses, default_max_cycles, operator_response_delay, n_crazy_ivans, functional_acuity
+  global hits, misses, default_max_cycles, operator_response_delay, n_crazy_ivans, functional_acuity, msg
   hits = 0
   misses = 0
   stream_pos = 0.0
@@ -58,11 +62,11 @@ def run_stream(show_p=False):
   else:
     max_cycles=default_max_cycles
   while (cycle <= max_cycles) and (abs(stream_pos) < 1.0): # Stop if it hits the wall on either side
+    msg = ""
     # Decide if the stream is going to shift:
     if random.random() < p_crazy_ivan:
         n_crazy_ivans = n_crazy_ivans +1
-        if show_p:
-          print(">>>>>>>> CRAZY IVAN <<<<<<<<")
+        msg=msg+" *CI* "
         stream_pos=trunc2(stream_pos+(crazy_ivan_shift_amount*porm()))
         if allow_response_cycle==99999999999:
           allow_response_cycle=cycle+operator_response_delay
@@ -78,6 +82,7 @@ def run_stream(show_p=False):
     if abs(beam_pos-stream_pos)<functional_acuity: 
         allow_response_cycle=99999999999
     cycle=cycle+1
+
 def update_stats(stream_pos, beam_pos):
   global physical_acuity, hits, misses
   delta = abs(beam_pos-stream_pos)
@@ -100,9 +105,10 @@ def trunc2(n):
 # FFF This should use a model of visual UI-mediated visual acuity, rather than just exact operators.
 
 def track(stream_pos, beam_pos):
-  global functional_acuity
+  global functional_acuity, msg
   delta = abs(beam_pos-stream_pos)
   if delta<functional_acuity:
+    msg=msg+" NoTrack(FA) "
     return(beam_pos)
   # ??? Since the acuity relates to the equality, I don't think we
   # need it in the > and < tests -- they are protected by the ==
@@ -149,7 +155,7 @@ def showpos(stream_pos, beam_pos, show_p, cycle):
         if show_p:
             print(f'{char}',end="")
     if show_p:
-        print(f'] s:{stream_pos} b:{beam_pos}')
+        print(f'] s:{stream_pos} b:{beam_pos} {msg}')
 
 def run(show_p,initial_ord=0):
   f = open("results/r"+str(time.time())+".tsv", "w")
@@ -180,4 +186,4 @@ def run(show_p,initial_ord=0):
 
 # If display is true, we only do one rep and only allow it to run 1000 cycles
 # For testing with display code, you'll want to set this inital_ord to 2 or greater
-run(False, initial_ord=0) 
+run(True, initial_ord=2) 
