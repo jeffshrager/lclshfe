@@ -43,14 +43,15 @@ default_max_cycles=10000 # If the beam doesn't hit a wall before this, we cut th
 # can SEE that it is! Nb. Whole scale is -1...+1
 
 functional_acuity=0.01
-physical_acuity=0.01
+physical_acuity=0.02 # You want this a little larger than the shift so that it allows for near misses
 
 # Some debugging stuff
 
-msg = ""
+global msg
+msg=""
 
 def run_stream(show_p=False):
-  global hits, misses, default_max_cycles, operator_response_delay, n_crazy_ivans, functional_acuity, msg
+  global hits, misses, default_max_cycles, operator_response_delay, n_crazy_ivans, functional_acuity
   hits = 0
   misses = 0
   stream_pos = 0.0
@@ -61,24 +62,29 @@ def run_stream(show_p=False):
     max_cycles=1000
   else:
     max_cycles=default_max_cycles
+  msg=""
   while (cycle <= max_cycles) and (abs(stream_pos) < 1.0): # Stop if it hits the wall on either side
-    msg = ""
     # Decide if the stream is going to shift:
     if random.random() < p_crazy_ivan:
         n_crazy_ivans = n_crazy_ivans +1
-        msg=msg+" *CI* "
-        stream_pos=trunc2(stream_pos+(crazy_ivan_shift_amount*porm()))
+        msg=msg+"!!!"
+        stream_pos=round(stream_pos+(crazy_ivan_shift_amount*porm()),4) 
         if allow_response_cycle==99999999999:
           allow_response_cycle=cycle+operator_response_delay
     elif random.random() < p_stream_shift:
-        stream_pos=trunc2(stream_pos+(stream_shift_amount*porm()))
+        stream_pos=round(stream_pos+(stream_shift_amount*porm()),4)
         if allow_response_cycle==99999999999:
           allow_response_cycle=cycle+operator_response_delay
     update_stats(stream_pos,beam_pos)
     if show_p:
         showpos(stream_pos,beam_pos,show_p,cycle)
     if cycle >= allow_response_cycle:
-        beam_pos=trunc2(track(stream_pos,beam_pos))
+        msg=msg+"<?>"
+        # Warning! WWW This used to truncate, but that interacts badly
+        # with computer math bcs occassionally you'll end up with
+        # 0.6999999 which truncation makes 0.6 instead of 0.7, and it
+        # loops out.
+        beam_pos=round(track(stream_pos,beam_pos),4)
     if abs(beam_pos-stream_pos)<functional_acuity: 
         allow_response_cycle=99999999999
     cycle=cycle+1
@@ -108,14 +114,18 @@ def track(stream_pos, beam_pos):
   global functional_acuity, msg
   delta = abs(beam_pos-stream_pos)
   if delta<functional_acuity:
-    msg=msg+" NoTrack(FA) "
+    msg=msg+"(FA)"
     return(beam_pos)
   # ??? Since the acuity relates to the equality, I don't think we
   # need it in the > and < tests -- they are protected by the ==
   # test ???
   elif beam_pos>stream_pos:
+    #print("<<"+str(beam_pos-beam_shift_amount))
+    msg=msg+"<<"
     return(beam_pos-beam_shift_amount)
   else:
+    #print(">>"+str(beam_pos+beam_shift_amount))
+    msg=msg+">>"
     return(beam_pos+beam_shift_amount)
 
 # The display and hit-counting logic are intertwined. Maybe they
@@ -128,9 +138,9 @@ show_width=40
 show_incr=2.0/show_width
 
 def showpos(stream_pos, beam_pos, show_p, cycle):
-    global show_width, show_incr
+    global show_width, show_incr, msg
     if show_p:
-        print(f'{cycle}:[',end="")
+        print(f'{cycle: >6}:[',end="")
     beam_shown_p = False
     stream_shown_p = False
     sp = -1.0
@@ -156,6 +166,7 @@ def showpos(stream_pos, beam_pos, show_p, cycle):
             print(f'{char}',end="")
     if show_p:
         print(f'] s:{stream_pos} b:{beam_pos} {msg}')
+        msg=""
 
 def run(show_p,initial_ord=0):
   f = open("results/r"+str(time.time())+".tsv", "w")
@@ -186,4 +197,15 @@ def run(show_p,initial_ord=0):
 
 # If display is true, we only do one rep and only allow it to run 1000 cycles
 # For testing with display code, you'll want to set this inital_ord to 2 or greater
+p_crazy_ivan=0.01
 run(True, initial_ord=2) 
+
+# p_crazy_ivan=0.000
+# physical_acuity=0.02
+# functional_acuity=0.01
+# run(False, initial_ord=2) 
+# functional_acuity=0.02
+# run(False, initial_ord=2) 
+# functional_acuity=0.03
+# run(False, initial_ord=2) 
+
