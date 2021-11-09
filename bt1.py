@@ -50,7 +50,7 @@ physical_acuity=0.02 # You want this a little larger than the shift so that it a
 global msg
 msg=""
 
-def run_stream(show_p=False):
+def run_stream(show_f=False):
   global hits, misses, default_max_cycles, operator_response_delay, n_crazy_ivans, functional_acuity
   hits = 0
   misses = 0
@@ -58,7 +58,7 @@ def run_stream(show_p=False):
   beam_pos = 0.0
   allow_response_cycle = 99999999999
   cycle = 1
-  if show_p:
+  if show_f:
     max_cycles=1000
   else:
     max_cycles=default_max_cycles
@@ -76,8 +76,8 @@ def run_stream(show_p=False):
         if allow_response_cycle==99999999999:
           allow_response_cycle=cycle+operator_response_delay
     update_stats(stream_pos,beam_pos)
-    if show_p:
-        showpos(stream_pos,beam_pos,show_p,cycle)
+    if show_f:
+        showpos(stream_pos,beam_pos,show_f,cycle)
     if cycle >= allow_response_cycle:
         msg=msg+"<?>"
         # Warning! WWW This used to truncate, but that interacts badly
@@ -137,44 +137,44 @@ def track(stream_pos, beam_pos):
 show_width=40
 show_incr=2.0/show_width
 
-def showpos(stream_pos, beam_pos, show_p, cycle):
+def showpos(stream_pos, beam_pos, show_f, cycle):
     global show_width, show_incr, msg
-    if show_p:
+    if show_f:
         print(f'{cycle: >6}:[',end="")
-    beam_shown_p = False
-    stream_shown_p = False
+    beam_shown_f = False
+    stream_shown_f = False
     sp = -1.0
     for i in range(show_width):
         miss = False
         sp = sp+show_incr
-        if stream_shown_p and beam_shown_p: 
+        if stream_shown_f and beam_shown_f: 
             char = " "
         # This is a rather obscure way of simply asking if the beam is on the stream:
-        elif (not stream_shown_p) and (not beam_shown_p) and (sp >= stream_pos) and (sp >= beam_pos):
-            stream_shown_p=True
-            beam_shown_p=True
+        elif (not stream_shown_f) and (not beam_shown_f) and (sp >= stream_pos) and (sp >= beam_pos):
+            stream_shown_f=True
+            beam_shown_f=True
             char="*"
-        elif (not stream_shown_p) and (sp >= stream_pos):
-            stream_shown_p=True
+        elif (not stream_shown_f) and (sp >= stream_pos):
+            stream_shown_f=True
             char="|"
-        elif (not beam_shown_p) and (sp >= beam_pos):
-            beam_shown_p=True
+        elif (not beam_shown_f) and (sp >= beam_pos):
+            beam_shown_f=True
             char="x"
         else:
             char=" "
-        if show_p:
+        if show_f:
             print(f'{char}',end="")
-    if show_p:
+    if show_f:
         print(f'] s:{stream_pos} b:{beam_pos} {msg}')
         msg=""
 
-def run(show_p,initial_ord=0):
+def run(show_f,initial_ord=0): # _f is a flag
   f = open("results/r"+str(time.time())+".tsv", "w")
   global operator_response_delay, functional_acuity, n_crazy_ivans, default_reps, hits, misses
   operator_response_delay=initial_ord
   n_ord_values_to_try=40
   ord_delta=1
-  if show_p:
+  if show_f:
     reps = 1
   else:
     reps=default_reps
@@ -185,9 +185,9 @@ def run(show_p,initial_ord=0):
     n_crazy_ivans = 0 # These are counted over all reps and then the mean is display at the end
     results = []
     for rep in range(reps):
-      run_stream(show_p)
+      run_stream(show_f)
       frac = hits/(hits+misses)
-      if show_p:
+      if show_f:
         print(f"============================================\nHits={hits}, Misses={misses}, Win fraction={frac}\n")
       results=results+[frac]
     operator_response_delay=operator_response_delay+ord_delta
@@ -197,8 +197,9 @@ def run(show_p,initial_ord=0):
 
 # If display is true, we only do one rep and only allow it to run 1000 cycles
 # For testing with display code, you'll want to set this inital_ord to 2 or greater
+
 p_crazy_ivan=0.01
-run(True, initial_ord=2) 
+run(False,initial_ord=2) 
 
 # p_crazy_ivan=0.000
 # physical_acuity=0.02
