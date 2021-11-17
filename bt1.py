@@ -69,22 +69,22 @@ physical_acuity=0.02 # You want this a little larger than the shift so that it a
 
 def run_stream(show_f=False):
   global hits, misses, default_max_cycles, n_crazy_ivans, functional_acuity
-  hits = 0
-  misses = 0
-  stream_pos = 0.0
-  beam_pos = 0.0
-  allow_response_cycle = 99999999999
+  hits = 0  #Status
+  misses = 0  #Status
+  stream_pos = 0.0 
+  beam_pos = 0.0 
+  allow_response_cycle = 99999999999 
   cycle = 1
   if show_f:
     max_cycles=1000
   else:
-    max_cycles=default_max_cycles
+    max_cycles=default_max_cycles  #Task
   msg=""
   while (cycle <= max_cycles) and (abs(stream_pos) < 1.0): # Stop if it hits the wall on either side
     # Decide if the stream is going to shift:
-    if random.random() < p_crazy_ivan:
-        n_crazy_ivans = n_crazy_ivans +1
-        msg=msg+"!!!"
+    if random.random() < p_crazy_ivan:  #Stream
+        n_crazy_ivans = n_crazy_ivans +1  #Stream
+        msg=msg+"!!!"  #Status
         stream_pos=round(stream_pos+(crazy_ivan_shift_amount*porm()),4) 
         if allow_response_cycle==99999999999:
           allow_response_cycle=cycle+operator_response_delay(stream_pos,beam_pos)
