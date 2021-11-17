@@ -8,58 +8,64 @@ import time
 from datetime import datetime, date
 random.seed(datetime.now())
 
-hits=0
-misses=0
-default_reps = 20
 
-# We have a stream (aka. jet) which shifts around in accord with these
-# params. The stream_shift_time_slice is a bit obscure. The idea is
-# that.
+class Status:
+  hits=0
+  misses=0
+  msg=""
+  
+  
+class Task:
+  default_reps = 20
+  default_max_cycles=10000 # If the beam doesn't hit a wall before this, we cut the run off here.
+  
+  
+class Stream:
+  # We have a stream (aka. jet) which shifts around in accord with these
+  # params. The stream_shift_time_slice is a bit obscure. The idea is
+  # that.
 
-# Warning: The stream shift amount should be an integer multiple of
-# the beam_shift_amount, otherwise the liklihood that they overlap
-# (based on acuity) will be reduced. Usually these will be the same.
+  # Warning: The stream shift amount should be an integer multiple of
+  # the beam_shift_amount, otherwise the liklihood that they overlap
+  # (based on acuity) will be reduced. Usually these will be the same.
 
-stream_shift_amount=0.01 # Minimal unit of stream shift
-p_stream_shift=0.15 # prob. of stream shift per cycle
+  stream_shift_amount=0.01 # Minimal unit of stream shift
+  p_stream_shift=0.15 # prob. of stream shift per cycle
 
-# A crazy ivan is when the stream goes haywire; It should happen very rarely.
+  # A crazy ivan is when the stream goes haywire; It should happen very rarely.
 
-p_crazy_ivan=0.001 # About 0.0001 gives you one/10k
-crazy_ivan_shift_amount=0.2
-n_crazy_ivans = 0 # !!!! YOU DON'T MEAN TO BE CHANGING THIS! IT'S THE P_ ABOVE!!!!
+  p_crazy_ivan=0.001 # About 0.0001 gives you one/10k
+  crazy_ivan_shift_amount=0.2
+  n_crazy_ivans = 0 # !!!! YOU DON'T MEAN TO BE CHANGING THIS! IT'S THE P_ ABOVE!!!!
 
-# And the beam, which is under the control of the operator (or
-# automation), which can be shifted in accord with these params:
+  
+class Beam:
+  # And the beam, which is under the control of the operator (or
+  # automation), which can be shifted in accord with these params:
+  beam_shift_amount=0.01 # You may want to have more or less fine control of the beam vs. the stream's shiftiness
 
-beam_shift_amount=0.01 # You may want to have more or less fine control of the beam vs. the stream's shiftiness
+  
+class Operation:
+  # Operator reponse delay combines noticing, attention shifting to button, decision delay, moving to the button, and pressing it
+  # (Possibly also need attention shift into the display, but we're leaving that out bcs it can be arbitrarily large)
+  noticing_delay = 1 # 100 ms
+  decision_delay = 1 # 100 ms -- FFF incorporate differential switch time
+  # attention shifting to button has to be computed from where we are and where the buttons are
+  # current_eye_position = 0 
+  # left_button_position = -2 # we're actually not gonna use these but just use a fixed shift time
+  # right_button_position = +2
+  switch_button_delay_per_cm = 1 # ms
+  button_press_delay = 1 # ms
+  button_distance = 0 # cm
+  which_button_were_on = "<<" # or ">>"
 
-# Operator reponse delay combines noticing, attention shifting to button, decision delay, moving to the button, and pressing it
-# (Possibly also need attention shift into the display, but we're leaving that out bcs it can be arbitrarily large)
-noticing_delay = 1 # 100 ms
-decision_delay = 1 # 100 ms -- FFF incorporate differential switch time
-# attention shifting to button has to be computed from where we are and where the buttons are
-# current_eye_position = 0 
-# left_button_position = -2 # we're actually not gonna use these but just use a fixed shift time
-# right_button_position = +2
-switch_button_delay_per_cm = 1 # ms
-button_press_delay = 1 # ms
-button_distance = 0 # cm
-which_button_were_on = "<<" # or ">>"
-
-default_max_cycles=10000 # If the beam doesn't hit a wall before this, we cut the run off here.
 
 # There are two different and wholly separate senses of acutity:
-# Whether the beam is physically on target, and whether the operator
+# functional_acuity: Whether the beam is physically on target, and physical_acuity: whether the operator
 # can SEE that it is! Nb. Whole scale is -1...+1
 
 functional_acuity=0.01
 physical_acuity=0.02 # You want this a little larger than the shift so that it allows for near misses
-
-# Some debugging stuff
-
-global msg
-msg=""
 
 def run_stream(show_f=False):
   global hits, misses, default_max_cycles, n_crazy_ivans, functional_acuity
@@ -106,7 +112,7 @@ def run_stream(show_f=False):
 # button distance to delay. It return an integer number of cycles to
 # wait before the input arrives.
 
-def operator_response_delay(stream_pos,beam_pos):
+def operator_response_delay(stream_pos,beam_pos):  #OperationParameters
   global switch_button_delay_per_cm, button_press_delay, button_distance, which_button_were_on, msg
   way = which_way_do_we_need_to_shift(stream_pos, beam_pos)
   if way == which_button_were_on:
@@ -154,7 +160,7 @@ def track(stream_pos, beam_pos):
 
 # Used in various places, returns "<<", ">>", "none"
 
-def which_way_do_we_need_to_shift(stream_pos, beam_pos):
+def which_way_do_we_need_to_shift(stream_pos, beam_pos):  #OperationParameters
   global functional_acuity, msg
   delta = abs(beam_pos-stream_pos)
   if delta<functional_acuity:
