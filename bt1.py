@@ -20,18 +20,22 @@ class Status:
     def __init__(self):
         pass
 
+
 class Beam:
-    # And the beam, which is under the control of the operator (or automation), which can be shifted in accord with these params:
+    # And the beam, which is under the control of the operator (or automation),
+    # which can be shifted in accord with these params:
     beam_shift_amount = 0.01  # You may want to have more or less fine control of the beam vs. the stream's shiftiness
 
     # There are two different and wholly separate senses of acuity:
-    # physical_acuity: Whether the beam is physically on target, and functional_acuity: whether the operator can SEE that it is!
+    # physical_acuity: Whether the beam is physically on target, and functional_acuity:
+    # whether the operator can SEE that it is!
     # Nb. Whole scale is -1...+1
     physical_acuity = 0.02  # You want this a little larger than the shift so that it allows for near misses
 
 
 class Operation:
-    # Operator reponse delay combines noticing, attention shifting to button, decision delay, moving to the button, and pressing it
+    # Operator reponse delay combines noticing, attention shifting to button, decision delay,
+    # moving to the button, and pressing it
     # (Possibly also need attention shift into the display, but we're leaving that out bcs it can be arbitrarily large)
     noticing_delay = 1  # 100 ms
     decision_delay = 1  # 100 ms -- FFF incorporate differential switch time
@@ -72,8 +76,10 @@ class Operation:
             return self.button_press_delay + self.decision_delay + self.noticing_delay
         else:
             self.which_button_were_on = way
-            Status.msg = Status.msg + "[" + str((self.button_distance * self.switch_button_delay_per_cm) + self.button_press_delay + self.decision_delay + self.noticing_delay) + "]"
-            return (self.button_distance * self.switch_button_delay_per_cm) + self.button_press_delay + self.decision_delay + self.noticing_delay
+            Status.msg = Status.msg + "[" + str((self.button_distance * self.switch_button_delay_per_cm)
+                                                + self.button_press_delay + self.decision_delay + self.noticing_delay) + "]"
+            return (self.button_distance * self.switch_button_delay_per_cm) + self.button_press_delay \
+                   + self.decision_delay + self.noticing_delay
 
 
 class Stream:
@@ -88,7 +94,7 @@ class Stream:
 
     # A crazy ivan is when the stream goes haywire; It should happen very rarely.
     p_crazy_ivan = 0.01  # About 0.0001 gives you one/10k
-    crazy_ivan_shift_amount = round(random.uniform(0.1, 0.2), 2)    # 0.2
+    crazy_ivan_shift_amount = round(random.uniform(0.1, 0.2), 2)  # 0.2
 
     default_max_cycles = 10000  # If the beam doesn't hit a wall before this, we cut the run off here.
     stream_pos = 0.0
@@ -130,10 +136,9 @@ class Stream:
                 self.show_pos(show_f)
             if self.cycle >= self.allow_response_cycle:
                 Status.msg = Status.msg + "<?>"
-                # Warning! WWW This used to truncate, but that interacts badly
-                # with computer math bcs occassionally you'll end up with
-                # 0.6999999 which truncation makes 0.6 instead of 0.7, and it
-                # loops out.
+                # Warning! WWW This used to truncate, but that interacts badly with computer math
+                # bcs occassionally you'll end up with 0.6999999 which truncation makes 0.6 instead of 0.7,
+                # and it loops out.
                 self.beam_pos = round(self.track(self.stream_pos, self.beam_pos), 4)
             if abs(self.beam_pos - self.stream_pos) < Operation.functional_acuity:
                 self.allow_response_cycle = 99999999999
@@ -149,7 +154,8 @@ class Stream:
     def show_pos(self, if_show):
         # The display and hit-counting logic are intertwined. Maybe they shouldn't be.
         # Pretty straight-forward refactoring would pull them apart. Also, the hit scoring is unfortunately,
-        # based on whether a * would be displayed, which in turn depends on the display increment, which is clearly wrong. UUU FFF Clean this up!!
+        # based on whether a * would be displayed, which in turn depends on the display increment,
+        # which is clearly wrong. UUU FFF Clean this up!!
         show_width = 40
         show_incr = 2.0 / show_width
 
@@ -199,6 +205,7 @@ class Stream:
             Status.msg = Status.msg + ">>"
             return beam_pos + Beam.beam_shift_amount
 
+
 def run(show_f):  # _f is a flag
     default_reps = 20
     button_distances = 10
@@ -210,10 +217,12 @@ def run(show_f):  # _f is a flag
         reps = default_reps
     f.write(
         f"Functional Acuity = {Operation.functional_acuity} stream_shift_amount= {Stream.stream_shift_amount}, "
-        f"p_stream_shift={Stream.p_stream_shift}, beam_shift_amount={Beam.beam_shift_amount}, p_crazy_ivan={Stream.p_crazy_ivan}\n")
+        f"p_stream_shift={Stream.p_stream_shift}, beam_shift_amount={Beam.beam_shift_amount}, "
+        f"p_crazy_ivan={Stream.p_crazy_ivan}\n")
     print(
         f"Functional Acuity = {Operation.functional_acuity} stream_shift_amount= {Stream.stream_shift_amount}, "
-        f"p_stream_shift={Stream.p_stream_shift}, beam_shift_amount={Beam.beam_shift_amount}, p_crazy_ivan={Stream.p_crazy_ivan}")
+        f"p_stream_shift={Stream.p_stream_shift}, beam_shift_amount={Beam.beam_shift_amount}, "
+        f"p_crazy_ivan={Stream.p_crazy_ivan}")
     f.write("operator_response_delay\tmean\tsem\tn_crazy_ivans\n")
 
     for local_button_distance in range(button_distances):
@@ -226,17 +235,17 @@ def run(show_f):  # _f is a flag
             frac = Status.hits / (Status.hits + Status.misses)
             if show_f:
                 print(
-                    f"============================================\nHits={Status.hits}, Misses={Status.misses}, Win fraction={frac}\n")
+                    f"============================================\nHits={Status.hits}, Misses={Status.misses}, "
+                    f"Win fraction={frac}\n")
             results = results + [frac]
         print(
             f"@ button_distance={Operation.button_distance} mean hit fraction = "
-            f"{format(numpy.mean(results), '.2f')} [se={format(sem(results), '.2f')}], crazy_ivans/reps = {Status.n_crazy_ivans / reps}")
+            f"{format(numpy.mean(results), '.2f')} [se={format(sem(results), '.2f')}], "
+            f"crazy_ivans/reps = {Status.n_crazy_ivans / reps}")
         f.write(
             f"{Operation.button_distance}\t{format(numpy.mean(results), '.2f')}\t{format(sem(results), '.2f')}\t{Status.n_crazy_ivans / reps}\n")
     f.close()
 
 
 # If display is true, we only do one rep and only allow it to run 1000 cycles
-
-# p_crazy_ivan = 0.00  # 0.01 is good
-run(False)
+run(True)
