@@ -17,9 +17,11 @@ class Status:
     msg = ""
     n_crazy_ivans = 0  # These are counted over all reps and then the mean is display at the end
 
+    def __init__(self):
+        pass
+
 class Beam:
-    # And the beam, which is under the control of the operator (or
-    # automation), which can be shifted in accord with these params:
+    # And the beam, which is under the control of the operator (or automation), which can be shifted in accord with these params:
     beam_shift_amount = 0.01  # You may want to have more or less fine control of the beam vs. the stream's shiftiness
 
     # There are two different and wholly separate senses of acuity:
@@ -43,47 +45,50 @@ class Operation:
     which_button_were_on = "<<"  # or ">>"
     functional_acuity = 0.01
 
+    def __init__(self, x, y):
+        self.par_stream_pos = x
+        self.par_beam_pos = y
+
+    # Used in various places, returns "<<", ">>", "none"
+    def which_way_do_we_need_to_shift(self):
+        delta = abs(self.par_beam_pos - self.par_stream_pos)
+        if delta < self.functional_acuity:
+            return "none"
+        elif self.par_beam_pos > self.par_stream_pos:
+            return "<<"
+        else:
+            return ">>"
+
     # operator_response_delay() uses the current eye position and button distances to decide
     # how many cycles it takes to hit the button, which is either short
     # (you're there already), or long (you're not), the longer using the
     # button distance to delay. It return an integer number of cycles to
     # wait before the input arrives.
-    def operator_response_delay(self, par_stream_pos, par_beam_pos):
-        way = self.which_way_do_we_need_to_shift(par_stream_pos, par_beam_pos)
+    def operator_response_delay(self):
+        way = self.which_way_do_we_need_to_shift()
         if way == self.which_button_were_on:
-            Status.msg = Status.msg + "[" + str(self.button_press_delay + self.decision_delay + self.noticing_delay) + "]"
+            Status.msg = Status.msg + "[" + str(
+                self.button_press_delay + self.decision_delay + self.noticing_delay) + "]"
             return self.button_press_delay + self.decision_delay + self.noticing_delay
         else:
             self.which_button_were_on = way
             Status.msg = Status.msg + "[" + str((self.button_distance * self.switch_button_delay_per_cm) + self.button_press_delay + self.decision_delay + self.noticing_delay) + "]"
             return (self.button_distance * self.switch_button_delay_per_cm) + self.button_press_delay + self.decision_delay + self.noticing_delay
 
-    # Used in various places, returns "<<", ">>", "none"
-    def which_way_do_we_need_to_shift(self, par_stream_pos, par_beam_pos):
-        delta = abs(par_beam_pos - par_stream_pos)
-        if delta < self.functional_acuity:
-            return ("none")
-        elif par_beam_pos > par_stream_pos:
-            return ("<<")
-        else:
-            return (">>")
-
 
 class Stream:
-    # We have a stream (aka. jet) which shifts around in accord with these
-    # params. The stream_shift_time_slice is a bit obscure. The idea is
-    # that.
+    # We have a stream (aka. jet) which shifts around in accord with these params.
+    # The stream_shift_time_slice is a bit obscure. The idea is that.
 
-    # Warning: The stream shift amount should be an integer multiple of
-    # the beam_shift_amount, otherwise the likelihood that they overlap
-    # (based on acuity) will be reduced. Usually these will be the same.
+    # Warning: The stream shift amount should be an integer multiple of the beam_shift_amount, otherwise
+    # the likelihood that they overlap (based on acuity) will be reduced. Usually these will be the same.
 
     stream_shift_amount = 0.01  # Minimal unit of stream shift
     p_stream_shift = 0.15  # prob. of stream shift per cycle
 
     # A crazy ivan is when the stream goes haywire; It should happen very rarely.
-    p_crazy_ivan = 0.001  # About 0.0001 gives you one/10k
-    crazy_ivan_shift_amount = 0.2
+    p_crazy_ivan = 0.01  # About 0.0001 gives you one/10k
+    crazy_ivan_shift_amount = round(random.uniform(0.1, 0.2), 2)    # 0.2
 
     default_max_cycles = 10000  # If the beam doesn't hit a wall before this, we cut the run off here.
     stream_pos = 0.0
@@ -91,7 +96,11 @@ class Stream:
     allow_response_cycle = 99999999999
     cycle = 1
 
-    def run_stream(self, show_f=False):
+    def run_stream(self, show_f):
+        Status.hits = 0
+        Status.misses = 0
+        Status.msg = ""
+
         if show_f:
             max_cycles = 1000
         else:
@@ -102,15 +111,20 @@ class Stream:
             if random.random() < self.p_crazy_ivan:
                 Status.n_crazy_ivans = Status.n_crazy_ivans + 1
                 Status.msg = Status.msg + "!!!"
+                # If response target has not already been set, it will be 99999999999.
+                # If it has been set, it will be whatever number it is (e.g., now+20)
+                # Only change the response cycle if it has not been set (i.e., 99999999999)
                 self.stream_pos = round(self.stream_pos + (
-                            self.crazy_ivan_shift_amount * random.choice([i for i in range(-1, 2) if i not in [0]])), 4)
+                        self.crazy_ivan_shift_amount * random.choice([i for i in range(-1, 2) if i not in [0]])), 4)
                 if self.allow_response_cycle == 99999999999:
-                    self.allow_response_cycle = self.cycle + Operation.operator_response_delay(self.stream_pos, self.beam_pos)
+                    o = Operation(self.stream_pos, self.beam_pos)
+                    self.allow_response_cycle = self.cycle + o.operator_response_delay()
             elif random.random() < self.p_stream_shift:
                 self.stream_pos = round(self.stream_pos + (
-                            self.stream_shift_amount * random.choice([i for i in range(-1, 2) if i not in [0]])), 4)
+                        self.stream_shift_amount * random.choice([i for i in range(-1, 2) if i not in [0]])), 4)
                 if self.allow_response_cycle == 99999999999:
-                    self.allow_response_cycle = self.cycle + Operation.operator_response_delay(self.stream_pos, self.beam_pos)
+                    o = Operation(self.stream_pos, self.beam_pos)
+                    self.allow_response_cycle = self.cycle + o.operator_response_delay()
             self.update_stats()
             if show_f:
                 self.show_pos(show_f)
@@ -120,7 +134,7 @@ class Stream:
                 # with computer math bcs occassionally you'll end up with
                 # 0.6999999 which truncation makes 0.6 instead of 0.7, and it
                 # loops out.
-                self.beam_pos = round(self.track(), 4)
+                self.beam_pos = round(self.track(self.stream_pos, self.beam_pos), 4)
             if abs(self.beam_pos - self.stream_pos) < Operation.functional_acuity:
                 self.allow_response_cycle = 99999999999
             self.cycle = self.cycle + 1
@@ -133,11 +147,9 @@ class Stream:
             Status.misses = Status.misses + 1
 
     def show_pos(self, if_show):
-        # The display and hit-counting logic are intertwined. Maybe they
-        # shouldn't be. Pretty straight-forward refactoring would pull them
-        # apart. Also, the hit scoring is unfortunately, based on whether a *
-        # would be displayed, which in turn depends on the display increment,
-        # which is clearly wrong. UUU FFF Clean this up!!
+        # The display and hit-counting logic are intertwined. Maybe they shouldn't be.
+        # Pretty straight-forward refactoring would pull them apart. Also, the hit scoring is unfortunately,
+        # based on whether a * would be displayed, which in turn depends on the display increment, which is clearly wrong. UUU FFF Clean this up!!
         show_width = 40
         show_incr = 2.0 / show_width
 
@@ -175,7 +187,8 @@ class Stream:
     # rather than just exact operators.
 
     def track(self, stream_pos, beam_pos):
-        which_way = Operation.which_way_do_we_need_to_shift(stream_pos, beam_pos)
+        o = Operation(stream_pos, beam_pos)
+        which_way = o.which_way_do_we_need_to_shift()
         if which_way == "none":
             Status.msg = Status.msg + "(FA)"
             return beam_pos
@@ -186,50 +199,40 @@ class Stream:
             Status.msg = Status.msg + ">>"
             return beam_pos + Beam.beam_shift_amount
 
-    # # (This is ultra-ugly! There must be a better idiom for this!)
-    # def porm(self):
-    #     if random.random() < 0.5:
-    #         return (+1)
-    #     else:
-    #         return (-1)
-
-
-# Both the beam and stream are positional to two decimal digits.
-# def trunc2(n):
-#     return (int(n * 100.0) / 100.0)
-
-
 def run(show_f):  # _f is a flag
     default_reps = 20
     button_distances = 10
 
     f = open("results/r" + str(time.time()) + ".tsv", "w")
-    # global functional_acuity, n_crazy_ivans, hits, misses, button_distance
     if show_f:
         reps = 1
     else:
         reps = default_reps
     f.write(
-        f"Functional Acuity = {Operation.functional_acuity} stream_shift_amount= {Stream.stream_shift_amount}, p_stream_shift={Stream.p_stream_shift}, beam_shift_amount={Beam.beam_shift_amount}, p_crazy_ivan={Stream.p_crazy_ivan}\n")
+        f"Functional Acuity = {Operation.functional_acuity} stream_shift_amount= {Stream.stream_shift_amount}, "
+        f"p_stream_shift={Stream.p_stream_shift}, beam_shift_amount={Beam.beam_shift_amount}, p_crazy_ivan={Stream.p_crazy_ivan}\n")
     print(
-        f"Functional Acuity = {Operation.functional_acuity} stream_shift_amount= {Stream.stream_shift_amount}, p_stream_shift={Stream.p_stream_shift}, beam_shift_amount={Beam.beam_shift_amount}, p_crazy_ivan={Stream.p_crazy_ivan}")
+        f"Functional Acuity = {Operation.functional_acuity} stream_shift_amount= {Stream.stream_shift_amount}, "
+        f"p_stream_shift={Stream.p_stream_shift}, beam_shift_amount={Beam.beam_shift_amount}, p_crazy_ivan={Stream.p_crazy_ivan}")
     f.write("operator_response_delay\tmean\tsem\tn_crazy_ivans\n")
 
     for local_button_distance in range(button_distances):
-        button_distance = 4 + local_button_distance
+        Operation.button_distance = 4 + local_button_distance
         Status.n_crazy_ivans = 0
         results = []
         for rep in range(reps):
-            Stream.run_stream(show_f)
+            s = Stream()
+            s.run_stream(show_f)
             frac = Status.hits / (Status.hits + Status.misses)
             if show_f:
                 print(
-                    f"============================================\nHits={hits}, Misses={misses}, Win fraction={frac}\n")
+                    f"============================================\nHits={Status.hits}, Misses={Status.misses}, Win fraction={frac}\n")
             results = results + [frac]
         print(
-            f"@ button_distance={button_distance} mean hit fraction = {format(numpy.mean(results), '.2f')} [se={format(sem(results), '.2f')}], crazy_ivans/reps = {Status.n_crazy_ivans / reps}")
+            f"@ button_distance={Operation.button_distance} mean hit fraction = "
+            f"{format(numpy.mean(results), '.2f')} [se={format(sem(results), '.2f')}], crazy_ivans/reps = {Status.n_crazy_ivans / reps}")
         f.write(
-            f"{button_distance}\t{format(numpy.mean(results), '.2f')}\t{format(sem(results), '.2f')}\t{Status.n_crazy_ivans / reps}\n")
+            f"{Operation.button_distance}\t{format(numpy.mean(results), '.2f')}\t{format(sem(results), '.2f')}\t{Status.n_crazy_ivans / reps}\n")
     f.close()
 
 
