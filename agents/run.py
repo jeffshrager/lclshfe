@@ -10,10 +10,12 @@ import instrument
 def run(value):
     """Run CXI Simulation"""
     reps = value
+    experimental_time = ""
+    goal = ""
+    agenda = ""
 
     # Store results to file
     f = open("results/r" + str(time.time()) + ".tsv", "w")
-
 
     # Instantiate Agents
     agent_da = agent.DataAnalyst()
@@ -28,11 +30,12 @@ def run(value):
     for rep in range(reps):
         agent_em.plan()
         agent_op.manipulate_system()
+        agent_op.run_peak_chasing(instrument_cxi)
         agent_da.analyse_data()
 
 run(1)
 
-# Add agenda
+# Add agenda - does the EM have the agenda
 # Jet Tracking - current 10 - 15 mins
 # 12 hour scale add that layer to the program
 # System stability, affect attention level

@@ -3,6 +3,10 @@ The cognitive agents in the model
 """
 
 from enum import Enum
+from scipy.stats import sem
+import numpy
+
+from agents.instrument import Instrument
 class AgentType(Enum):
     """Enum to mark the different agent roles"""
     DA = "Data Analyst"
@@ -12,10 +16,12 @@ class AgentType(Enum):
 class Person:
     """Agent Parent Class"""
     agent_type = ""
+    # begining they will be focused, not exausted yet, 4pm things go wrong and they are tired
+    focus_meter = ""
 
     def __init__(self, agent_type):
         self.agent_type = agent_type
-
+    
 class DataAnalyst(Person):
     """Retrives data from the instrument"""
     def __init__(self):
@@ -83,6 +89,27 @@ class Operator(Person):
             return (self.button_distance * self.switch_button_delay_per_cm) + self.button_press_delay \
                    + self.decision_delay + self.noticing_delay
 
+    def run_peak_chasing(self, instrument: Instrument):
+        button_distances = 10
+        show_f = True
+
+        for local_button_distance in range(button_distances):
+            self.button_distance = 4 + local_button_distance
+            instrument.status["n_crazy_ivans"] = 0
+            results = []
+            for rep in range(reps):
+                # s = Stream()
+                instrument.run_stream(show_f)
+                frac = instrument.status["hits"] / (instrument.status["hits"] + instrument.status["misses"])
+                if show_f:
+                    print(
+                        f"============================================\nHits={instrument.status['hits']}, Misses={instrument.status['misses']}, "
+                        f"Win fraction={frac}\n")
+                results = results + [frac]
+            print(
+                f"@ button_distance={Operation.button_distance} mean hit fraction = "
+                f"{format(numpy.mean(results), '.2f')} [se={format(sem(results), '.2f')}], "
+                f"crazy_ivans/reps = {instrument.status['n_crazy_ivans'] / reps}")
 
     def manipulate_system(self):
         """using the goal from the em change the instrument"""
