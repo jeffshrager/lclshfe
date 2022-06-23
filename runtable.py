@@ -1,6 +1,4 @@
-"""
-RunTable Generator Tool
-"""
+"""RunTable Generator Tool"""
 
 import csv
 from datetime import datetime, timedelta
@@ -42,7 +40,7 @@ for x, file in enumerate(filenames):
             "Ndamaged": entry["N damaged"] if "N damaged" in entry else "",
             "ShutterIn": entry["ShutterIn"] if "ShutterIn" in entry else "",
             "WaveplateAngle": entry["WaveplateAngle"] if "WaveplateAngle" in entry else "",
-            "GasCell-Pressure": entry["GasCell-Pressure"] if "GasCell-Pressure" in entry else 
+            "GasCell-Pressure": entry["GasCell-Pressure"] if "GasCell-Pressure" in entry else
                                 entry["GasCell Pressure"] if "GasCell Pressure" in entry else "",
             "JungFrau-Z": entry["JungFrau-Z"] if "JungFrau-Z" in entry else
                           entry["Junfrau Z"] if "Junfrau Z" in entry else "",
