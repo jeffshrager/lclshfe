@@ -8,6 +8,10 @@ class AgentType(Enum):
     DA = "Data Analyst"
     EM = "Experiment Manager"
     OP = "Operator"
+    RU = "Remote User"
+    ACR = "ACR Operator"
+
+
 
 class InstrumentType(Enum):
     """Enum to mark the different hutches"""

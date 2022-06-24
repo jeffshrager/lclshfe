@@ -43,10 +43,12 @@ class Instrument:
                 self.run_start_frame = False
             else:
                 print(f"Run {self.run_number} {colored('Collecting Data', 'green')}")
+                # TODO: Ask Instrument scientist to see what is the real decision logic stopping criteria
                 if current_time > (self.run_start_time + self.run_timedelta):
                     self.collecting_data = False
                     agenda.add_event(self.run_number, self.run_start_time, current_time)
                 else:
+                    # TODO: If sample is done stop regardless dont go to next one
                     current_sample = None
                     for index, sample_goal in enumerate(goal.samples):
                         if sample_goal < goal.datapoints_needed_per_sample:
@@ -65,7 +67,8 @@ class CXI(Instrument):
     """CXI"""
     def __init__(self):
         super().__init__(InstrumentType.CXI)
-        self.data_per_second = 36
+        # TODO: Need to get n events, from elog data
+        self.data_per_second = 100
 
     def run_peak_chasing(self, start_time):
         """Start collecting data"""
