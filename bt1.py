@@ -1,11 +1,14 @@
 # Todo:
 #    -- Where exact beam|jet match is tested with ==, replace with a more "perceptually" accurate model
 
+import csv
 from scipy.stats import sem
 import numpy
 import random
 import time
-from datetime import datetime, date
+import plotly.express as px
+from datetime import datetime, date, timedelta
+import pandas as pd
 
 # random.seed(datetime.now())
 random.seed(a=None, version=2)
@@ -205,10 +208,61 @@ class Stream:
             Status.msg = Status.msg + ">>"
             return beam_pos + Beam.beam_shift_amount
 
+class Event:
+    """Stores all the information about each experiment run"""
+    run_start:datetime
+    run_end:datetime
+    translated_position:datetime
+    run_duration:timedelta
+    thickness:float
+
+    def __init__(self, run_start:datetime, run_duration:timedelta):
+        self.run_start = run_start
+        self.run_end = run_start + run_duration
+        self.run_duration = run_duration
+        # Thickness is centered, moving each position x + (duration / 2)
+        self.translated_position = run_start + run_duration / 2
+        self.thickness = run_duration.total_seconds()/100
+
+    def __str__(self):
+        return (f"Start Time: {self.run_start}, "+
+		        f"Duration: {self.run_duration}, "+
+		        f"Translated Position: {self.translated_position}, "+
+		        f"Thickness: {self.thickness}")
+
+def runTable():
+    # Set path with run csv files
+    PATH = "run_tables"
+
+    with open(f"{PATH}/cxilx6320.csv",'r', encoding="utf-8") as f:
+        reader = csv.reader(f)
+        headers = next(reader)
+        data = [{h:x for (h,x) in zip(headers,row)} for row in reader]
+    
+    events = []
+    for entry in data:
+        if "RunStart" in entry:
+            events.append(Event(datetime.strptime(entry["RunStart"], '%b/%d/%Y %H:%M:%S'),
+                            timedelta(seconds=int(entry["RunDuration"].split('.')[0]),
+                                    milliseconds=int(entry["RunDuration"].split('.')[1]))))
+        if "Duration of run" in entry:
+            events.append(Event(datetime.strptime(entry["run start"], '%b/%d/%Y %H:%M:%S'),
+                            timedelta(seconds=int(entry["Duration of run"].split('.')[0]),
+                                    milliseconds=int(entry["Duration of run"].split('.')[1]))))
+    total_duration = timedelta(0, 0, 0)
+    event:Event
+    for event in events:
+        total_duration += event.run_duration
+    return total_duration.total_seconds()
+
+DATA_PER_SECOND = 36
 
 def run(show_f):  # _f is a flag
-    default_reps = 20
+    default_reps = 30
+    # button_distances = 10
     button_distances = 10
+    functional_accuity_list = pd.DataFrame([])
+    title_string = ""
 
     f = open("results/r" + str(time.time()) + ".tsv", "w")
     if show_f:
@@ -223,10 +277,12 @@ def run(show_f):  # _f is a flag
         f"Functional Acuity = {Operation.functional_acuity} stream_shift_amount= {Stream.stream_shift_amount}, "
         f"p_stream_shift={Stream.p_stream_shift}, beam_shift_amount={Beam.beam_shift_amount}, "
         f"p_crazy_ivan={Stream.p_crazy_ivan}")
+    title_string = f"Functional Acuity = {Operation.functional_acuity} stream_shift_amount= {Stream.stream_shift_amount}, p_stream_shift={Stream.p_stream_shift}, beam_shift_amount={Beam.beam_shift_amount}, p_crazy_ivan={Stream.p_crazy_ivan}"
     f.write("operator_response_delay\tmean\tsem\tn_crazy_ivans\n")
 
     for local_button_distance in range(button_distances):
-        Operation.button_distance = 4 + local_button_distance
+        Operation.button_distance = 1 + local_button_distance
+        # 4 + local_button_distance
         Status.n_crazy_ivans = 0
         results = []
         for rep in range(reps):
@@ -238,6 +294,13 @@ def run(show_f):  # _f is a flag
                     f"============================================\nHits={Status.hits}, Misses={Status.misses}, "
                     f"Win fraction={frac}\n")
             results = results + [frac]
+        functional_accuity_list = pd.concat([functional_accuity_list, pd.DataFrame.from_records([{
+                                                "Fraction Hits":format(numpy.mean(results), '.2f'),
+                                                "Operator Response Time (cycles)": Operation.button_distance,
+                                                "Data Per Second (Constant)": DATA_PER_SECOND,
+                                                "Data Captured (RunTime * DPS * Hits)": f"{format(runTable() * DATA_PER_SECOND * numpy.mean(results), '.2f')}"
+                                                }])])
+        # .append(format(numpy.mean(results), '.2f'))
         print(
             f"@ button_distance={Operation.button_distance} mean hit fraction = "
             f"{format(numpy.mean(results), '.2f')} [se={format(sem(results), '.2f')}], "
@@ -246,6 +309,89 @@ def run(show_f):  # _f is a flag
             f"{Operation.button_distance}\t{format(numpy.mean(results), '.2f')}\t{format(sem(results), '.2f')}\t{Status.n_crazy_ivans / reps}\n")
     f.close()
 
+    # print(functional_accuity_list)
+    # for fa in functional_accuity_list:
+    #     print(fa)
+    
+    # df = px.data.gapminder().query("continent=='Oceania'")
+
+    # print(runTable() * DATA_PER_SECOND * )
+
+    fig = px.line(functional_accuity_list, x="Operator Response Time (cycles)", y="Fraction Hits", title=title_string, hover_data=["Data Per Second (Constant)", "Data Captured (RunTime * DPS * Hits)"])
+    fig.update_traces(mode="markers+lines")
+    fig.update_layout(hovermode="x unified")
+    fig.update_yaxes(autorange="reversed")
+
+    fig.show()
+
 
 # If display is true, we only do one rep and only allow it to run 1000 cycles
-run(True)
+run(False)
+
+
+# Add agenda - does the EM have the agenda
+# Jet Tracking - current 10 - 15 mins
+# 12 hour scale add that layer to the program
+# System stability, affect attention level
+# If the system is unstable attention should increase, if system is stable attention will decrease
+# If something happens for a shift there is a transition time
+# We know what the status of the system is use this to callibrate the system
+# begining they will be focused, not exausted yet, 4pm things go wrong and they are tired
+
+# Based on the button distance getting worse and worse scans
+# Kinda a cheat different purpose, model how bad the UI would be if buttons were far away
+# Data to be being read by the DA at a fixed button distance
+# Can use button distance as a proxy for the experiment not doing well
+# Signal Noise Ratio, as the operator was changing stuff, data analyst was looking at data saying background was high
+# EM was saying to get more data
+# Smoothest thing to use is data quality
+# X axis should be data quality
+# We have to decide weather im going to take more data or abort and fix something
+# As peak chasing gets harder because the buttons are father apart, like power is too low
+# Could rename Button distance to something like, difficulty
+# Data analyst looking at the number
+# Mike being tired or data being difficult to get or anything else
+# Data analyst reading data as it comes off
+# Agent reading the means
+# Each of the reps the quality of the data will get better and better
+
+# EM tells the OP to stop or to take more data
+# Taking more data
+# A bunch of low quality data, suppose data quality was low enough
+# RULE is to extend if quality is low
+# Calculate data quality not just points
+# Data quality per measurement
+
+# Suppose 100 measurements total
+# Want to get high data quality for all 100
+# Mean is 100 regardless of how many you take
+# Should we go longer, even if you double it you can only get 50 not 100 
+# Data quality within measurement is very low or high = number of runs, length
+
+# Number of samples taken / Number of measurements
+# Each of the runs
+# Declare single noise ratio above 1
+# down at 0.1 it would be 50 mins
+# At the top of the curve that should be calibrated at 0.9, 5 mins
+# At 0.9, 300 * 36 = 10,000 good observations * 0,9 = 9,000
+# As you collect data points it approaches 9000
+
+# DA reads the mean of the number, reports to the EM
+# up to 10000 so keep going, as the number is going operator wants to keep going until sum of 9000
+# constrain the total time
+
+# Say how many measurements you got vs how much you expected
+# If you were expecting 120 measurements, 1 less than 1% ROI
+
+# Data quality was so low, OP had to keep going to get up to 10000
+
+#  Curve is going to float
+
+# Attention distracted and tired
+
+
+
+
+
+
+# If they stop 

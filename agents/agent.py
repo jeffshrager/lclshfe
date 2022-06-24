@@ -1,17 +1,8 @@
-"""
-The cognitive agents in the model
-"""
-
-from enum import Enum
-from scipy.stats import sem
-import numpy
-
-from agents.instrument import Instrument
-class AgentType(Enum):
-    """Enum to mark the different agent roles"""
-    DA = "Data Analyst"
-    EM = "Experiment Manager"
-    OP = "Operator"
+"""The cognitive agents in the model"""
+from datetime import timedelta
+from termcolor import colored
+from data import AgentType
+from instrument import CXI
 
 class Person:
     """Agent Parent Class"""
@@ -21,7 +12,7 @@ class Person:
 
     def __init__(self, agent_type):
         self.agent_type = agent_type
-    
+
 class DataAnalyst(Person):
     """Retrives data from the instrument"""
     def __init__(self):
@@ -31,86 +22,33 @@ class DataAnalyst(Person):
         """determine if the output of the instrument is good"""
         print("Check if data is good")
 
+class Operator(Person):
+    """Operator reponse delay combines noticing, attention shifting to button, decision delay,
+    moving to the button, and pressing it (Possibly also need attention shift into the
+    display, but we're leaving that out bcs it can be arbitrarily large)"""
+    def __init__(self):
+        super().__init__(AgentType.OP)
+
+    def start_peak_chasing(self, instrument:CXI, current_time:timedelta, file):
+        """Start Peak Chasing"""
+        file.write("OP: Start Peak Chasing\n")
+        print("OP: " + colored("Start Peak Chasing", "blue"))
+        instrument.run_peak_chasing(current_time)
+
 class ExperimentManager(Person):
     """High level GAP Goal Agenda Plan"""
     def __init__(self):
         super().__init__(AgentType.EM)
 
-    def plan(self):
-        """Given current situation plan for goal"""
-        print("Create a Plan")
+    def start_experiment(self, instrument:CXI, file):
+        """determine if the output of the instrument is good"""
+        file.write("EM: Start Experiment\n")
+        print("EM: " + colored("Start Experiment", "green"))
+        instrument.start()
 
-class Operator(Person):
-    """Operator reponse delay combines noticing, attention shifting to button, decision delay,
-    moving to the button, and pressing it
-    (Possibly also need attention shift into the display, but we're leaving that out bcs it can be arbitrarily large)"""
-    noticing_delay = 1  # 100 ms
-    decision_delay = 1  # 100 ms -- FFF incorporate differential switch time
-    # attention shifting to button has to be computed from where we are and where the buttons are
-    # current_eye_position = 0
-    # left_button_position = -2 # we're actually not gonna use these but just use a fixed shift time
-    # right_button_position = +2
-    switch_button_delay_per_cm = 1  # ms
-    button_press_delay = 1  # ms
-    button_distance = 0  # cm
-    which_button_were_on = "<<"  # or ">>"
-    functional_acuity = 0.01
-
-    def __init__(self, x, y):
-        super().__init__(AgentType.OP)
-        self.par_stream_pos = x
-        self.par_beam_pos = y
-
-    def which_way_do_we_need_to_shift(self):
-        """Used in various places, returns "<<", ">>", "none" """
-        delta = abs(self.par_beam_pos - self.par_stream_pos)
-        if delta < self.functional_acuity:
-            return "none"
-        elif self.par_beam_pos > self.par_stream_pos:
-            return "<<"
-        else:
-            return ">>"
-
-    def operator_response_delay(self, instrument):
-        """operator_response_delay() uses the current eye position and button distances to decide
-        how many cycles it takes to hit the button, which is either short
-        (you're there already), or long (you're not), the longer using the
-        button distance to delay. It return an integer number of cycles to
-        wait before the input arrives."""
-        way = self.which_way_do_we_need_to_shift()
-        if way == self.which_button_were_on:
-            instrument.status["msg"] = instrument.status["msg"] + "[" + str(
-                self.button_press_delay + self.decision_delay + self.noticing_delay) + "]"
-            return self.button_press_delay + self.decision_delay + self.noticing_delay
-        else:
-            self.which_button_were_on = way
-            instrument.status["msg"] = instrument.status["msg"] + "[" + str((self.button_distance * self.switch_button_delay_per_cm)
-                                                + self.button_press_delay + self.decision_delay + self.noticing_delay) + "]"
-            return (self.button_distance * self.switch_button_delay_per_cm) + self.button_press_delay \
-                   + self.decision_delay + self.noticing_delay
-
-    def run_peak_chasing(self, instrument: Instrument):
-        button_distances = 10
-        show_f = True
-
-        for local_button_distance in range(button_distances):
-            self.button_distance = 4 + local_button_distance
-            instrument.status["n_crazy_ivans"] = 0
-            results = []
-            for rep in range(reps):
-                # s = Stream()
-                instrument.run_stream(show_f)
-                frac = instrument.status["hits"] / (instrument.status["hits"] + instrument.status["misses"])
-                if show_f:
-                    print(
-                        f"============================================\nHits={instrument.status['hits']}, Misses={instrument.status['misses']}, "
-                        f"Win fraction={frac}\n")
-                results = results + [frac]
-            print(
-                f"@ button_distance={Operation.button_distance} mean hit fraction = "
-                f"{format(numpy.mean(results), '.2f')} [se={format(sem(results), '.2f')}], "
-                f"crazy_ivans/reps = {instrument.status['n_crazy_ivans'] / reps}")
-
-    def manipulate_system(self):
-        """using the goal from the em change the instrument"""
-        print("Modify Instrument")
+    def tell_operator_start_data_collection(self, operator:Operator, instrument:CXI,
+                                                  current_time:timedelta, file):
+        """Communicate with operator to start collecting data"""
+        file.write("EM: Communicate with Operator\n")
+        print("EM: " + colored("Communicate with Operator", "blue"))
+        operator.start_peak_chasing(instrument, current_time, file)
