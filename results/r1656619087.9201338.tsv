@@ -1,0 +1,1338 @@
+Functional Acuity = 0.01 stream_shift_amount= 0.01, p_stream_shift=0.15, beam_shift_amount=0.01, p_crazy_ivan=0.01
+[   S1,   S1,   S1,   S1,   S1,   S1,   S1,   S1,   S1,   S1,   S1,   S1,   S1,   S1,   S1,   S2,   S2,   S2,   S2,   S2,   S2,   S2,   S2,   S2,   S2,   S2,   S2,   S2,   S2,   S2,   S3,   S3,   S3,   S3,   S3,   S3,   S3,   S3,   S3,   S3,   S3,   S3,   S3,   S3,   S3]
+[    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0]
+[    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0]
+
+Current Time: 0:00:00 Experimental Time: 5:00:00
+-------------------------------------------------
+0:00:00 | EM: Start Experiment
+0:10:00 | Start Run 1
+0:10:00 | OP: Start Peak Chasing
+0:10:00 | EM: Communicate with Operator
+0:10:10 | OP: Move Beam >>
+0:10:15 | OP: Move Beam >>
+0:12:10 | OP: Move Beam <<
+0:12:20 | DA: Data from run 1 is good
+0:12:30 | Instrument transition: 0:00:17.218370
+0:12:35 | Instrument transition: 0:00:12.218370
+0:12:40 | Instrument transition: 0:00:07.218370
+0:12:45 | Instrument transition: 0:00:02.218370
+0:12:50 | Start Run 2
+0:12:50 | OP: Start Peak Chasing
+0:12:50 | EM: Communicate with Operator
+0:13:00 | OP: Move Beam <<
+0:13:55 | OP: Move Beam <<
+0:14:05 | OP: Move Beam <<
+0:14:55 | OP: Move Beam <<
+0:15:00 | OP: Move Beam <<
+0:15:05 | OP: Move Beam <<
+0:15:35 | DA: Data from run 2 is good
+0:15:45 | Instrument transition: 0:00:46.687808
+0:15:50 | Instrument transition: 0:00:41.687808
+0:15:55 | Instrument transition: 0:00:36.687808
+0:16:00 | Instrument transition: 0:00:31.687808
+0:16:05 | Instrument transition: 0:00:26.687808
+0:16:10 | Instrument transition: 0:00:21.687808
+0:16:15 | Instrument transition: 0:00:16.687808
+0:16:20 | Instrument transition: 0:00:11.687808
+0:16:25 | Instrument transition: 0:00:06.687808
+0:16:30 | Instrument transition: 0:00:01.687808
+0:16:35 | Start Run 3
+0:16:35 | OP: Start Peak Chasing
+0:16:35 | EM: Communicate with Operator
+0:17:10 | OP: Move Beam >>
+0:18:15 | OP: Move Beam <<
+0:18:35 | DA: Data from run 3 is good
+0:18:45 | Instrument transition: 0:00:43.004841
+0:18:50 | Instrument transition: 0:00:38.004841
+0:18:55 | Instrument transition: 0:00:33.004841
+0:19:00 | Instrument transition: 0:00:28.004841
+0:19:05 | Instrument transition: 0:00:23.004841
+0:19:10 | Instrument transition: 0:00:18.004841
+0:19:15 | Instrument transition: 0:00:13.004841
+0:19:20 | Instrument transition: 0:00:08.004841
+0:19:25 | Instrument transition: 0:00:03.004841
+0:19:30 | Start Run 4
+0:19:30 | OP: Start Peak Chasing
+0:19:30 | EM: Communicate with Operator
+0:20:10 | OP: Move Beam >>
+0:20:25 | OP: Move Beam <<
+0:20:30 | OP: Move Beam <<
+0:20:35 | OP: Move Beam <<
+0:20:40 | OP: Move Beam <<
+0:20:45 | OP: Move Beam <<
+0:20:50 | OP: Move Beam <<
+0:20:55 | OP: Move Beam <<
+0:21:00 | OP: Move Beam <<
+0:21:05 | OP: Move Beam <<
+0:21:10 | OP: Move Beam <<
+0:21:15 | OP: Move Beam <<
+0:21:20 | OP: Move Beam <<
+0:21:25 | OP: Move Beam <<
+0:21:30 | OP: Move Beam <<
+0:21:35 | OP: Move Beam <<
+0:21:40 | OP: Move Beam <<
+0:21:45 | OP: Move Beam <<
+0:21:50 | OP: Move Beam <<
+0:21:55 | OP: Move Beam <<
+0:22:00 | OP: Move Beam <<
+0:22:05 | OP: Move Beam <<
+0:22:10 | OP: Move Beam <<
+0:22:15 | OP: Move Beam <<
+0:22:20 | OP: Move Beam <<
+0:22:25 | OP: Move Beam <<
+0:22:30 | OP: Move Beam <<
+0:22:35 | OP: Move Beam <<
+0:22:40 | OP: Move Beam <<
+0:22:45 | OP: Move Beam <<
+0:22:50 | OP: Move Beam <<
+0:22:55 | OP: Move Beam <<
+0:23:00 | OP: Move Beam <<
+0:23:05 | OP: Move Beam <<
+0:23:10 | OP: Move Beam <<
+0:23:15 | OP: Move Beam <<
+0:23:20 | OP: Move Beam <<
+0:23:25 | OP: Move Beam <<
+0:23:30 | OP: Move Beam <<
+0:23:35 | OP: Move Beam <<
+0:23:40 | OP: Move Beam <<
+0:23:45 | OP: Move Beam <<
+0:23:50 | OP: Move Beam <<
+0:23:55 | OP: Move Beam <<
+0:24:00 | OP: Move Beam <<
+0:24:05 | OP: Move Beam <<
+0:24:10 | OP: Move Beam <<
+0:24:15 | OP: Move Beam <<
+0:24:20 | OP: Move Beam <<
+0:24:25 | OP: Move Beam <<
+0:24:30 | OP: Move Beam <<
+0:24:35 | OP: Move Beam <<
+0:24:55 | OP: Move Beam >>
+0:25:25 | OP: Move Beam >>
+0:25:45 | OP: Move Beam <<
+0:25:50 | OP: Move Beam <<
+0:26:00 | DA: Data from run 4 is good
+0:26:10 | Instrument transition: 0:00:55.885987
+0:26:15 | Instrument transition: 0:00:50.885987
+0:26:20 | Instrument transition: 0:00:45.885987
+0:26:25 | Instrument transition: 0:00:40.885987
+0:26:30 | Instrument transition: 0:00:35.885987
+0:26:35 | Instrument transition: 0:00:30.885987
+0:26:40 | Instrument transition: 0:00:25.885987
+0:26:45 | Instrument transition: 0:00:20.885987
+0:26:50 | Instrument transition: 0:00:15.885987
+0:26:55 | Instrument transition: 0:00:10.885987
+0:27:00 | Instrument transition: 0:00:05.885987
+0:27:05 | Instrument transition: 0:00:00.885987
+0:27:10 | Start Run 5
+0:27:10 | OP: Start Peak Chasing
+0:27:10 | EM: Communicate with Operator
+0:27:25 | OP: Move Beam <<
+0:27:50 | OP: Move Beam <<
+0:27:55 | OP: Move Beam <<
+0:28:20 | OP: Move Beam <<
+0:29:10 | OP: Move Beam >>
+0:29:30 | DA: Data from run 5 is good
+0:29:40 | Instrument transition: 0:01:32.161645
+0:29:45 | Instrument transition: 0:01:27.161645
+0:29:50 | Instrument transition: 0:01:22.161645
+0:29:55 | Instrument transition: 0:01:17.161645
+0:30:00 | Instrument transition: 0:01:12.161645
+0:30:05 | Instrument transition: 0:01:07.161645
+0:30:10 | Instrument transition: 0:01:02.161645
+0:30:15 | Instrument transition: 0:00:57.161645
+0:30:20 | Instrument transition: 0:00:52.161645
+0:30:25 | Instrument transition: 0:00:47.161645
+0:30:30 | Instrument transition: 0:00:42.161645
+0:30:35 | Instrument transition: 0:00:37.161645
+0:30:40 | Instrument transition: 0:00:32.161645
+0:30:45 | Instrument transition: 0:00:27.161645
+0:30:50 | Instrument transition: 0:00:22.161645
+0:30:55 | Instrument transition: 0:00:17.161645
+0:31:00 | Instrument transition: 0:00:12.161645
+0:31:05 | Instrument transition: 0:00:07.161645
+0:31:10 | Instrument transition: 0:00:02.161645
+0:31:15 | Start Run 6
+0:31:15 | OP: Start Peak Chasing
+0:31:15 | EM: Communicate with Operator
+0:32:35 | OP: Move Beam >>
+0:33:05 | OP: Move Beam <<
+0:33:15 | DA: Data from run 6 is good
+0:33:25 | Instrument transition: 0:01:25.628787
+0:33:30 | Instrument transition: 0:01:20.628787
+0:33:35 | Instrument transition: 0:01:15.628787
+0:33:40 | Instrument transition: 0:01:10.628787
+0:33:45 | Instrument transition: 0:01:05.628787
+0:33:50 | Instrument transition: 0:01:00.628787
+0:33:55 | Instrument transition: 0:00:55.628787
+0:34:00 | Instrument transition: 0:00:50.628787
+0:34:05 | Instrument transition: 0:00:45.628787
+0:34:10 | Instrument transition: 0:00:40.628787
+0:34:15 | Instrument transition: 0:00:35.628787
+0:34:20 | Instrument transition: 0:00:30.628787
+0:34:25 | Instrument transition: 0:00:25.628787
+0:34:30 | Instrument transition: 0:00:20.628787
+0:34:35 | Instrument transition: 0:00:15.628787
+0:34:40 | Instrument transition: 0:00:10.628787
+0:34:45 | Instrument transition: 0:00:05.628787
+0:34:50 | Instrument transition: 0:00:00.628787
+0:34:55 | Start Run 7
+0:34:55 | OP: Start Peak Chasing
+0:34:55 | EM: Communicate with Operator
+0:35:20 | OP: Move Beam <<
+0:36:50 | DA: Data from run 7 is good
+0:37:00 | Instrument transition: 0:01:50.149424
+0:37:05 | Instrument transition: 0:01:45.149424
+0:37:10 | Instrument transition: 0:01:40.149424
+0:37:15 | Instrument transition: 0:01:35.149424
+0:37:20 | Instrument transition: 0:01:30.149424
+0:37:25 | Instrument transition: 0:01:25.149424
+0:37:30 | Instrument transition: 0:01:20.149424
+0:37:35 | Instrument transition: 0:01:15.149424
+0:37:40 | Instrument transition: 0:01:10.149424
+0:37:45 | Instrument transition: 0:01:05.149424
+0:37:50 | Instrument transition: 0:01:00.149424
+0:37:55 | Instrument transition: 0:00:55.149424
+0:38:00 | Instrument transition: 0:00:50.149424
+0:38:05 | Instrument transition: 0:00:45.149424
+0:38:10 | Instrument transition: 0:00:40.149424
+0:38:15 | Instrument transition: 0:00:35.149424
+0:38:20 | Instrument transition: 0:00:30.149424
+0:38:25 | Instrument transition: 0:00:25.149424
+0:38:30 | Instrument transition: 0:00:20.149424
+0:38:35 | Instrument transition: 0:00:15.149424
+0:38:40 | Instrument transition: 0:00:10.149424
+0:38:45 | Instrument transition: 0:00:05.149424
+0:38:50 | Instrument transition: 0:00:00.149424
+0:38:55 | Start Run 8
+0:38:55 | OP: Start Peak Chasing
+0:38:55 | EM: Communicate with Operator
+0:39:00 | OP: Move Beam >>
+0:39:10 | OP: Move Beam <<
+0:39:50 | OP: Move Beam <<
+0:39:55 | OP: Move Beam >>
+0:40:25 | OP: Move Beam >>
+0:41:05 | DA: Data from run 8 is good
+0:41:15 | Instrument transition: 0:00:19.925480
+0:41:20 | Instrument transition: 0:00:14.925480
+0:41:25 | Instrument transition: 0:00:09.925480
+0:41:30 | Instrument transition: 0:00:04.925480
+0:41:35 | Start Run 9
+0:41:35 | OP: Start Peak Chasing
+0:41:35 | EM: Communicate with Operator
+0:42:45 | OP: Move Beam >>
+0:43:30 | DA: Data from run 9 is good
+0:43:40 | Instrument transition: 0:00:37.762198
+0:43:45 | Instrument transition: 0:00:32.762198
+0:43:50 | Instrument transition: 0:00:27.762198
+0:43:55 | Instrument transition: 0:00:22.762198
+0:44:00 | Instrument transition: 0:00:17.762198
+0:44:05 | Instrument transition: 0:00:12.762198
+0:44:10 | Instrument transition: 0:00:07.762198
+0:44:15 | Instrument transition: 0:00:02.762198
+0:44:20 | Start Run 10
+0:44:20 | OP: Start Peak Chasing
+0:44:20 | EM: Communicate with Operator
+0:44:40 | OP: Move Beam >>
+0:44:45 | OP: Move Beam >>
+0:44:50 | OP: Move Beam >>
+0:45:05 | OP: Move Beam <<
+0:45:10 | OP: Move Beam <<
+0:45:30 | OP: Move Beam >>
+0:45:50 | OP: Move Beam >>
+0:45:55 | OP: Move Beam <<
+0:46:30 | OP: Move Beam >>
+0:46:35 | OP: Move Beam >>
+0:46:40 | OP: Move Beam >>
+0:46:45 | OP: Move Beam >>
+0:46:50 | OP: Move Beam >>
+0:46:55 | OP: Move Beam >>
+0:47:00 | OP: Move Beam >>
+0:47:05 | OP: Move Beam >>
+0:47:10 | OP: Move Beam >>
+0:47:15 | OP: Move Beam >>
+0:47:20 | OP: Move Beam >>
+0:47:25 | OP: Move Beam >>
+0:47:30 | OP: Move Beam >>
+0:47:35 | OP: Move Beam >>
+0:47:40 | OP: Move Beam >>
+0:47:45 | OP: Move Beam >>
+0:47:50 | OP: Move Beam >>
+0:47:55 | OP: Move Beam >>
+0:48:00 | OP: Move Beam >>
+0:48:05 | OP: Move Beam >>
+0:49:00 | DA: Data from run 10 is good
+0:49:10 | Instrument transition: 0:01:25.793361
+0:49:15 | Instrument transition: 0:01:20.793361
+0:49:20 | Instrument transition: 0:01:15.793361
+0:49:25 | Instrument transition: 0:01:10.793361
+0:49:30 | Instrument transition: 0:01:05.793361
+0:49:35 | Instrument transition: 0:01:00.793361
+0:49:40 | Instrument transition: 0:00:55.793361
+0:49:45 | Instrument transition: 0:00:50.793361
+0:49:50 | Instrument transition: 0:00:45.793361
+0:49:55 | Instrument transition: 0:00:40.793361
+0:50:00 | Instrument transition: 0:00:35.793361
+0:50:05 | Instrument transition: 0:00:30.793361
+0:50:10 | Instrument transition: 0:00:25.793361
+0:50:15 | Instrument transition: 0:00:20.793361
+0:50:20 | Instrument transition: 0:00:15.793361
+0:50:25 | Instrument transition: 0:00:10.793361
+0:50:30 | Instrument transition: 0:00:05.793361
+0:50:35 | Instrument transition: 0:00:00.793361
+0:50:40 | Start Run 11
+0:50:40 | OP: Start Peak Chasing
+0:50:40 | EM: Communicate with Operator
+0:51:05 | OP: Move Beam <<
+0:51:45 | OP: Move Beam >>
+0:52:30 | OP: Move Beam <<
+0:52:35 | OP: Move Beam <<
+0:52:40 | OP: Move Beam <<
+0:52:45 | OP: Move Beam <<
+0:52:50 | OP: Move Beam <<
+0:52:55 | OP: Move Beam <<
+0:53:00 | OP: Move Beam <<
+0:53:05 | OP: Move Beam <<
+0:53:10 | OP: Move Beam <<
+0:53:15 | OP: Move Beam <<
+0:53:20 | OP: Move Beam <<
+0:53:25 | OP: Move Beam <<
+0:53:30 | OP: Move Beam <<
+0:53:35 | OP: Move Beam <<
+0:53:40 | OP: Move Beam <<
+0:53:45 | OP: Move Beam <<
+0:53:50 | OP: Move Beam <<
+0:53:55 | OP: Move Beam <<
+0:54:00 | OP: Move Beam <<
+0:54:05 | OP: Move Beam <<
+0:54:10 | OP: Move Beam <<
+0:54:30 | OP: Move Beam >>
+0:54:40 | OP: Move Beam <<
+0:56:05 | OP: Move Beam <<
+0:56:10 | OP: Move Beam <<
+0:56:30 | DA: Data from run 11 is good
+0:56:40 | Instrument transition: 0:01:28.540704
+0:56:45 | Instrument transition: 0:01:23.540704
+0:56:50 | Instrument transition: 0:01:18.540704
+0:56:55 | Instrument transition: 0:01:13.540704
+0:57:00 | Instrument transition: 0:01:08.540704
+0:57:05 | Instrument transition: 0:01:03.540704
+0:57:10 | Instrument transition: 0:00:58.540704
+0:57:15 | Instrument transition: 0:00:53.540704
+0:57:20 | Instrument transition: 0:00:48.540704
+0:57:25 | Instrument transition: 0:00:43.540704
+0:57:30 | Instrument transition: 0:00:38.540704
+0:57:35 | Instrument transition: 0:00:33.540704
+0:57:40 | Instrument transition: 0:00:28.540704
+0:57:45 | Instrument transition: 0:00:23.540704
+0:57:50 | Instrument transition: 0:00:18.540704
+0:57:55 | Instrument transition: 0:00:13.540704
+0:58:00 | Instrument transition: 0:00:08.540704
+0:58:05 | Instrument transition: 0:00:03.540704
+0:58:10 | Start Run 12
+0:58:10 | OP: Start Peak Chasing
+0:58:10 | EM: Communicate with Operator
+0:58:20 | OP: Move Beam <<
+0:58:35 | OP: Move Beam <<
+0:58:50 | OP: Move Beam <<
+0:58:55 | OP: Move Beam >>
+0:59:00 | OP: Move Beam >>
+0:59:05 | OP: Move Beam >>
+0:59:10 | OP: Move Beam >>
+0:59:15 | OP: Move Beam >>
+0:59:20 | OP: Move Beam >>
+0:59:25 | OP: Move Beam >>
+0:59:30 | OP: Move Beam >>
+0:59:35 | OP: Move Beam >>
+0:59:40 | OP: Move Beam >>
+0:59:45 | OP: Move Beam >>
+0:59:50 | OP: Move Beam >>
+0:59:55 | OP: Move Beam >>
+1:00:00 | OP: Move Beam >>
+1:00:05 | OP: Move Beam >>
+1:00:10 | OP: Move Beam >>
+1:00:15 | OP: Move Beam >>
+1:00:20 | OP: Move Beam >>
+1:00:25 | OP: Move Beam >>
+1:01:10 | OP: Move Beam >>
+1:01:15 | OP: Move Beam <<
+1:01:20 | OP: Move Beam >>
+1:01:45 | OP: Move Beam <<
+1:02:05 | OP: Move Beam <<
+1:02:20 | DA: Data from run 12 is good
+1:02:30 | Instrument transition: 0:00:31.628622
+1:02:35 | Instrument transition: 0:00:26.628622
+1:02:40 | Instrument transition: 0:00:21.628622
+1:02:45 | Instrument transition: 0:00:16.628622
+1:02:50 | Instrument transition: 0:00:11.628622
+1:02:55 | Instrument transition: 0:00:06.628622
+1:03:00 | Instrument transition: 0:00:01.628622
+1:03:05 | Start Run 13
+1:03:05 | OP: Start Peak Chasing
+1:03:05 | EM: Communicate with Operator
+1:03:10 | OP: Move Beam >>
+1:03:15 | OP: Move Beam >>
+1:03:20 | OP: Move Beam <<
+1:03:35 | OP: Move Beam >>
+1:05:30 | OP: Move Beam <<
+1:06:05 | DA: Data from run 13 is good
+1:06:15 | Instrument transition: 0:01:54.013426
+1:06:20 | Instrument transition: 0:01:49.013426
+1:06:25 | Instrument transition: 0:01:44.013426
+1:06:30 | Instrument transition: 0:01:39.013426
+1:06:35 | Instrument transition: 0:01:34.013426
+1:06:40 | Instrument transition: 0:01:29.013426
+1:06:45 | Instrument transition: 0:01:24.013426
+1:06:50 | Instrument transition: 0:01:19.013426
+1:06:55 | Instrument transition: 0:01:14.013426
+1:07:00 | Instrument transition: 0:01:09.013426
+1:07:05 | Instrument transition: 0:01:04.013426
+1:07:10 | Instrument transition: 0:00:59.013426
+1:07:15 | Instrument transition: 0:00:54.013426
+1:07:20 | Instrument transition: 0:00:49.013426
+1:07:25 | Instrument transition: 0:00:44.013426
+1:07:30 | Instrument transition: 0:00:39.013426
+1:07:35 | Instrument transition: 0:00:34.013426
+1:07:40 | Instrument transition: 0:00:29.013426
+1:07:45 | Instrument transition: 0:00:24.013426
+1:07:50 | Instrument transition: 0:00:19.013426
+1:07:55 | Instrument transition: 0:00:14.013426
+1:08:00 | Instrument transition: 0:00:09.013426
+1:08:05 | Instrument transition: 0:00:04.013426
+1:08:10 | Start Run 14
+1:08:10 | OP: Start Peak Chasing
+1:08:10 | EM: Communicate with Operator
+1:08:15 | OP: Move Beam <<
+1:09:05 | OP: Move Beam <<
+1:09:40 | OP: Move Beam >>
+1:09:55 | OP: Move Beam <<
+1:10:15 | DA: Data from run 14 is good
+1:10:25 | Instrument transition: 0:01:12.817276
+1:10:30 | Instrument transition: 0:01:07.817276
+1:10:35 | Instrument transition: 0:01:02.817276
+1:10:40 | Instrument transition: 0:00:57.817276
+1:10:45 | Instrument transition: 0:00:52.817276
+1:10:50 | Instrument transition: 0:00:47.817276
+1:10:55 | Instrument transition: 0:00:42.817276
+1:11:00 | Instrument transition: 0:00:37.817276
+1:11:05 | Instrument transition: 0:00:32.817276
+1:11:10 | Instrument transition: 0:00:27.817276
+1:11:15 | Instrument transition: 0:00:22.817276
+1:11:20 | Instrument transition: 0:00:17.817276
+1:11:25 | Instrument transition: 0:00:12.817276
+1:11:30 | Instrument transition: 0:00:07.817276
+1:11:35 | Instrument transition: 0:00:02.817276
+1:11:40 | Start Run 15
+1:11:40 | OP: Start Peak Chasing
+1:11:40 | EM: Communicate with Operator
+1:12:10 | OP: Move Beam <<
+1:12:20 | OP: Move Beam <<
+1:13:40 | DA: Data from run 15 is good
+1:28:45 | Start Run 16
+1:28:45 | OP: Start Peak Chasing
+1:28:45 | EM: Communicate with Operator
+1:30:50 | DA: Data from run 16 is good
+1:31:00 | Instrument transition: 0:01:02.664376
+1:31:05 | Instrument transition: 0:00:57.664376
+1:31:10 | Instrument transition: 0:00:52.664376
+1:31:15 | Instrument transition: 0:00:47.664376
+1:31:20 | Instrument transition: 0:00:42.664376
+1:31:25 | Instrument transition: 0:00:37.664376
+1:31:30 | Instrument transition: 0:00:32.664376
+1:31:35 | Instrument transition: 0:00:27.664376
+1:31:40 | Instrument transition: 0:00:22.664376
+1:31:45 | Instrument transition: 0:00:17.664376
+1:31:50 | Instrument transition: 0:00:12.664376
+1:31:55 | Instrument transition: 0:00:07.664376
+1:32:00 | Instrument transition: 0:00:02.664376
+1:32:05 | Start Run 17
+1:32:05 | OP: Start Peak Chasing
+1:32:05 | EM: Communicate with Operator
+1:32:20 | OP: Move Beam >>
+1:32:40 | OP: Move Beam >>
+1:32:45 | OP: Move Beam >>
+1:32:50 | OP: Move Beam >>
+1:32:55 | OP: Move Beam >>
+1:33:00 | OP: Move Beam >>
+1:33:05 | OP: Move Beam >>
+1:33:10 | OP: Move Beam >>
+1:33:15 | OP: Move Beam >>
+1:33:20 | OP: Move Beam >>
+1:33:25 | OP: Move Beam >>
+1:33:30 | OP: Move Beam >>
+1:33:35 | OP: Move Beam >>
+1:33:40 | OP: Move Beam >>
+1:33:45 | OP: Move Beam >>
+1:33:50 | OP: Move Beam >>
+1:34:15 | OP: Move Beam <<
+1:34:45 | OP: Move Beam >>
+1:35:25 | OP: Move Beam >>
+1:36:00 | OP: Move Beam >>
+1:36:05 | OP: Move Beam >>
+1:36:10 | DA: Data from run 17 is good
+1:36:20 | Instrument transition: 0:00:35.956307
+1:36:25 | Instrument transition: 0:00:30.956307
+1:36:30 | Instrument transition: 0:00:25.956307
+1:36:35 | Instrument transition: 0:00:20.956307
+1:36:40 | Instrument transition: 0:00:15.956307
+1:36:45 | Instrument transition: 0:00:10.956307
+1:36:50 | Instrument transition: 0:00:05.956307
+1:36:55 | Instrument transition: 0:00:00.956307
+1:37:00 | Start Run 18
+1:37:00 | OP: Start Peak Chasing
+1:37:00 | EM: Communicate with Operator
+1:37:25 | OP: Move Beam >>
+1:37:40 | OP: Move Beam >>
+1:37:45 | OP: Move Beam >>
+1:38:40 | OP: Move Beam <<
+1:39:15 | OP: Move Beam <<
+1:39:30 | DA: Data from run 18 is good
+1:39:40 | Instrument transition: 0:01:54.465328
+1:39:45 | Instrument transition: 0:01:49.465328
+1:39:50 | Instrument transition: 0:01:44.465328
+1:39:55 | Instrument transition: 0:01:39.465328
+1:40:00 | Instrument transition: 0:01:34.465328
+1:40:05 | Instrument transition: 0:01:29.465328
+1:40:10 | Instrument transition: 0:01:24.465328
+1:40:15 | Instrument transition: 0:01:19.465328
+1:40:20 | Instrument transition: 0:01:14.465328
+1:40:25 | Instrument transition: 0:01:09.465328
+1:40:30 | Instrument transition: 0:01:04.465328
+1:40:35 | Instrument transition: 0:00:59.465328
+1:40:40 | Instrument transition: 0:00:54.465328
+1:40:45 | Instrument transition: 0:00:49.465328
+1:40:50 | Instrument transition: 0:00:44.465328
+1:40:55 | Instrument transition: 0:00:39.465328
+1:41:00 | Instrument transition: 0:00:34.465328
+1:41:05 | Instrument transition: 0:00:29.465328
+1:41:10 | Instrument transition: 0:00:24.465328
+1:41:15 | Instrument transition: 0:00:19.465328
+1:41:20 | Instrument transition: 0:00:14.465328
+1:41:25 | Instrument transition: 0:00:09.465328
+1:41:30 | Instrument transition: 0:00:04.465328
+1:41:35 | Start Run 19
+1:41:35 | OP: Start Peak Chasing
+1:41:35 | EM: Communicate with Operator
+1:41:50 | OP: Move Beam >>
+1:42:15 | OP: Move Beam >>
+1:43:05 | OP: Move Beam <<
+1:43:25 | OP: Move Beam >>
+1:43:50 | OP: Move Beam <<
+1:44:30 | DA: Data from run 19 is good
+1:44:40 | Instrument transition: 0:01:42.834759
+1:44:45 | Instrument transition: 0:01:37.834759
+1:44:50 | Instrument transition: 0:01:32.834759
+1:44:55 | Instrument transition: 0:01:27.834759
+1:45:00 | Instrument transition: 0:01:22.834759
+1:45:05 | Instrument transition: 0:01:17.834759
+1:45:10 | Instrument transition: 0:01:12.834759
+1:45:15 | Instrument transition: 0:01:07.834759
+1:45:20 | Instrument transition: 0:01:02.834759
+1:45:25 | Instrument transition: 0:00:57.834759
+1:45:30 | Instrument transition: 0:00:52.834759
+1:45:35 | Instrument transition: 0:00:47.834759
+1:45:40 | Instrument transition: 0:00:42.834759
+1:45:45 | Instrument transition: 0:00:37.834759
+1:45:50 | Instrument transition: 0:00:32.834759
+1:45:55 | Instrument transition: 0:00:27.834759
+1:46:00 | Instrument transition: 0:00:22.834759
+1:46:05 | Instrument transition: 0:00:17.834759
+1:46:10 | Instrument transition: 0:00:12.834759
+1:46:15 | Instrument transition: 0:00:07.834759
+1:46:20 | Instrument transition: 0:00:02.834759
+1:46:25 | Start Run 20
+1:46:25 | OP: Start Peak Chasing
+1:46:25 | EM: Communicate with Operator
+1:47:35 | OP: Move Beam <<
+1:48:35 | OP: Move Beam >>
+1:48:40 | OP: Move Beam <<
+1:48:45 | OP: Move Beam <<
+1:48:50 | OP: Move Beam >>
+1:48:55 | DA: Data from run 20 is good
+1:49:05 | Instrument transition: 0:00:49.495042
+1:49:10 | Instrument transition: 0:00:44.495042
+1:49:15 | Instrument transition: 0:00:39.495042
+1:49:20 | Instrument transition: 0:00:34.495042
+1:49:25 | Instrument transition: 0:00:29.495042
+1:49:30 | Instrument transition: 0:00:24.495042
+1:49:35 | Instrument transition: 0:00:19.495042
+1:49:40 | Instrument transition: 0:00:14.495042
+1:49:45 | Instrument transition: 0:00:09.495042
+1:49:50 | Instrument transition: 0:00:04.495042
+1:49:55 | Start Run 21
+1:49:55 | OP: Start Peak Chasing
+1:49:55 | EM: Communicate with Operator
+1:50:00 | OP: Move Beam >>
+1:50:10 | OP: Move Beam <<
+1:51:00 | OP: Move Beam >>
+1:51:20 | OP: Move Beam >>
+1:52:05 | OP: Move Beam >>
+1:52:20 | OP: Move Beam >>
+1:52:30 | OP: Move Beam <<
+1:52:55 | OP: Move Beam <<
+1:53:00 | OP: Move Beam <<
+1:53:05 | OP: Move Beam <<
+1:53:10 | OP: Move Beam <<
+1:53:15 | OP: Move Beam <<
+1:53:20 | OP: Move Beam <<
+1:53:25 | OP: Move Beam <<
+1:53:30 | OP: Move Beam <<
+1:53:35 | OP: Move Beam <<
+1:53:40 | OP: Move Beam <<
+1:53:45 | OP: Move Beam <<
+1:53:50 | OP: Move Beam <<
+1:53:55 | OP: Move Beam <<
+1:54:00 | OP: Move Beam <<
+1:54:05 | OP: Move Beam <<
+1:54:10 | OP: Move Beam <<
+1:54:15 | OP: Move Beam <<
+1:54:50 | OP: Move Beam <<
+1:54:55 | OP: Move Beam <<
+1:55:00 | OP: Move Beam <<
+1:55:15 | DA: Data from run 21 is good
+1:55:25 | Instrument transition: 0:00:34.222269
+1:55:30 | Instrument transition: 0:00:29.222269
+1:55:35 | Instrument transition: 0:00:24.222269
+1:55:40 | Instrument transition: 0:00:19.222269
+1:55:45 | Instrument transition: 0:00:14.222269
+1:55:50 | Instrument transition: 0:00:09.222269
+1:55:55 | Instrument transition: 0:00:04.222269
+1:56:00 | Start Run 22
+1:56:00 | OP: Start Peak Chasing
+1:56:00 | EM: Communicate with Operator
+1:56:45 | OP: Move Beam <<
+1:57:30 | OP: Move Beam >>
+1:57:55 | OP: Move Beam >>
+1:58:20 | DA: Data from run 22 is good
+1:58:30 | Instrument transition: 0:01:43.881162
+1:58:35 | Instrument transition: 0:01:38.881162
+1:58:40 | Instrument transition: 0:01:33.881162
+1:58:45 | Instrument transition: 0:01:28.881162
+1:58:50 | Instrument transition: 0:01:23.881162
+1:58:55 | Instrument transition: 0:01:18.881162
+1:59:00 | Instrument transition: 0:01:13.881162
+1:59:05 | Instrument transition: 0:01:08.881162
+1:59:10 | Instrument transition: 0:01:03.881162
+1:59:15 | Instrument transition: 0:00:58.881162
+1:59:20 | Instrument transition: 0:00:53.881162
+1:59:25 | Instrument transition: 0:00:48.881162
+1:59:30 | Instrument transition: 0:00:43.881162
+1:59:35 | Instrument transition: 0:00:38.881162
+1:59:40 | Instrument transition: 0:00:33.881162
+1:59:45 | Instrument transition: 0:00:28.881162
+1:59:50 | Instrument transition: 0:00:23.881162
+1:59:55 | Instrument transition: 0:00:18.881162
+2:00:00 | Instrument transition: 0:00:13.881162
+2:00:05 | Instrument transition: 0:00:08.881162
+2:00:10 | Instrument transition: 0:00:03.881162
+2:00:15 | Start Run 23
+2:00:15 | OP: Start Peak Chasing
+2:00:15 | EM: Communicate with Operator
+2:01:15 | OP: Move Beam >>
+2:01:50 | OP: Move Beam >>
+2:01:55 | OP: Move Beam >>
+2:02:25 | OP: Move Beam <<
+2:03:00 | OP: Move Beam >>
+2:03:10 | DA: Data from run 23 is good
+2:03:20 | Instrument transition: 0:00:52.099642
+2:03:25 | Instrument transition: 0:00:47.099642
+2:03:30 | Instrument transition: 0:00:42.099642
+2:03:35 | Instrument transition: 0:00:37.099642
+2:03:40 | Instrument transition: 0:00:32.099642
+2:03:45 | Instrument transition: 0:00:27.099642
+2:03:50 | Instrument transition: 0:00:22.099642
+2:03:55 | Instrument transition: 0:00:17.099642
+2:04:00 | Instrument transition: 0:00:12.099642
+2:04:05 | Instrument transition: 0:00:07.099642
+2:04:10 | Instrument transition: 0:00:02.099642
+2:04:15 | Start Run 24
+2:04:15 | OP: Start Peak Chasing
+2:04:15 | EM: Communicate with Operator
+2:04:45 | OP: Move Beam >>
+2:05:00 | OP: Move Beam <<
+2:06:10 | OP: Move Beam <<
+2:06:15 | OP: Move Beam <<
+2:06:20 | OP: Move Beam <<
+2:06:25 | OP: Move Beam <<
+2:06:30 | OP: Move Beam <<
+2:06:35 | OP: Move Beam <<
+2:06:40 | OP: Move Beam <<
+2:06:45 | OP: Move Beam <<
+2:06:50 | OP: Move Beam <<
+2:06:55 | OP: Move Beam <<
+2:07:00 | OP: Move Beam <<
+2:07:05 | OP: Move Beam <<
+2:07:10 | OP: Move Beam <<
+2:07:15 | OP: Move Beam <<
+2:07:20 | OP: Move Beam <<
+2:07:25 | OP: Move Beam <<
+2:07:30 | OP: Move Beam <<
+2:08:00 | DA: Data from run 24 is good
+2:08:10 | Instrument transition: 0:00:49.179491
+2:08:15 | Instrument transition: 0:00:44.179491
+2:08:20 | Instrument transition: 0:00:39.179491
+2:08:25 | Instrument transition: 0:00:34.179491
+2:08:30 | Instrument transition: 0:00:29.179491
+2:08:35 | Instrument transition: 0:00:24.179491
+2:08:40 | Instrument transition: 0:00:19.179491
+2:08:45 | Instrument transition: 0:00:14.179491
+2:08:50 | Instrument transition: 0:00:09.179491
+2:08:55 | Instrument transition: 0:00:04.179491
+2:09:00 | Start Run 25
+2:09:00 | OP: Start Peak Chasing
+2:09:00 | EM: Communicate with Operator
+2:10:00 | OP: Move Beam >>
+2:10:10 | OP: Move Beam <<
+2:10:15 | OP: Move Beam <<
+2:10:20 | OP: Move Beam <<
+2:10:25 | OP: Move Beam <<
+2:10:30 | OP: Move Beam <<
+2:10:35 | OP: Move Beam <<
+2:10:40 | OP: Move Beam <<
+2:10:45 | OP: Move Beam <<
+2:10:50 | OP: Move Beam <<
+2:10:55 | OP: Move Beam <<
+2:11:00 | OP: Move Beam <<
+2:11:05 | OP: Move Beam <<
+2:11:10 | OP: Move Beam <<
+2:11:15 | OP: Move Beam <<
+2:11:20 | OP: Move Beam <<
+2:11:25 | OP: Move Beam <<
+2:11:30 | OP: Move Beam <<
+2:11:50 | OP: Move Beam >>
+2:12:15 | OP: Move Beam >>
+2:12:20 | OP: Move Beam >>
+2:12:25 | OP: Move Beam >>
+2:12:30 | OP: Move Beam >>
+2:12:35 | OP: Move Beam >>
+2:12:40 | OP: Move Beam >>
+2:12:45 | OP: Move Beam >>
+2:12:50 | OP: Move Beam >>
+2:12:55 | OP: Move Beam >>
+2:13:00 | OP: Move Beam <<
+2:13:05 | OP: Move Beam <<
+2:13:10 | OP: Move Beam <<
+2:13:15 | OP: Move Beam <<
+2:13:20 | OP: Move Beam <<
+2:13:25 | OP: Move Beam <<
+2:15:40 | OP: Move Beam >>
+2:16:10 | OP: Move Beam <<
+2:16:15 | DA: Data from run 25 is good
+2:16:25 | Instrument transition: 0:00:12.709859
+2:16:30 | Instrument transition: 0:00:07.709859
+2:16:35 | Instrument transition: 0:00:02.709859
+2:16:40 | Start Run 26
+2:16:40 | OP: Start Peak Chasing
+2:16:40 | EM: Communicate with Operator
+2:18:25 | OP: Move Beam >>
+2:18:35 | OP: Move Beam >>
+2:18:55 | OP: Move Beam <<
+2:19:00 | DA: Data from run 26 is good
+2:19:10 | Instrument transition: 0:00:38.358107
+2:19:15 | Instrument transition: 0:00:33.358107
+2:19:20 | Instrument transition: 0:00:28.358107
+2:19:25 | Instrument transition: 0:00:23.358107
+2:19:30 | Instrument transition: 0:00:18.358107
+2:19:35 | Instrument transition: 0:00:13.358107
+2:19:40 | Instrument transition: 0:00:08.358107
+2:19:45 | Instrument transition: 0:00:03.358107
+2:19:50 | Start Run 27
+2:19:50 | OP: Start Peak Chasing
+2:19:50 | EM: Communicate with Operator
+2:20:15 | OP: Move Beam <<
+2:21:05 | OP: Move Beam <<
+2:21:10 | OP: Move Beam <<
+2:21:15 | OP: Move Beam <<
+2:21:20 | OP: Move Beam <<
+2:21:25 | OP: Move Beam <<
+2:21:30 | OP: Move Beam <<
+2:21:35 | OP: Move Beam <<
+2:21:40 | OP: Move Beam <<
+2:21:45 | OP: Move Beam <<
+2:21:50 | OP: Move Beam <<
+2:21:55 | OP: Move Beam <<
+2:22:00 | OP: Move Beam <<
+2:22:05 | OP: Move Beam <<
+2:22:10 | OP: Move Beam <<
+2:22:15 | OP: Move Beam <<
+2:22:20 | OP: Move Beam <<
+2:22:25 | OP: Move Beam <<
+2:22:30 | OP: Move Beam >>
+2:22:35 | OP: Move Beam >>
+2:22:40 | OP: Move Beam >>
+2:22:45 | OP: Move Beam >>
+2:22:50 | OP: Move Beam >>
+2:22:55 | OP: Move Beam >>
+2:23:00 | OP: Move Beam >>
+2:23:05 | OP: Move Beam >>
+2:23:10 | OP: Move Beam >>
+2:23:15 | OP: Move Beam >>
+2:23:20 | OP: Move Beam >>
+2:23:25 | OP: Move Beam >>
+2:23:30 | OP: Move Beam >>
+2:23:35 | OP: Move Beam >>
+2:23:40 | OP: Move Beam >>
+2:23:45 | OP: Move Beam >>
+2:24:35 | OP: Move Beam >>
+2:24:40 | OP: Move Beam >>
+2:25:05 | DA: Data from run 27 is good
+2:25:15 | Instrument transition: 0:01:07.656045
+2:25:20 | Instrument transition: 0:01:02.656045
+2:25:25 | Instrument transition: 0:00:57.656045
+2:25:30 | Instrument transition: 0:00:52.656045
+2:25:35 | Instrument transition: 0:00:47.656045
+2:25:40 | Instrument transition: 0:00:42.656045
+2:25:45 | Instrument transition: 0:00:37.656045
+2:25:50 | Instrument transition: 0:00:32.656045
+2:25:55 | Instrument transition: 0:00:27.656045
+2:26:00 | Instrument transition: 0:00:22.656045
+2:26:05 | Instrument transition: 0:00:17.656045
+2:26:10 | Instrument transition: 0:00:12.656045
+2:26:15 | Instrument transition: 0:00:07.656045
+2:26:20 | Instrument transition: 0:00:02.656045
+2:26:25 | Start Run 28
+2:26:25 | OP: Start Peak Chasing
+2:26:25 | EM: Communicate with Operator
+2:27:10 | OP: Move Beam >>
+2:28:25 | OP: Move Beam >>
+2:28:40 | DA: Data from run 28 is good
+2:28:50 | Instrument transition: 0:01:55.812931
+2:28:55 | Instrument transition: 0:01:50.812931
+2:29:00 | Instrument transition: 0:01:45.812931
+2:29:05 | Instrument transition: 0:01:40.812931
+2:29:10 | Instrument transition: 0:01:35.812931
+2:29:15 | Instrument transition: 0:01:30.812931
+2:29:20 | Instrument transition: 0:01:25.812931
+2:29:25 | Instrument transition: 0:01:20.812931
+2:29:30 | Instrument transition: 0:01:15.812931
+2:29:35 | Instrument transition: 0:01:10.812931
+2:29:40 | Instrument transition: 0:01:05.812931
+2:29:45 | Instrument transition: 0:01:00.812931
+2:29:50 | Instrument transition: 0:00:55.812931
+2:29:55 | Instrument transition: 0:00:50.812931
+2:30:00 | Instrument transition: 0:00:45.812931
+2:30:05 | Instrument transition: 0:00:40.812931
+2:30:10 | Instrument transition: 0:00:35.812931
+2:30:15 | Instrument transition: 0:00:30.812931
+2:30:20 | Instrument transition: 0:00:25.812931
+2:30:25 | Instrument transition: 0:00:20.812931
+2:30:30 | Instrument transition: 0:00:15.812931
+2:30:35 | Instrument transition: 0:00:10.812931
+2:30:40 | Instrument transition: 0:00:05.812931
+2:30:45 | Instrument transition: 0:00:00.812931
+2:30:50 | Start Run 29
+2:30:50 | OP: Start Peak Chasing
+2:30:50 | EM: Communicate with Operator
+2:31:00 | OP: Move Beam <<
+2:31:25 | OP: Move Beam >>
+2:31:30 | OP: Move Beam >>
+2:31:35 | OP: Move Beam >>
+2:31:40 | OP: Move Beam >>
+2:31:45 | OP: Move Beam >>
+2:31:50 | OP: Move Beam >>
+2:31:55 | OP: Move Beam >>
+2:32:00 | OP: Move Beam >>
+2:32:05 | OP: Move Beam >>
+2:32:10 | OP: Move Beam >>
+2:32:15 | OP: Move Beam >>
+2:32:20 | OP: Move Beam >>
+2:32:25 | OP: Move Beam >>
+2:32:30 | OP: Move Beam >>
+2:32:35 | OP: Move Beam >>
+2:32:40 | OP: Move Beam >>
+2:32:45 | OP: Move Beam >>
+2:33:35 | OP: Move Beam <<
+2:34:20 | OP: Move Beam >>
+2:34:30 | OP: Move Beam >>
+2:34:45 | DA: Data from run 29 is good
+2:34:55 | Instrument transition: 0:00:50.840639
+2:35:00 | Instrument transition: 0:00:45.840639
+2:35:05 | Instrument transition: 0:00:40.840639
+2:35:10 | Instrument transition: 0:00:35.840639
+2:35:15 | Instrument transition: 0:00:30.840639
+2:35:20 | Instrument transition: 0:00:25.840639
+2:35:25 | Instrument transition: 0:00:20.840639
+2:35:30 | Instrument transition: 0:00:15.840639
+2:35:35 | Instrument transition: 0:00:10.840639
+2:35:40 | Instrument transition: 0:00:05.840639
+2:35:45 | Instrument transition: 0:00:00.840639
+2:35:50 | Start Run 30
+2:35:50 | OP: Start Peak Chasing
+2:35:50 | EM: Communicate with Operator
+2:37:55 | DA: Data from run 30 is good
+2:50:00 | Start Run 31
+2:50:00 | OP: Start Peak Chasing
+2:50:00 | EM: Communicate with Operator
+2:50:25 | OP: Move Beam >>
+2:52:30 | DA: Data from run 31 is good
+2:52:40 | Instrument transition: 0:01:51.488350
+2:52:45 | Instrument transition: 0:01:46.488350
+2:52:50 | Instrument transition: 0:01:41.488350
+2:52:55 | Instrument transition: 0:01:36.488350
+2:53:00 | Instrument transition: 0:01:31.488350
+2:53:05 | Instrument transition: 0:01:26.488350
+2:53:10 | Instrument transition: 0:01:21.488350
+2:53:15 | Instrument transition: 0:01:16.488350
+2:53:20 | Instrument transition: 0:01:11.488350
+2:53:25 | Instrument transition: 0:01:06.488350
+2:53:30 | Instrument transition: 0:01:01.488350
+2:53:35 | Instrument transition: 0:00:56.488350
+2:53:40 | Instrument transition: 0:00:51.488350
+2:53:45 | Instrument transition: 0:00:46.488350
+2:53:50 | Instrument transition: 0:00:41.488350
+2:53:55 | Instrument transition: 0:00:36.488350
+2:54:00 | Instrument transition: 0:00:31.488350
+2:54:05 | Instrument transition: 0:00:26.488350
+2:54:10 | Instrument transition: 0:00:21.488350
+2:54:15 | Instrument transition: 0:00:16.488350
+2:54:20 | Instrument transition: 0:00:11.488350
+2:54:25 | Instrument transition: 0:00:06.488350
+2:54:30 | Instrument transition: 0:00:01.488350
+2:54:35 | Start Run 32
+2:54:35 | OP: Start Peak Chasing
+2:54:35 | EM: Communicate with Operator
+2:55:15 | OP: Move Beam <<
+2:55:40 | OP: Move Beam <<
+2:55:45 | OP: Move Beam <<
+2:55:55 | OP: Move Beam >>
+2:56:20 | OP: Move Beam <<
+2:56:55 | OP: Move Beam <<
+2:57:30 | DA: Data from run 32 is good
+2:57:40 | Instrument transition: 0:00:30.620754
+2:57:45 | Instrument transition: 0:00:25.620754
+2:57:50 | Instrument transition: 0:00:20.620754
+2:57:55 | Instrument transition: 0:00:15.620754
+2:58:00 | Instrument transition: 0:00:10.620754
+2:58:05 | Instrument transition: 0:00:05.620754
+2:58:10 | Instrument transition: 0:00:00.620754
+2:58:15 | Start Run 33
+2:58:15 | OP: Start Peak Chasing
+2:58:15 | EM: Communicate with Operator
+2:58:20 | OP: Move Beam >>
+2:58:25 | OP: Move Beam >>
+2:58:30 | OP: Move Beam >>
+2:59:00 | OP: Move Beam <<
+2:59:05 | OP: Move Beam >>
+2:59:10 | OP: Move Beam >>
+2:59:15 | OP: Move Beam >>
+2:59:20 | OP: Move Beam >>
+2:59:25 | OP: Move Beam >>
+2:59:30 | OP: Move Beam >>
+2:59:35 | OP: Move Beam >>
+2:59:40 | OP: Move Beam >>
+2:59:45 | OP: Move Beam >>
+2:59:50 | OP: Move Beam >>
+2:59:55 | OP: Move Beam >>
+3:00:00 | OP: Move Beam >>
+3:00:05 | OP: Move Beam >>
+3:00:10 | OP: Move Beam >>
+3:00:15 | OP: Move Beam >>
+3:00:20 | OP: Move Beam >>
+3:00:25 | OP: Move Beam >>
+3:00:30 | OP: Move Beam >>
+3:00:35 | OP: Move Beam >>
+3:00:40 | OP: Move Beam >>
+3:01:25 | OP: Move Beam >>
+3:01:30 | OP: Move Beam >>
+3:02:10 | OP: Move Beam <<
+3:02:40 | OP: Move Beam >>
+3:02:50 | OP: Move Beam >>
+3:03:15 | DA: Data from run 33 is good
+3:03:25 | Instrument transition: 0:01:00.913957
+3:03:30 | Instrument transition: 0:00:55.913957
+3:03:35 | Instrument transition: 0:00:50.913957
+3:03:40 | Instrument transition: 0:00:45.913957
+3:03:45 | Instrument transition: 0:00:40.913957
+3:03:50 | Instrument transition: 0:00:35.913957
+3:03:55 | Instrument transition: 0:00:30.913957
+3:04:00 | Instrument transition: 0:00:25.913957
+3:04:05 | Instrument transition: 0:00:20.913957
+3:04:10 | Instrument transition: 0:00:15.913957
+3:04:15 | Instrument transition: 0:00:10.913957
+3:04:20 | Instrument transition: 0:00:05.913957
+3:04:25 | Instrument transition: 0:00:00.913957
+3:04:30 | Start Run 34
+3:04:30 | OP: Start Peak Chasing
+3:04:30 | EM: Communicate with Operator
+3:04:35 | OP: Move Beam >>
+3:04:40 | OP: Move Beam >>
+3:04:45 | OP: Move Beam >>
+3:04:50 | OP: Move Beam >>
+3:04:55 | OP: Move Beam >>
+3:05:00 | OP: Move Beam >>
+3:05:05 | OP: Move Beam >>
+3:05:10 | OP: Move Beam >>
+3:05:15 | OP: Move Beam >>
+3:05:20 | OP: Move Beam >>
+3:05:25 | OP: Move Beam >>
+3:05:30 | OP: Move Beam >>
+3:05:35 | OP: Move Beam >>
+3:05:40 | OP: Move Beam >>
+3:05:45 | OP: Move Beam >>
+3:05:50 | OP: Move Beam >>
+3:05:55 | OP: Move Beam >>
+3:08:25 | OP: Move Beam <<
+3:09:00 | OP: Move Beam <<
+3:09:35 | OP: Move Beam <<
+3:09:40 | OP: Move Beam <<
+3:10:05 | OP: Move Beam >>
+3:10:45 | OP: Move Beam <<
+3:11:00 | DA: Data from run 34 is good
+3:11:10 | Instrument transition: 0:00:37.905532
+3:11:15 | Instrument transition: 0:00:32.905532
+3:11:20 | Instrument transition: 0:00:27.905532
+3:11:25 | Instrument transition: 0:00:22.905532
+3:11:30 | Instrument transition: 0:00:17.905532
+3:11:35 | Instrument transition: 0:00:12.905532
+3:11:40 | Instrument transition: 0:00:07.905532
+3:11:45 | Instrument transition: 0:00:02.905532
+3:11:50 | Start Run 35
+3:11:50 | OP: Start Peak Chasing
+3:11:50 | EM: Communicate with Operator
+3:12:00 | OP: Move Beam <<
+3:12:05 | OP: Move Beam <<
+3:12:10 | OP: Move Beam <<
+3:12:15 | OP: Move Beam <<
+3:12:20 | OP: Move Beam <<
+3:12:25 | OP: Move Beam <<
+3:12:30 | OP: Move Beam <<
+3:12:35 | OP: Move Beam <<
+3:12:40 | OP: Move Beam <<
+3:12:45 | OP: Move Beam <<
+3:12:50 | OP: Move Beam <<
+3:12:55 | OP: Move Beam <<
+3:13:00 | OP: Move Beam <<
+3:13:05 | OP: Move Beam <<
+3:13:10 | OP: Move Beam <<
+3:13:15 | OP: Move Beam <<
+3:13:20 | OP: Move Beam <<
+3:13:25 | OP: Move Beam <<
+3:13:30 | OP: Move Beam <<
+3:13:35 | OP: Move Beam <<
+3:13:40 | OP: Move Beam <<
+3:14:35 | OP: Move Beam >>
+3:15:35 | OP: Move Beam >>
+3:16:15 | DA: Data from run 35 is good
+3:16:25 | Instrument transition: 0:00:31.125378
+3:16:30 | Instrument transition: 0:00:26.125378
+3:16:35 | Instrument transition: 0:00:21.125378
+3:16:40 | Instrument transition: 0:00:16.125378
+3:16:45 | Instrument transition: 0:00:11.125378
+3:16:50 | Instrument transition: 0:00:06.125378
+3:16:55 | Instrument transition: 0:00:01.125378
+3:17:00 | Start Run 36
+3:17:00 | OP: Start Peak Chasing
+3:17:00 | EM: Communicate with Operator
+3:18:05 | OP: Move Beam >>
+3:18:25 | OP: Move Beam <<
+3:18:30 | OP: Move Beam >>
+3:18:50 | OP: Move Beam >>
+3:18:55 | OP: Move Beam >>
+3:19:50 | DA: Data from run 36 is good
+3:20:00 | Instrument transition: 0:00:52.241420
+3:20:05 | Instrument transition: 0:00:47.241420
+3:20:10 | Instrument transition: 0:00:42.241420
+3:20:15 | Instrument transition: 0:00:37.241420
+3:20:20 | Instrument transition: 0:00:32.241420
+3:20:25 | Instrument transition: 0:00:27.241420
+3:20:30 | Instrument transition: 0:00:22.241420
+3:20:35 | Instrument transition: 0:00:17.241420
+3:20:40 | Instrument transition: 0:00:12.241420
+3:20:45 | Instrument transition: 0:00:07.241420
+3:20:50 | Instrument transition: 0:00:02.241420
+3:20:55 | Start Run 37
+3:20:55 | OP: Start Peak Chasing
+3:20:55 | EM: Communicate with Operator
+3:21:25 | OP: Move Beam <<
+3:21:45 | OP: Move Beam >>
+3:22:00 | OP: Move Beam >>
+3:23:00 | OP: Move Beam >>
+3:23:20 | OP: Move Beam >>
+3:23:30 | OP: Move Beam >>
+3:23:50 | OP: Move Beam >>
+3:24:05 | DA: Data from run 37 is good
+3:24:15 | Instrument transition: 0:01:10.318910
+3:24:20 | Instrument transition: 0:01:05.318910
+3:24:25 | Instrument transition: 0:01:00.318910
+3:24:30 | Instrument transition: 0:00:55.318910
+3:24:35 | Instrument transition: 0:00:50.318910
+3:24:40 | Instrument transition: 0:00:45.318910
+3:24:45 | Instrument transition: 0:00:40.318910
+3:24:50 | Instrument transition: 0:00:35.318910
+3:24:55 | Instrument transition: 0:00:30.318910
+3:25:00 | Instrument transition: 0:00:25.318910
+3:25:05 | Instrument transition: 0:00:20.318910
+3:25:10 | Instrument transition: 0:00:15.318910
+3:25:15 | Instrument transition: 0:00:10.318910
+3:25:20 | Instrument transition: 0:00:05.318910
+3:25:25 | Instrument transition: 0:00:00.318910
+3:25:30 | Start Run 38
+3:25:30 | OP: Start Peak Chasing
+3:25:30 | EM: Communicate with Operator
+3:26:40 | OP: Move Beam >>
+3:26:45 | OP: Move Beam >>
+3:26:50 | OP: Move Beam >>
+3:27:20 | OP: Move Beam >>
+3:27:25 | OP: Move Beam >>
+3:28:10 | OP: Move Beam <<
+3:28:40 | OP: Move Beam >>
+3:29:00 | OP: Move Beam >>
+3:30:25 | DA: Data from run 38 is good
+3:30:35 | Instrument transition: 0:00:33.055084
+3:30:40 | Instrument transition: 0:00:28.055084
+3:30:45 | Instrument transition: 0:00:23.055084
+3:30:50 | Instrument transition: 0:00:18.055084
+3:30:55 | Instrument transition: 0:00:13.055084
+3:31:00 | Instrument transition: 0:00:08.055084
+3:31:05 | Instrument transition: 0:00:03.055084
+3:31:10 | Start Run 39
+3:31:10 | OP: Start Peak Chasing
+3:31:10 | EM: Communicate with Operator
+3:31:25 | OP: Move Beam >>
+3:31:30 | OP: Move Beam >>
+3:31:35 | OP: Move Beam >>
+3:31:40 | OP: Move Beam >>
+3:31:45 | OP: Move Beam >>
+3:31:50 | OP: Move Beam >>
+3:31:55 | OP: Move Beam >>
+3:32:00 | OP: Move Beam >>
+3:32:05 | OP: Move Beam >>
+3:32:10 | OP: Move Beam >>
+3:32:15 | OP: Move Beam >>
+3:32:20 | OP: Move Beam >>
+3:32:25 | OP: Move Beam >>
+3:32:30 | OP: Move Beam >>
+3:32:35 | OP: Move Beam >>
+3:32:40 | OP: Move Beam >>
+3:32:45 | OP: Move Beam >>
+3:32:50 | OP: Move Beam >>
+3:32:55 | OP: Move Beam >>
+3:33:00 | OP: Move Beam >>
+3:33:15 | OP: Move Beam >>
+3:33:20 | OP: Move Beam >>
+3:33:40 | OP: Move Beam <<
+3:34:05 | OP: Move Beam <<
+3:34:10 | OP: Move Beam <<
+3:34:15 | OP: Move Beam <<
+3:34:20 | OP: Move Beam <<
+3:34:25 | OP: Move Beam <<
+3:34:30 | OP: Move Beam <<
+3:34:35 | OP: Move Beam <<
+3:34:40 | OP: Move Beam <<
+3:34:45 | OP: Move Beam <<
+3:34:50 | OP: Move Beam <<
+3:34:55 | OP: Move Beam <<
+3:35:00 | OP: Move Beam <<
+3:35:05 | OP: Move Beam <<
+3:35:10 | OP: Move Beam <<
+3:35:15 | OP: Move Beam <<
+3:35:20 | OP: Move Beam <<
+3:35:25 | OP: Move Beam <<
+3:35:30 | OP: Move Beam <<
+3:35:35 | OP: Move Beam <<
+3:35:55 | OP: Move Beam >>
+3:36:10 | OP: Move Beam <<
+3:36:45 | OP: Move Beam >>
+3:37:40 | DA: Data from run 39 is good
+3:37:50 | Instrument transition: 0:00:25.489756
+3:37:55 | Instrument transition: 0:00:20.489756
+3:38:00 | Instrument transition: 0:00:15.489756
+3:38:05 | Instrument transition: 0:00:10.489756
+3:38:10 | Instrument transition: 0:00:05.489756
+3:38:15 | Instrument transition: 0:00:00.489756
+3:38:20 | Start Run 40
+3:38:20 | OP: Start Peak Chasing
+3:38:20 | EM: Communicate with Operator
+3:42:00 | OP: Move Beam <<
+3:42:40 | OP: Move Beam <<
+3:42:45 | OP: Move Beam >>
+3:43:20 | DA: Data from run 40 is good
+3:43:30 | Instrument transition: 0:00:25.034482
+3:43:35 | Instrument transition: 0:00:20.034482
+3:43:40 | Instrument transition: 0:00:15.034482
+3:43:45 | Instrument transition: 0:00:10.034482
+3:43:50 | Instrument transition: 0:00:05.034482
+3:43:55 | Instrument transition: 0:00:00.034482
+3:44:00 | Start Run 41
+3:44:00 | OP: Start Peak Chasing
+3:44:00 | EM: Communicate with Operator
+3:44:55 | OP: Move Beam >>
+3:48:10 | OP: Move Beam >>
+3:48:15 | OP: Move Beam >>
+3:48:20 | OP: Move Beam >>
+3:51:05 | OP: Move Beam <<
+3:51:35 | DA: Data from run 41 is good
+3:51:45 | Instrument transition: 0:01:19.259283
+3:51:50 | Instrument transition: 0:01:14.259283
+3:51:55 | Instrument transition: 0:01:09.259283
+3:52:00 | Instrument transition: 0:01:04.259283
+3:52:05 | Instrument transition: 0:00:59.259283
+3:52:10 | Instrument transition: 0:00:54.259283
+3:52:15 | Instrument transition: 0:00:49.259283
+3:52:20 | Instrument transition: 0:00:44.259283
+3:52:25 | Instrument transition: 0:00:39.259283
+3:52:30 | Instrument transition: 0:00:34.259283
+3:52:35 | Instrument transition: 0:00:29.259283
+3:52:40 | Instrument transition: 0:00:24.259283
+3:52:45 | Instrument transition: 0:00:19.259283
+3:52:50 | Instrument transition: 0:00:14.259283
+3:52:55 | Instrument transition: 0:00:09.259283
+3:53:00 | Instrument transition: 0:00:04.259283
+3:53:05 | Start Run 42
+3:53:05 | OP: Start Peak Chasing
+3:53:05 | EM: Communicate with Operator
+3:54:10 | OP: Move Beam <<
+3:54:15 | OP: Move Beam >>
+3:54:20 | OP: Move Beam >>
+3:55:20 | OP: Move Beam >>
+3:55:35 | OP: Move Beam >>
+3:55:40 | OP: Move Beam >>
+3:58:20 | DA: Data from run 42 is good
+3:58:30 | Instrument transition: 0:01:46.637155
+3:58:35 | Instrument transition: 0:01:41.637155
+3:58:40 | Instrument transition: 0:01:36.637155
+3:58:45 | Instrument transition: 0:01:31.637155
+3:58:50 | Instrument transition: 0:01:26.637155
+3:58:55 | Instrument transition: 0:01:21.637155
+3:59:00 | Instrument transition: 0:01:16.637155
+3:59:05 | Instrument transition: 0:01:11.637155
+3:59:10 | Instrument transition: 0:01:06.637155
+3:59:15 | Instrument transition: 0:01:01.637155
+3:59:20 | Instrument transition: 0:00:56.637155
+3:59:25 | Instrument transition: 0:00:51.637155
+3:59:30 | Instrument transition: 0:00:46.637155
+3:59:35 | Instrument transition: 0:00:41.637155
+3:59:40 | Instrument transition: 0:00:36.637155
+3:59:45 | Instrument transition: 0:00:31.637155
+3:59:50 | Instrument transition: 0:00:26.637155
+3:59:55 | Instrument transition: 0:00:21.637155
+4:00:00 | Instrument transition: 0:00:16.637155
+4:00:05 | Instrument transition: 0:00:11.637155
+4:00:10 | Instrument transition: 0:00:06.637155
+4:00:15 | Instrument transition: 0:00:01.637155
+4:00:20 | Start Run 43
+4:00:20 | OP: Start Peak Chasing
+4:00:20 | EM: Communicate with Operator
+4:00:30 | OP: Move Beam <<
+4:01:05 | OP: Move Beam >>
+4:02:30 | OP: Move Beam >>
+4:02:50 | OP: Move Beam >>
+4:02:55 | OP: Move Beam >>
+4:04:05 | OP: Move Beam >>
+4:04:10 | OP: Move Beam >>
+4:04:15 | OP: Move Beam >>
+4:04:20 | OP: Move Beam >>
+4:04:25 | OP: Move Beam >>
+4:04:30 | OP: Move Beam >>
+4:04:35 | OP: Move Beam >>
+4:04:40 | OP: Move Beam >>
+4:04:45 | OP: Move Beam >>
+4:04:50 | OP: Move Beam >>
+4:04:55 | OP: Move Beam >>
+4:05:00 | OP: Move Beam >>
+4:05:05 | OP: Move Beam >>
+4:05:10 | OP: Move Beam >>
+4:05:15 | OP: Move Beam >>
+4:05:20 | OP: Move Beam >>
+4:05:25 | OP: Move Beam >>
+4:05:50 | OP: Move Beam >>
+4:05:55 | OP: Move Beam >>
+4:06:05 | OP: Move Beam <<
+4:06:20 | DA: Data from run 43 is good
+4:06:30 | Instrument transition: 0:00:31.181962
+4:06:35 | Instrument transition: 0:00:26.181962
+4:06:40 | Instrument transition: 0:00:21.181962
+4:06:45 | Instrument transition: 0:00:16.181962
+4:06:50 | Instrument transition: 0:00:11.181962
+4:06:55 | Instrument transition: 0:00:06.181962
+4:07:00 | Instrument transition: 0:00:01.181962
+4:07:05 | Start Run 44
+4:07:05 | OP: Start Peak Chasing
+4:07:05 | EM: Communicate with Operator
+4:07:35 | OP: Move Beam <<
+4:07:45 | OP: Move Beam <<
+4:07:50 | OP: Move Beam <<
+4:08:40 | OP: Move Beam >>
+4:08:55 | OP: Move Beam >>
+4:10:55 | OP: Move Beam >>
+4:11:00 | OP: Move Beam >>
+4:11:40 | OP: Move Beam <<
+4:12:40 | DA: Data from run 44 is good
+4:12:50 | Instrument transition: 0:00:51.661248
+4:12:55 | Instrument transition: 0:00:46.661248
+4:13:00 | Instrument transition: 0:00:41.661248
+4:13:05 | Instrument transition: 0:00:36.661248
+4:13:10 | Instrument transition: 0:00:31.661248
+4:13:15 | Instrument transition: 0:00:26.661248
+4:13:20 | Instrument transition: 0:00:21.661248
+4:13:25 | Instrument transition: 0:00:16.661248
+4:13:30 | Instrument transition: 0:00:11.661248
+4:13:35 | Instrument transition: 0:00:06.661248
+4:13:40 | Instrument transition: 0:00:01.661248
+4:13:45 | Start Run 45
+4:13:45 | OP: Start Peak Chasing
+4:13:45 | EM: Communicate with Operator
+4:14:10 | OP: Move Beam >>
+4:14:15 | OP: Move Beam >>
+4:14:20 | OP: Move Beam <<
+4:15:20 | OP: Move Beam >>
+4:15:45 | OP: Move Beam >>
+4:15:50 | OP: Move Beam >>
+4:15:55 | OP: Move Beam <<
+4:16:10 | OP: Move Beam >>
+4:17:10 | DA: Data from run 45 is good
+
+[   S1,   S1,   S1,   S1,   S1,   S1,   S1,   S1,   S1,   S1,   S1,   S1,   S1,   S1,   S1,   S2,   S2,   S2,   S2,   S2,   S2,   S2,   S2,   S2,   S2,   S2,   S2,   S2,   S2,   S2,   S3,   S3,   S3,   S3,   S3,   S3,   S3,   S3,   S3,   S3,   S3,   S3,   S3,   S3,   S3]
+[14000,16500,12000,39000,14000,12000,11500,13000,11500,28000,35000,25000,18000,12500,12000,12500,24500,15000,17500,15000,32000,14000,17500,22500,43500,14000,31500,13500,23500,12500,15000,17500,30000,39000,26500,17000,19000,29500,39000,30000,45500,31500,36000,33500,20500]
+[ 0.78, 0.67, 0.92, 0.28, 0.78, 0.92, 0.96, 0.85, 0.96, 0.39, 0.31, 0.44, 0.61, 0.88, 0.92, 1.00, 0.51, 0.83, 0.71, 0.83, 0.39, 0.89, 0.71, 0.56, 0.29, 0.89, 0.40, 0.92, 0.53, 1.00, 0.97, 0.83, 0.48, 0.37, 0.55, 0.85, 0.76, 0.49, 0.37, 0.48, 0.32, 0.46, 0.40, 0.43, 0.71]
+
+Current Time: 4:17:15 Experimental Time: 5:00:00
+-------------------------------------------------
+ROI: 100%
+Run:  1, Start: 0:10:00, End: 0:12:20, Duration: 0:02:20
+Run:  2, Start: 0:12:50, End: 0:15:35, Duration: 0:02:45
+Run:  3, Start: 0:16:35, End: 0:18:35, Duration: 0:02:00
+Run:  4, Start: 0:19:30, End: 0:26:00, Duration: 0:06:30
+Run:  5, Start: 0:27:10, End: 0:29:30, Duration: 0:02:20
+Run:  6, Start: 0:31:15, End: 0:33:15, Duration: 0:02:00
+Run:  7, Start: 0:34:55, End: 0:36:50, Duration: 0:01:55
+Run:  8, Start: 0:38:55, End: 0:41:05, Duration: 0:02:10
+Run:  9, Start: 0:41:35, End: 0:43:30, Duration: 0:01:55
+Run: 10, Start: 0:44:20, End: 0:49:00, Duration: 0:04:40
+Run: 11, Start: 0:50:40, End: 0:56:30, Duration: 0:05:50
+Run: 12, Start: 0:58:10, End: 1:02:20, Duration: 0:04:10
+Run: 13, Start: 1:03:05, End: 1:06:05, Duration: 0:03:00
+Run: 14, Start: 1:08:10, End: 1:10:15, Duration: 0:02:05
+Run: 15, Start: 1:11:40, End: 1:13:40, Duration: 0:02:00
+Run: 16, Start: 1:28:45, End: 1:30:50, Duration: 0:02:05
+Run: 17, Start: 1:32:05, End: 1:36:10, Duration: 0:04:05
+Run: 18, Start: 1:37:00, End: 1:39:30, Duration: 0:02:30
+Run: 19, Start: 1:41:35, End: 1:44:30, Duration: 0:02:55
+Run: 20, Start: 1:46:25, End: 1:48:55, Duration: 0:02:30
+Run: 21, Start: 1:49:55, End: 1:55:15, Duration: 0:05:20
+Run: 22, Start: 1:56:00, End: 1:58:20, Duration: 0:02:20
+Run: 23, Start: 2:00:15, End: 2:03:10, Duration: 0:02:55
+Run: 24, Start: 2:04:15, End: 2:08:00, Duration: 0:03:45
+Run: 25, Start: 2:09:00, End: 2:16:15, Duration: 0:07:15
+Run: 26, Start: 2:16:40, End: 2:19:00, Duration: 0:02:20
+Run: 27, Start: 2:19:50, End: 2:25:05, Duration: 0:05:15
+Run: 28, Start: 2:26:25, End: 2:28:40, Duration: 0:02:15
+Run: 29, Start: 2:30:50, End: 2:34:45, Duration: 0:03:55
+Run: 30, Start: 2:35:50, End: 2:37:55, Duration: 0:02:05
+Run: 31, Start: 2:50:00, End: 2:52:30, Duration: 0:02:30
+Run: 32, Start: 2:54:35, End: 2:57:30, Duration: 0:02:55
+Run: 33, Start: 2:58:15, End: 3:03:15, Duration: 0:05:00
+Run: 34, Start: 3:04:30, End: 3:11:00, Duration: 0:06:30
+Run: 35, Start: 3:11:50, End: 3:16:15, Duration: 0:04:25
+Run: 36, Start: 3:17:00, End: 3:19:50, Duration: 0:02:50
+Run: 37, Start: 3:20:55, End: 3:24:05, Duration: 0:03:10
+Run: 38, Start: 3:25:30, End: 3:30:25, Duration: 0:04:55
+Run: 39, Start: 3:31:10, End: 3:37:40, Duration: 0:06:30
+Run: 40, Start: 3:38:20, End: 3:43:20, Duration: 0:05:00
+Run: 41, Start: 3:44:00, End: 3:51:35, Duration: 0:07:35
+Run: 42, Start: 3:53:05, End: 3:58:20, Duration: 0:05:15
+Run: 43, Start: 4:00:20, End: 4:06:20, Duration: 0:06:00
+Run: 44, Start: 4:07:05, End: 4:12:40, Duration: 0:05:35
+Run: 45, Start: 4:13:45, End: 4:17:10, Duration: 0:03:25
+
+Finished

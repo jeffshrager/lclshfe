@@ -1,4 +1,4 @@
-# Todo:
+# TODO:
 #    -- Where exact beam|jet match is tested with ==, replace with a more "perceptually" accurate model
 
 import csv
@@ -309,14 +309,6 @@ def run(show_f):  # _f is a flag
             f"{Operation.button_distance}\t{format(numpy.mean(results), '.2f')}\t{format(sem(results), '.2f')}\t{Status.n_crazy_ivans / reps}\n")
     f.close()
 
-    # print(functional_accuity_list)
-    # for fa in functional_accuity_list:
-    #     print(fa)
-    
-    # df = px.data.gapminder().query("continent=='Oceania'")
-
-    # print(runTable() * DATA_PER_SECOND * )
-
     fig = px.line(functional_accuity_list, x="Operator Response Time (cycles)", y="Fraction Hits", title=title_string, hover_data=["Data Per Second (Constant)", "Data Captured (RunTime * DPS * Hits)"])
     fig.update_traces(mode="markers+lines")
     fig.update_layout(hovermode="x unified")
@@ -327,71 +319,3 @@ def run(show_f):  # _f is a flag
 
 # If display is true, we only do one rep and only allow it to run 1000 cycles
 run(False)
-
-
-# Add agenda - does the EM have the agenda
-# Jet Tracking - current 10 - 15 mins
-# 12 hour scale add that layer to the program
-# System stability, affect attention level
-# If the system is unstable attention should increase, if system is stable attention will decrease
-# If something happens for a shift there is a transition time
-# We know what the status of the system is use this to callibrate the system
-# begining they will be focused, not exausted yet, 4pm things go wrong and they are tired
-
-# Based on the button distance getting worse and worse scans
-# Kinda a cheat different purpose, model how bad the UI would be if buttons were far away
-# Data to be being read by the DA at a fixed button distance
-# Can use button distance as a proxy for the experiment not doing well
-# Signal Noise Ratio, as the operator was changing stuff, data analyst was looking at data saying background was high
-# EM was saying to get more data
-# Smoothest thing to use is data quality
-# X axis should be data quality
-# We have to decide weather im going to take more data or abort and fix something
-# As peak chasing gets harder because the buttons are father apart, like power is too low
-# Could rename Button distance to something like, difficulty
-# Data analyst looking at the number
-# Mike being tired or data being difficult to get or anything else
-# Data analyst reading data as it comes off
-# Agent reading the means
-# Each of the reps the quality of the data will get better and better
-
-# EM tells the OP to stop or to take more data
-# Taking more data
-# A bunch of low quality data, suppose data quality was low enough
-# RULE is to extend if quality is low
-# Calculate data quality not just points
-# Data quality per measurement
-
-# Suppose 100 measurements total
-# Want to get high data quality for all 100
-# Mean is 100 regardless of how many you take
-# Should we go longer, even if you double it you can only get 50 not 100 
-# Data quality within measurement is very low or high = number of runs, length
-
-# Number of samples taken / Number of measurements
-# Each of the runs
-# Declare single noise ratio above 1
-# down at 0.1 it would be 50 mins
-# At the top of the curve that should be calibrated at 0.9, 5 mins
-# At 0.9, 300 * 36 = 10,000 good observations * 0,9 = 9,000
-# As you collect data points it approaches 9000
-
-# DA reads the mean of the number, reports to the EM
-# up to 10000 so keep going, as the number is going operator wants to keep going until sum of 9000
-# constrain the total time
-
-# Say how many measurements you got vs how much you expected
-# If you were expecting 120 measurements, 1 less than 1% ROI
-
-# Data quality was so low, OP had to keep going to get up to 10000
-
-#  Curve is going to float
-
-# Attention distracted and tired
-
-
-
-
-
-
-# If they stop 
