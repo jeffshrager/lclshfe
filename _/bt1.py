@@ -1,6 +1,3 @@
-# TODO:
-#    -- Where exact beam|jet match is tested with ==, replace with a more "perceptually" accurate model
-
 import csv
 from scipy.stats import sem
 import numpy

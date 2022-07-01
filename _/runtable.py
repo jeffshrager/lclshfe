@@ -1,5 +1,4 @@
 """RunTable Generator Tool"""
-
 import csv
 from datetime import datetime, timedelta
 from os import walk
@@ -72,16 +71,3 @@ fig = px.timeline(df,
             "Photonenergy","Comment"])
 fig.update_yaxes(autorange="reversed")
 fig.show()
-
-# Stepped
-# functional aquity
-# Add the experiemnt number to the graph number
-# Estimate efficiency
-# 6b(9320 FA = 1.5, CI = 0.01, ACI = 5%)
-# Multiplying by the amount of time the data is taken
-# Funciotal aquity is something we controll directly, a function of the UI and training
-
-
-# Take a point on the graph and multiply it by the time (Datapoints) on the run
-# 36 datapoints per second
-# fraction of hits multiply by 36

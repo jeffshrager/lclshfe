@@ -1,0 +1,382 @@
+Functional Acuity = 0.01 stream_shift_amount= 0.01, p_stream_shift=0.15, beam_shift_amount=0.03, p_crazy_ivan=0.01
+[   S1,   S1,   S1,   S1,   S1,   S1,   S2,   S2,   S2,   S2,   S2,   S2,   S3,   S3,   S3,   S3,   S3,   S3]
+[    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0]
+[    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0]
+
+Current Time: 0:00:00 Experimental Time: 8:00:00
+--------------------------------------------------------------------------------------------------
+0:00:00 | DA_E:1.00 DA_A:1.00, OP_E:1.00 OP_A:1.00 | EM: Start Experiment
+0:01:00 | DA_E:1.00 DA_A:1.00, OP_E:1.00 OP_A:1.00 | Start Run 1
+0:01:00 | DA_E:1.00 DA_A:1.00, OP_E:1.00 OP_A:1.00 | OP: Start Peak Chasing
+0:01:00 | DA_E:1.00 DA_A:1.00, OP_E:1.00 OP_A:1.00 | EM: Communicate with Operator
+0:01:05 | DA_E:1.00 DA_A:1.00, OP_E:1.00 OP_A:1.00 | OP: Move Beam >>
+0:01:10 | DA_E:1.00 DA_A:1.00, OP_E:1.00 OP_A:1.00 | OP: Move Beam <<
+0:01:15 | DA_E:1.00 DA_A:1.00, OP_E:1.00 OP_A:1.00 | OP: Move Beam >>
+0:01:20 | DA_E:1.00 DA_A:1.00, OP_E:1.00 OP_A:1.00 | OP: Move Beam <<
+0:01:20 | DA_E:1.00 DA_A:1.00, OP_E:1.00 OP_A:1.00 | DA: Data from run 1 has enough data to analyse
+0:01:25 | DA_E:1.00 DA_A:1.00, OP_E:1.00 OP_A:1.00 | OP: Move Beam >>
+0:01:30 | DA_E:1.00 DA_A:1.00, OP_E:1.00 OP_A:1.00 | OP: Move Beam <<
+0:01:35 | DA_E:1.00 DA_A:1.00, OP_E:1.00 OP_A:1.00 | OP: Move Beam >>
+0:01:40 | DA_E:1.00 DA_A:1.00, OP_E:1.00 OP_A:1.00 | OP: Move Beam <<
+0:01:45 | DA_E:1.00 DA_A:1.00, OP_E:1.00 OP_A:1.00 | OP: Move Beam >>
+0:01:50 | DA_E:1.00 DA_A:1.00, OP_E:1.00 OP_A:1.00 | OP: Move Beam <<
+0:01:55 | DA_E:1.00 DA_A:1.00, OP_E:1.00 OP_A:1.00 | OP: Move Beam >>
+0:02:00 | DA_E:1.00 DA_A:1.00, OP_E:1.00 OP_A:1.00 | OP: Move Beam <<
+0:02:05 | DA_E:1.00 DA_A:1.00, OP_E:1.00 OP_A:1.00 | OP: Move Beam >>
+0:02:10 | DA_E:1.00 DA_A:1.00, OP_E:1.00 OP_A:1.00 | OP: Move Beam <<
+0:02:40 | DA_E:1.00 DA_A:1.00, OP_E:1.00 OP_A:1.00 | OP: Move Beam >>
+0:02:45 | DA_E:1.00 DA_A:1.00, OP_E:1.00 OP_A:1.00 | OP: Move Beam <<
+0:02:50 | DA_E:1.00 DA_A:1.00, OP_E:1.00 OP_A:1.00 | OP: Move Beam >>
+0:02:50 | DA_E:1.00 DA_A:1.00, OP_E:1.00 OP_A:1.00 | DA: Data from run 1 is good
+0:02:50 | DA_E:1.00 DA_A:1.00, OP_E:1.00 OP_A:1.00 | DA: Tell operator to stop collecting data
+0:02:50 | DA_E:1.00 DA_A:1.00, OP_E:1.00 OP_A:1.00 | OP: Stop Collecting Data
+0:02:55 | DA_E:1.00 DA_A:1.00, OP_E:1.00 OP_A:1.00 | Instrument transition: 0:01:16.764047
+0:04:20 | DA_E:0.99 DA_A:1.01, OP_E:0.99 OP_A:1.01 | Start Run 2
+0:04:20 | DA_E:0.99 DA_A:1.01, OP_E:0.99 OP_A:1.01 | OP: Start Peak Chasing
+0:04:20 | DA_E:0.99 DA_A:1.01, OP_E:0.99 OP_A:1.01 | EM: Communicate with Operator
+0:04:25 | DA_E:0.99 DA_A:1.01, OP_E:0.99 OP_A:1.01 | OP: Move Beam <<
+0:04:30 | DA_E:0.99 DA_A:1.01, OP_E:0.99 OP_A:1.01 | OP: Move Beam >>
+0:04:35 | DA_E:0.99 DA_A:1.01, OP_E:0.99 OP_A:1.01 | OP: Move Beam <<
+0:04:40 | DA_E:0.99 DA_A:1.01, OP_E:0.99 OP_A:1.01 | DA: Data from run 2 has enough data to analyse
+0:05:30 | DA_E:0.99 DA_A:1.01, OP_E:0.99 OP_A:1.01 | OP: Move Beam >>
+0:05:35 | DA_E:0.99 DA_A:1.01, OP_E:0.99 OP_A:1.01 | OP: Move Beam <<
+0:05:40 | DA_E:0.99 DA_A:1.01, OP_E:0.99 OP_A:1.01 | OP: Move Beam >>
+0:05:45 | DA_E:0.99 DA_A:1.01, OP_E:0.99 OP_A:1.01 | OP: Move Beam <<
+0:05:55 | DA_E:0.99 DA_A:1.01, OP_E:0.99 OP_A:1.01 | OP: Move Beam <<
+0:06:00 | DA_E:0.99 DA_A:1.01, OP_E:0.99 OP_A:1.01 | OP: Move Beam >>
+0:06:10 | DA_E:0.99 DA_A:1.01, OP_E:0.99 OP_A:1.01 | DA: Data from run 2 is good
+0:06:10 | DA_E:0.99 DA_A:1.01, OP_E:0.99 OP_A:1.01 | DA: Tell operator to stop collecting data
+0:06:10 | DA_E:0.99 DA_A:1.01, OP_E:0.99 OP_A:1.01 | OP: Stop Collecting Data
+0:06:15 | DA_E:0.99 DA_A:1.01, OP_E:0.99 OP_A:1.01 | Instrument transition: 0:01:37.988781
+0:08:00 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | Start Run 3
+0:08:00 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | OP: Start Peak Chasing
+0:08:00 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | EM: Communicate with Operator
+0:08:05 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | OP: Move Beam >>
+0:08:10 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | OP: Move Beam <<
+0:08:15 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | OP: Move Beam >>
+0:08:20 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | OP: Move Beam <<
+0:08:20 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | DA: Data from run 3 has enough data to analyse
+0:08:25 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | OP: Move Beam >>
+0:08:30 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | OP: Move Beam <<
+0:08:35 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | OP: Move Beam >>
+0:08:40 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | OP: Move Beam <<
+0:08:45 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | OP: Move Beam >>
+0:08:50 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | OP: Move Beam <<
+0:08:55 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | OP: Move Beam >>
+0:09:00 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | OP: Move Beam <<
+0:09:05 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | OP: Move Beam >>
+0:09:10 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | OP: Move Beam <<
+0:09:15 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | OP: Move Beam >>
+0:09:20 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | OP: Move Beam <<
+0:09:25 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | OP: Move Beam >>
+0:09:30 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | OP: Move Beam <<
+0:09:50 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | DA: Data from run 3 is good
+0:09:50 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | DA: Tell operator to stop collecting data
+0:09:50 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | OP: Stop Collecting Data
+0:09:55 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | Instrument transition: 0:00:29.155122
+0:10:30 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | Start Run 4
+0:10:30 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | OP: Start Peak Chasing
+0:10:30 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | EM: Communicate with Operator
+0:10:40 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | OP: Move Beam <<
+0:10:45 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | OP: Move Beam >>
+0:10:50 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | DA: Data from run 4 has enough data to analyse
+0:12:15 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | OP: Move Beam >>
+0:12:20 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | OP: Move Beam <<
+0:12:25 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | OP: Move Beam >>
+0:12:25 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | DA: Data from run 4 is good
+0:12:25 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | DA: Tell operator to stop collecting data
+0:12:25 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | OP: Stop Collecting Data
+0:12:30 | DA_E:0.98 DA_A:1.02, OP_E:0.98 OP_A:1.02 | Instrument transition: 0:01:49.763498
+0:14:25 | DA_E:0.97 DA_A:1.03, OP_E:0.97 OP_A:1.03 | Start Run 5
+0:14:25 | DA_E:0.97 DA_A:1.03, OP_E:0.97 OP_A:1.03 | OP: Start Peak Chasing
+0:14:25 | DA_E:0.97 DA_A:1.03, OP_E:0.97 OP_A:1.03 | EM: Communicate with Operator
+0:14:30 | DA_E:0.97 DA_A:1.03, OP_E:0.97 OP_A:1.03 | OP: Move Beam <<
+0:14:45 | DA_E:0.97 DA_A:1.03, OP_E:0.97 OP_A:1.03 | DA: Data from run 5 has enough data to analyse
+0:15:10 | DA_E:0.97 DA_A:1.03, OP_E:0.97 OP_A:1.03 | OP: Move Beam >>
+0:15:15 | DA_E:0.97 DA_A:1.03, OP_E:0.97 OP_A:1.03 | OP: Move Beam <<
+0:15:20 | DA_E:0.97 DA_A:1.03, OP_E:0.97 OP_A:1.03 | OP: Move Beam >>
+0:15:25 | DA_E:0.97 DA_A:1.03, OP_E:0.97 OP_A:1.03 | OP: Move Beam <<
+0:15:30 | DA_E:0.97 DA_A:1.03, OP_E:0.97 OP_A:1.03 | OP: Move Beam >>
+0:15:35 | DA_E:0.97 DA_A:1.03, OP_E:0.97 OP_A:1.03 | OP: Move Beam <<
+0:15:40 | DA_E:0.97 DA_A:1.03, OP_E:0.97 OP_A:1.03 | OP: Move Beam >>
+0:15:45 | DA_E:0.97 DA_A:1.03, OP_E:0.97 OP_A:1.03 | OP: Move Beam <<
+0:15:50 | DA_E:0.97 DA_A:1.03, OP_E:0.97 OP_A:1.03 | OP: Move Beam >>
+0:15:55 | DA_E:0.97 DA_A:1.03, OP_E:0.97 OP_A:1.03 | OP: Move Beam <<
+0:16:00 | DA_E:0.97 DA_A:1.03, OP_E:0.97 OP_A:1.03 | OP: Move Beam >>
+0:16:05 | DA_E:0.97 DA_A:1.03, OP_E:0.97 OP_A:1.03 | OP: Move Beam <<
+0:16:10 | DA_E:0.97 DA_A:1.03, OP_E:0.97 OP_A:1.03 | OP: Move Beam >>
+0:16:15 | DA_E:0.97 DA_A:1.03, OP_E:0.97 OP_A:1.03 | DA: Data from run 5 is good
+0:16:15 | DA_E:0.97 DA_A:1.03, OP_E:0.97 OP_A:1.03 | DA: Tell operator to stop collecting data
+0:16:15 | DA_E:0.97 DA_A:1.03, OP_E:0.97 OP_A:1.03 | OP: Stop Collecting Data
+0:16:20 | DA_E:0.97 DA_A:1.03, OP_E:0.97 OP_A:1.03 | Instrument transition: 0:01:22.749538
+0:17:50 | DA_E:0.97 DA_A:1.03, OP_E:0.97 OP_A:1.03 | Start Run 6
+0:17:50 | DA_E:0.97 DA_A:1.03, OP_E:0.97 OP_A:1.03 | OP: Start Peak Chasing
+0:17:50 | DA_E:0.97 DA_A:1.03, OP_E:0.97 OP_A:1.03 | EM: Communicate with Operator
+0:18:10 | DA_E:0.96 DA_A:1.04, OP_E:0.96 OP_A:1.04 | DA: Data from run 6 has enough data to analyse
+0:19:40 | DA_E:0.96 DA_A:1.04, OP_E:0.96 OP_A:1.04 | DA: Data from run 6 is good
+0:19:40 | DA_E:0.96 DA_A:1.04, OP_E:0.96 OP_A:1.04 | DA: Tell operator to stop collecting data
+0:19:40 | DA_E:0.96 DA_A:1.04, OP_E:0.96 OP_A:1.04 | OP: Stop Collecting Data
+0:20:45 | DA_E:0.96 DA_A:1.04, OP_E:0.96 OP_A:1.04 | Start Run 7
+0:20:45 | DA_E:0.96 DA_A:1.04, OP_E:0.96 OP_A:1.04 | OP: Start Peak Chasing
+0:20:45 | DA_E:0.96 DA_A:1.04, OP_E:0.96 OP_A:1.04 | EM: Communicate with Operator
+0:21:00 | DA_E:0.96 DA_A:1.04, OP_E:0.96 OP_A:1.04 | OP: Move Beam <<
+0:21:05 | DA_E:0.96 DA_A:1.04, OP_E:0.96 OP_A:1.04 | OP: Move Beam >>
+0:21:10 | DA_E:0.96 DA_A:1.04, OP_E:0.96 OP_A:1.04 | OP: Move Beam <<
+0:21:10 | DA_E:0.96 DA_A:1.04, OP_E:0.96 OP_A:1.04 | DA: Data from run 7 has enough data to analyse
+0:21:15 | DA_E:0.96 DA_A:1.04, OP_E:0.96 OP_A:1.04 | OP: Move Beam >>
+0:21:20 | DA_E:0.96 DA_A:1.04, OP_E:0.96 OP_A:1.04 | OP: Move Beam <<
+0:21:25 | DA_E:0.96 DA_A:1.04, OP_E:0.96 OP_A:1.04 | OP: Move Beam >>
+0:21:30 | DA_E:0.96 DA_A:1.04, OP_E:0.96 OP_A:1.04 | OP: Move Beam <<
+0:21:35 | DA_E:0.96 DA_A:1.04, OP_E:0.96 OP_A:1.04 | OP: Move Beam >>
+0:21:40 | DA_E:0.96 DA_A:1.04, OP_E:0.96 OP_A:1.04 | OP: Move Beam <<
+0:21:45 | DA_E:0.96 DA_A:1.04, OP_E:0.96 OP_A:1.04 | OP: Move Beam >>
+0:21:50 | DA_E:0.96 DA_A:1.04, OP_E:0.96 OP_A:1.04 | OP: Move Beam <<
+0:22:00 | DA_E:0.96 DA_A:1.04, OP_E:0.96 OP_A:1.04 | OP: Move Beam <<
+0:22:05 | DA_E:0.96 DA_A:1.04, OP_E:0.96 OP_A:1.04 | OP: Move Beam >>
+0:22:10 | DA_E:0.96 DA_A:1.04, OP_E:0.96 OP_A:1.04 | OP: Move Beam <<
+0:22:15 | DA_E:0.96 DA_A:1.04, OP_E:0.96 OP_A:1.04 | OP: Move Beam >>
+0:22:40 | DA_E:0.96 DA_A:1.04, OP_E:0.96 OP_A:1.04 | OP: Move Beam >>
+0:22:45 | DA_E:0.96 DA_A:1.04, OP_E:0.96 OP_A:1.04 | OP: Move Beam <<
+0:22:50 | DA_E:0.96 DA_A:1.04, OP_E:0.96 OP_A:1.04 | OP: Move Beam >>
+0:22:55 | DA_E:0.96 DA_A:1.04, OP_E:0.96 OP_A:1.04 | OP: Move Beam <<
+0:22:55 | DA_E:0.96 DA_A:1.04, OP_E:0.96 OP_A:1.04 | DA: Data from run 7 is good
+0:22:55 | DA_E:0.96 DA_A:1.04, OP_E:0.96 OP_A:1.04 | DA: Tell operator to stop collecting data
+0:22:55 | DA_E:0.96 DA_A:1.04, OP_E:0.96 OP_A:1.04 | OP: Stop Collecting Data
+0:23:00 | DA_E:0.95 DA_A:1.05, OP_E:0.95 OP_A:1.05 | Instrument transition: 0:00:46.120938
+0:23:55 | DA_E:0.95 DA_A:1.05, OP_E:0.95 OP_A:1.05 | Start Run 8
+0:23:55 | DA_E:0.95 DA_A:1.05, OP_E:0.95 OP_A:1.05 | OP: Start Peak Chasing
+0:23:55 | DA_E:0.95 DA_A:1.05, OP_E:0.95 OP_A:1.05 | EM: Communicate with Operator
+0:24:00 | DA_E:0.95 DA_A:1.05, OP_E:0.95 OP_A:1.05 | OP: Move Beam >>
+0:24:20 | DA_E:0.95 DA_A:1.05, OP_E:0.95 OP_A:1.05 | DA: Data from run 8 has enough data to analyse
+0:25:35 | DA_E:0.95 DA_A:1.05, OP_E:0.95 OP_A:1.05 | OP: Move Beam >>
+0:25:40 | DA_E:0.95 DA_A:1.05, OP_E:0.95 OP_A:1.05 | OP: Move Beam <<
+0:25:45 | DA_E:0.95 DA_A:1.05, OP_E:0.95 OP_A:1.05 | OP: Move Beam >>
+0:25:50 | DA_E:0.95 DA_A:1.05, OP_E:0.95 OP_A:1.05 | OP: Move Beam <<
+0:25:55 | DA_E:0.95 DA_A:1.05, OP_E:0.95 OP_A:1.05 | OP: Move Beam >>
+0:26:00 | DA_E:0.95 DA_A:1.05, OP_E:0.95 OP_A:1.05 | OP: Move Beam <<
+0:26:00 | DA_E:0.95 DA_A:1.05, OP_E:0.95 OP_A:1.05 | DA: Data from run 8 is good
+0:26:00 | DA_E:0.95 DA_A:1.05, OP_E:0.95 OP_A:1.05 | DA: Tell operator to stop collecting data
+0:26:00 | DA_E:0.95 DA_A:1.05, OP_E:0.95 OP_A:1.05 | OP: Stop Collecting Data
+0:26:05 | DA_E:0.95 DA_A:1.05, OP_E:0.95 OP_A:1.05 | Instrument transition: 0:00:12.529383
+0:26:25 | DA_E:0.95 DA_A:1.05, OP_E:0.95 OP_A:1.05 | Start Run 9
+0:26:25 | DA_E:0.95 DA_A:1.05, OP_E:0.95 OP_A:1.05 | OP: Start Peak Chasing
+0:26:25 | DA_E:0.95 DA_A:1.05, OP_E:0.95 OP_A:1.05 | EM: Communicate with Operator
+0:26:30 | DA_E:0.95 DA_A:1.05, OP_E:0.95 OP_A:1.05 | OP: Move Beam >>
+0:26:35 | DA_E:0.95 DA_A:1.05, OP_E:0.95 OP_A:1.05 | OP: Move Beam <<
+0:26:50 | DA_E:0.95 DA_A:1.05, OP_E:0.95 OP_A:1.05 | DA: Data from run 9 has enough data to analyse
+0:28:05 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | OP: Move Beam <<
+0:28:10 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | OP: Move Beam >>
+0:28:30 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | DA: Data from run 9 is good
+0:28:30 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | DA: Tell operator to stop collecting data
+0:28:30 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | OP: Stop Collecting Data
+0:28:35 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | Instrument transition: 0:01:52.011142
+0:30:35 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | Start Run 10
+0:30:35 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | OP: Start Peak Chasing
+0:30:35 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | EM: Communicate with Operator
+0:30:45 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | OP: Move Beam <<
+0:30:50 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | OP: Move Beam <<
+0:30:55 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | OP: Move Beam <<
+0:31:00 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | OP: Move Beam <<
+0:31:00 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | DA: Data from run 10 has enough data to analyse
+0:31:05 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | OP: Move Beam <<
+0:31:10 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | OP: Move Beam >>
+0:31:15 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | OP: Move Beam <<
+0:31:20 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | OP: Move Beam >>
+0:31:25 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | OP: Move Beam <<
+0:31:30 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | OP: Move Beam >>
+0:31:35 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | OP: Move Beam <<
+0:31:40 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | OP: Move Beam >>
+0:31:45 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | OP: Move Beam <<
+0:31:50 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | OP: Move Beam >>
+0:31:55 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | OP: Move Beam <<
+0:32:15 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | OP: Move Beam >>
+0:32:20 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | OP: Move Beam <<
+0:32:25 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | OP: Move Beam >>
+0:32:30 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | OP: Move Beam <<
+0:32:35 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | OP: Move Beam >>
+0:32:40 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | OP: Move Beam <<
+0:32:45 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | OP: Move Beam >>
+0:32:50 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | OP: Move Beam <<
+0:32:55 | DA_E:0.94 DA_A:1.06, OP_E:0.94 OP_A:1.06 | OP: Move Beam >>
+0:33:00 | DA_E:0.93 DA_A:1.07, OP_E:0.93 OP_A:1.07 | OP: Move Beam <<
+0:33:00 | DA_E:0.93 DA_A:1.07, OP_E:0.93 OP_A:1.07 | DA: Data from run 10 is good
+0:33:00 | DA_E:0.93 DA_A:1.07, OP_E:0.93 OP_A:1.07 | DA: Tell operator to stop collecting data
+0:33:00 | DA_E:0.93 DA_A:1.07, OP_E:0.93 OP_A:1.07 | OP: Stop Collecting Data
+0:33:05 | DA_E:0.93 DA_A:1.07, OP_E:0.93 OP_A:1.07 | Instrument transition: 0:01:35.598714
+0:34:50 | DA_E:0.93 DA_A:1.07, OP_E:0.93 OP_A:1.07 | Start Run 11
+0:34:50 | DA_E:0.93 DA_A:1.07, OP_E:0.93 OP_A:1.07 | OP: Start Peak Chasing
+0:34:50 | DA_E:0.93 DA_A:1.07, OP_E:0.93 OP_A:1.07 | EM: Communicate with Operator
+0:34:55 | DA_E:0.93 DA_A:1.07, OP_E:0.93 OP_A:1.07 | OP: Move Beam >>
+0:35:00 | DA_E:0.93 DA_A:1.07, OP_E:0.93 OP_A:1.07 | OP: Move Beam <<
+0:35:05 | DA_E:0.93 DA_A:1.07, OP_E:0.93 OP_A:1.07 | OP: Move Beam >>
+0:35:10 | DA_E:0.93 DA_A:1.07, OP_E:0.93 OP_A:1.07 | OP: Move Beam <<
+0:35:15 | DA_E:0.93 DA_A:1.07, OP_E:0.93 OP_A:1.07 | OP: Move Beam >>
+0:35:15 | DA_E:0.93 DA_A:1.07, OP_E:0.93 OP_A:1.07 | DA: Data from run 11 has enough data to analyse
+0:35:20 | DA_E:0.93 DA_A:1.07, OP_E:0.93 OP_A:1.07 | OP: Move Beam >>
+0:35:25 | DA_E:0.93 DA_A:1.07, OP_E:0.93 OP_A:1.07 | OP: Move Beam >>
+0:35:30 | DA_E:0.93 DA_A:1.07, OP_E:0.93 OP_A:1.07 | OP: Move Beam >>
+0:35:35 | DA_E:0.93 DA_A:1.07, OP_E:0.93 OP_A:1.07 | OP: Move Beam >>
+0:35:40 | DA_E:0.93 DA_A:1.07, OP_E:0.93 OP_A:1.07 | OP: Move Beam >>
+0:35:45 | DA_E:0.93 DA_A:1.07, OP_E:0.93 OP_A:1.07 | OP: Move Beam <<
+0:35:50 | DA_E:0.93 DA_A:1.07, OP_E:0.93 OP_A:1.07 | OP: Move Beam >>
+0:35:55 | DA_E:0.93 DA_A:1.07, OP_E:0.93 OP_A:1.07 | OP: Move Beam <<
+0:36:00 | DA_E:0.93 DA_A:1.07, OP_E:0.93 OP_A:1.07 | OP: Move Beam >>
+0:36:05 | DA_E:0.93 DA_A:1.07, OP_E:0.93 OP_A:1.07 | OP: Move Beam <<
+0:36:10 | DA_E:0.93 DA_A:1.07, OP_E:0.93 OP_A:1.07 | OP: Move Beam >>
+0:36:15 | DA_E:0.93 DA_A:1.07, OP_E:0.93 OP_A:1.07 | OP: Move Beam <<
+0:37:10 | DA_E:0.93 DA_A:1.07, OP_E:0.93 OP_A:1.07 | DA: Data from run 11 is good
+0:37:10 | DA_E:0.93 DA_A:1.07, OP_E:0.93 OP_A:1.07 | DA: Tell operator to stop collecting data
+0:37:10 | DA_E:0.93 DA_A:1.07, OP_E:0.93 OP_A:1.07 | OP: Stop Collecting Data
+0:37:15 | DA_E:0.93 DA_A:1.07, OP_E:0.93 OP_A:1.07 | Instrument transition: 0:01:23.853676
+0:38:45 | DA_E:0.92 DA_A:1.08, OP_E:0.92 OP_A:1.08 | Start Run 12
+0:38:45 | DA_E:0.92 DA_A:1.08, OP_E:0.92 OP_A:1.08 | OP: Start Peak Chasing
+0:38:45 | DA_E:0.92 DA_A:1.08, OP_E:0.92 OP_A:1.08 | EM: Communicate with Operator
+0:39:10 | DA_E:0.92 DA_A:1.08, OP_E:0.92 OP_A:1.08 | DA: Data from run 12 has enough data to analyse
+0:41:00 | DA_E:0.92 DA_A:1.08, OP_E:0.92 OP_A:1.08 | DA: Data from run 12 is good
+0:41:00 | DA_E:0.92 DA_A:1.08, OP_E:0.92 OP_A:1.08 | DA: Tell operator to stop collecting data
+0:41:00 | DA_E:0.92 DA_A:1.08, OP_E:0.92 OP_A:1.08 | OP: Stop Collecting Data
+0:42:05 | DA_E:0.92 DA_A:1.08, OP_E:0.92 OP_A:1.08 | Start Run 13
+0:42:05 | DA_E:0.92 DA_A:1.08, OP_E:0.92 OP_A:1.08 | OP: Start Peak Chasing
+0:42:05 | DA_E:0.92 DA_A:1.08, OP_E:0.92 OP_A:1.08 | EM: Communicate with Operator
+0:42:30 | DA_E:0.92 DA_A:1.08, OP_E:0.92 OP_A:1.08 | DA: Data from run 13 has enough data to analyse
+0:42:50 | DA_E:0.92 DA_A:1.08, OP_E:0.92 OP_A:1.08 | OP: Move Beam >>
+0:42:55 | DA_E:0.92 DA_A:1.08, OP_E:0.92 OP_A:1.08 | OP: Move Beam <<
+0:43:00 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | OP: Move Beam >>
+0:43:05 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | OP: Move Beam <<
+0:43:10 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | OP: Move Beam >>
+0:43:15 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | OP: Move Beam <<
+0:43:20 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | OP: Move Beam >>
+0:43:25 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | OP: Move Beam <<
+0:43:30 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | OP: Move Beam >>
+0:43:35 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | OP: Move Beam <<
+0:43:40 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | OP: Move Beam >>
+0:43:45 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | OP: Move Beam <<
+0:43:50 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | OP: Move Beam >>
+0:43:55 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | OP: Move Beam <<
+0:44:00 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | OP: Move Beam >>
+0:44:05 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | OP: Move Beam <<
+0:44:10 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | OP: Move Beam >>
+0:44:15 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | OP: Move Beam <<
+0:44:20 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | OP: Move Beam >>
+0:44:25 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | OP: Move Beam <<
+0:44:45 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | DA: Data from run 13 is good
+0:44:45 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | DA: Tell operator to stop collecting data
+0:44:45 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | OP: Stop Collecting Data
+0:44:50 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | Instrument transition: 0:01:19.690962
+0:46:15 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | Start Run 14
+0:46:15 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | OP: Start Peak Chasing
+0:46:15 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | EM: Communicate with Operator
+0:46:40 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | OP: Move Beam >>
+0:46:40 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | DA: Data from run 14 has enough data to analyse
+0:46:45 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | OP: Move Beam <<
+0:46:50 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | OP: Move Beam >>
+0:46:55 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | OP: Move Beam <<
+0:47:00 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | OP: Move Beam >>
+0:47:05 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | OP: Move Beam <<
+0:47:45 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | OP: Move Beam >>
+0:47:50 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | OP: Move Beam <<
+0:47:55 | DA_E:0.91 DA_A:1.09, OP_E:0.91 OP_A:1.09 | OP: Move Beam >>
+0:48:00 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | OP: Move Beam <<
+0:48:05 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | OP: Move Beam >>
+0:48:10 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | OP: Move Beam <<
+0:48:15 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | OP: Move Beam >>
+0:48:20 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | OP: Move Beam <<
+0:48:25 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | OP: Move Beam >>
+0:48:30 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | OP: Move Beam <<
+0:48:35 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | OP: Move Beam >>
+0:48:40 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | OP: Move Beam <<
+0:48:45 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | OP: Move Beam >>
+0:48:45 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | DA: Data from run 14 is good
+0:48:45 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | DA: Tell operator to stop collecting data
+0:48:45 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | OP: Stop Collecting Data
+0:48:50 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | Instrument transition: 0:01:20.393854
+0:50:20 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | Start Run 15
+0:50:20 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | OP: Start Peak Chasing
+0:50:20 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | EM: Communicate with Operator
+0:50:25 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | OP: Move Beam <<
+0:50:30 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | OP: Move Beam >>
+0:50:35 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | OP: Move Beam <<
+0:50:40 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | OP: Move Beam >>
+0:50:45 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | DA: Data from run 15 has enough data to analyse
+0:50:55 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | OP: Move Beam <<
+0:52:25 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | OP: Move Beam >>
+0:52:30 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | OP: Move Beam <<
+0:52:35 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | OP: Move Beam >>
+0:52:40 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | OP: Move Beam <<
+0:52:45 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | DA: Data from run 15 is good
+0:52:45 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | DA: Tell operator to stop collecting data
+0:52:45 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | OP: Stop Collecting Data
+0:52:50 | DA_E:0.90 DA_A:1.10, OP_E:0.90 OP_A:1.10 | Instrument transition: 0:01:35.920293
+0:54:35 | DA_E:0.89 DA_A:1.11, OP_E:0.89 OP_A:1.11 | Start Run 16
+0:54:35 | DA_E:0.89 DA_A:1.11, OP_E:0.89 OP_A:1.11 | OP: Start Peak Chasing
+0:54:35 | DA_E:0.89 DA_A:1.11, OP_E:0.89 OP_A:1.11 | EM: Communicate with Operator
+0:55:00 | DA_E:0.89 DA_A:1.11, OP_E:0.89 OP_A:1.11 | DA: Data from run 16 has enough data to analyse
+0:57:00 | DA_E:0.89 DA_A:1.11, OP_E:0.89 OP_A:1.11 | DA: Data from run 16 is good
+0:57:00 | DA_E:0.89 DA_A:1.11, OP_E:0.89 OP_A:1.11 | DA: Tell operator to stop collecting data
+0:57:00 | DA_E:0.89 DA_A:1.11, OP_E:0.89 OP_A:1.11 | OP: Stop Collecting Data
+0:57:05 | DA_E:0.89 DA_A:1.11, OP_E:0.89 OP_A:1.11 | Instrument transition: 0:01:06.240344
+0:58:20 | DA_E:0.88 DA_A:1.12, OP_E:0.88 OP_A:1.12 | Start Run 17
+0:58:20 | DA_E:0.88 DA_A:1.12, OP_E:0.88 OP_A:1.12 | OP: Start Peak Chasing
+0:58:20 | DA_E:0.88 DA_A:1.12, OP_E:0.88 OP_A:1.12 | EM: Communicate with Operator
+0:58:45 | DA_E:0.88 DA_A:1.12, OP_E:0.88 OP_A:1.12 | DA: Data from run 17 has enough data to analyse
+0:58:50 | DA_E:0.88 DA_A:1.12, OP_E:0.88 OP_A:1.12 | OP: Move Beam <<
+0:58:55 | DA_E:0.88 DA_A:1.12, OP_E:0.88 OP_A:1.12 | OP: Move Beam >>
+0:59:00 | DA_E:0.88 DA_A:1.12, OP_E:0.88 OP_A:1.12 | OP: Move Beam <<
+0:59:05 | DA_E:0.88 DA_A:1.12, OP_E:0.88 OP_A:1.12 | OP: Move Beam >>
+0:59:10 | DA_E:0.88 DA_A:1.12, OP_E:0.88 OP_A:1.12 | OP: Move Beam <<
+0:59:15 | DA_E:0.88 DA_A:1.12, OP_E:0.88 OP_A:1.12 | OP: Move Beam >>
+0:59:20 | DA_E:0.88 DA_A:1.12, OP_E:0.88 OP_A:1.12 | OP: Move Beam <<
+0:59:25 | DA_E:0.88 DA_A:1.12, OP_E:0.88 OP_A:1.12 | OP: Move Beam >>
+0:59:30 | DA_E:0.88 DA_A:1.12, OP_E:0.88 OP_A:1.12 | OP: Move Beam <<
+0:59:35 | DA_E:0.88 DA_A:1.12, OP_E:0.88 OP_A:1.12 | OP: Move Beam >>
+0:59:40 | DA_E:0.88 DA_A:1.12, OP_E:0.88 OP_A:1.12 | OP: Move Beam <<
+0:59:45 | DA_E:0.88 DA_A:1.12, OP_E:0.88 OP_A:1.12 | OP: Move Beam >>
+0:59:50 | DA_E:0.88 DA_A:1.12, OP_E:0.88 OP_A:1.12 | OP: Move Beam <<
+1:00:05 | DA_E:0.88 DA_A:1.12, OP_E:0.88 OP_A:1.12 | OP: Move Beam <<
+1:00:10 | DA_E:0.88 DA_A:1.12, OP_E:0.88 OP_A:1.12 | OP: Move Beam >>
+1:00:15 | DA_E:0.88 DA_A:1.12, OP_E:0.88 OP_A:1.12 | OP: Move Beam <<
+1:00:20 | DA_E:0.88 DA_A:1.12, OP_E:0.88 OP_A:1.12 | OP: Move Beam >>
+1:00:50 | DA_E:0.88 DA_A:1.12, OP_E:0.88 OP_A:1.12 | DA: Data from run 17 is good
+1:00:50 | DA_E:0.88 DA_A:1.12, OP_E:0.88 OP_A:1.12 | DA: Tell operator to stop collecting data
+1:00:50 | DA_E:0.88 DA_A:1.12, OP_E:0.88 OP_A:1.12 | OP: Stop Collecting Data
+1:00:55 | DA_E:0.88 DA_A:1.12, OP_E:0.88 OP_A:1.12 | Instrument transition: 0:01:46.760530
+1:02:50 | DA_E:0.88 DA_A:1.12, OP_E:0.88 OP_A:1.12 | Start Run 18
+1:02:50 | DA_E:0.88 DA_A:1.12, OP_E:0.88 OP_A:1.12 | OP: Start Peak Chasing
+1:02:50 | DA_E:0.88 DA_A:1.12, OP_E:0.88 OP_A:1.12 | EM: Communicate with Operator
+1:03:15 | DA_E:0.87 DA_A:1.13, OP_E:0.87 OP_A:1.13 | DA: Data from run 18 has enough data to analyse
+1:03:20 | DA_E:0.87 DA_A:1.13, OP_E:0.87 OP_A:1.13 | OP: Move Beam >>
+1:03:25 | DA_E:0.87 DA_A:1.13, OP_E:0.87 OP_A:1.13 | OP: Move Beam <<
+1:03:30 | DA_E:0.87 DA_A:1.13, OP_E:0.87 OP_A:1.13 | OP: Move Beam >>
+1:03:35 | DA_E:0.87 DA_A:1.13, OP_E:0.87 OP_A:1.13 | OP: Move Beam <<
+1:03:40 | DA_E:0.87 DA_A:1.13, OP_E:0.87 OP_A:1.13 | OP: Move Beam >>
+1:05:15 | DA_E:0.87 DA_A:1.13, OP_E:0.87 OP_A:1.13 | DA: Data from run 18 is good
+1:05:15 | DA_E:0.87 DA_A:1.13, OP_E:0.87 OP_A:1.13 | DA: Tell operator to stop collecting data
+1:05:15 | DA_E:0.87 DA_A:1.13, OP_E:0.87 OP_A:1.13 | OP: Stop Collecting Data
+
+[   S1,   S1,   S1,   S1,   S1,   S1,   S2,   S2,   S2,   S2,   S2,   S2,   S3,   S3,   S3,   S3,   S3,   S3]
+[11000,11000,11000,11500,11000,11000,13000,12500,12500,14500,14000,13500,16000,15000,14500,14500,15000,14500]
+[ 0.95, 1.00, 1.00, 0.96, 1.00, 1.00, 0.64, 0.89, 0.89, 0.51, 0.62, 1.00, 0.40, 0.40, 0.48, 0.69, 0.34, 0.37]
+
+Current Time: 1:05:20 Experimental Time: 8:00:00
+--------------------------------------------------------------------------------------------------
+ROI: 100%
+Run:  1, Start: 0:01:00, End: 0:02:50, Duration: 0:01:50
+Run:  2, Start: 0:04:20, End: 0:06:10, Duration: 0:01:50
+Run:  3, Start: 0:08:00, End: 0:09:50, Duration: 0:01:50
+Run:  4, Start: 0:10:30, End: 0:12:25, Duration: 0:01:55
+Run:  5, Start: 0:14:25, End: 0:16:15, Duration: 0:01:50
+Run:  6, Start: 0:17:50, End: 0:19:40, Duration: 0:01:50
+Run:  7, Start: 0:20:45, End: 0:22:55, Duration: 0:02:10
+Run:  8, Start: 0:23:55, End: 0:26:00, Duration: 0:02:05
+Run:  9, Start: 0:26:25, End: 0:28:30, Duration: 0:02:05
+Run: 10, Start: 0:30:35, End: 0:33:00, Duration: 0:02:25
+Run: 11, Start: 0:34:50, End: 0:37:10, Duration: 0:02:20
+Run: 12, Start: 0:38:45, End: 0:41:00, Duration: 0:02:15
+Run: 13, Start: 0:42:05, End: 0:44:45, Duration: 0:02:40
+Run: 14, Start: 0:46:15, End: 0:48:45, Duration: 0:02:30
+Run: 15, Start: 0:50:20, End: 0:52:45, Duration: 0:02:25
+Run: 16, Start: 0:54:35, End: 0:57:00, Duration: 0:02:25
+Run: 17, Start: 0:58:20, End: 1:00:50, Duration: 0:02:30
+Run: 18, Start: 1:02:50, End: 1:05:15, Duration: 0:02:25
+
+Finished

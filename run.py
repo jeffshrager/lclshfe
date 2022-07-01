@@ -1,24 +1,22 @@
 """High Level Controller
 Round Robbin processes of classes, Synchronous simulation"""
-from datetime import datetime, timedelta
+from datetime import timedelta
 import os
 from time import sleep, time
-import plotly.express as px
-import pandas as pd
 from termcolor import colored
 from model.agent import DataAnalyst, ExperimentManager, Operator
 from model.instrument import CXI
-from model.library.functions import experiment_stats, goal_agenda_plan, experiment_is_not_over
+from model.library.functions import create_experiment_figure, experiment_stats, \
+    goal_agenda_plan, experiment_is_not_over
 from model.library.objects import CommunicationObject, Context, Goal
 
-NUMBER_OF_SAMPLES:int = 45
-EXPERIMENT_TIME:timedelta = timedelta(hours=5)
+NUMBER_OF_SAMPLES:int = 18
+EXPERIMENT_TIME:timedelta = timedelta(hours=8)
 STEP_THROUGH_TIME:timedelta = timedelta(seconds=5)
 CYCLE_SLEEP_TIME:int = 0
 
-def run():
+def run(display:bool):
     """Run CXI Simulation"""
-    current_time:datetime = datetime.now()
     filename = f"results/r{str(time())}.tsv"
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     with open(filename, "w", encoding="utf-8") as file:
@@ -32,83 +30,62 @@ def run():
             file)
         context.file.write(f"{goal_agenda_plan(context)}\n")
         while experiment_is_not_over(context):
-            os.system('cls' if os.name == 'nt' else 'clear')
-            context.messages.reset()
             print(goal_agenda_plan(context))
-            context.instrument_cxi.update(context)
-            # TODO: instrument running is different than experiment started: Agenda
-            if not context.instrument_cxi.is_running():
-                context.agent_em.start_experiment(context)
-            elif context.instrument_cxi.is_running():
-                if not context.instrument_cxi.is_collecting_data():
-                    if context.agent_em.check_if_next_run_can_be_started(context):
-                        context.agent_em.tell_operator_start_data_collection(context)
-                elif context.instrument_cxi.is_collecting_data():
-                    context.agent_op.track_stream_position(context)
-                    # TODO: Analygous attentional properties will attach to data analyst
-                    # Hot vs cold cognition, hot rappid makes more mistakes, cold slower more accurate
-                    # Eventually check when worrying check all the time, when not check once in a while
-                    context.agent_da.check_if_data_is_sufficient(context)
+            context.update()
+            if not context.agent_em.agenda.is_started():
+                context.agent_em.agenda.start_experiment()
+            elif context.agent_em.agenda.is_started():
+                if not context.instrument_cxi.is_running():
+                    context.agent_em.start_experiment(context)
+                elif context.instrument_cxi.is_running():
+                    if not context.instrument_cxi.is_collecting_data():
+                        if context.agent_em.check_if_next_run_can_be_started(context):
+                            context.agent_em.tell_operator_start_data_collection(context)
+                    elif context.instrument_cxi.is_collecting_data():
+                        context.agent_op.track_stream_position(context)
+                        context.agent_em.check_if_data_is_sufficient(context)
             print(context.messages)
             context.agent_da.check_if_experiment_is_compleated(context)
             context.current_time += STEP_THROUGH_TIME
             sleep(CYCLE_SLEEP_TIME)
-        os.system('cls' if os.name == 'nt' else 'clear')
+            os.system('cls' if os.name == 'nt' else 'clear')
         context.file.write(f"\n{experiment_stats(context)}\nFinished")
         print(f"{experiment_stats(context)}\n{colored('Finished', 'green')}")
-        data_frame = pd.DataFrame([])
-        for event in context.agent_em.agenda.event_timeline:
-            data_frame = pd.concat([data_frame, pd.DataFrame.from_records([{
-                "Start":f"{current_time + event['start_time']}",
-                "Finish":f"{current_time + event['end_time']}",
-                "Task": "task",
-                "Run": f"Run: {event['run_number']}"}])])
-        fig = px.timeline(data_frame,
-            x_start="Start",
-            x_end="Finish",
-            y="Task",
-            hover_name="Run")
-        fig.update_yaxes(autorange="reversed")
-        fig.show()
-run()
+        create_experiment_figure(context, display)
+run(False)
 
-# TODO: Current Sample needs to be updated in a different place so that nowhere needs current sample + 1
+# TODO: Attention/ exaustion/ focus controlls for ever person
+# TODO: operator noise and ✓(detector noise)
+# TODO: Data analyst improved determening if data is good or not
 
-# TODO: Gausian degredation on beam and stream on eachother 0.1 at perfect
-# TODO: Detector just has noise, 1% of 1%
+# TODO: Analygous attentional properties will attach to data analyst
+# Hot vs cold cognition, hot rappid makes more mistakes, cold slower more accurate
+# Eventually check when worrying check all the time, when not check once in a while
 
-# TODO: Dont worry about but only gets a subset of samples
-
-# TODO: After the production is done shortly after then they can analyse
-
-# TODO: Change Sample Logic
-# TODO: Dynamic sample scheduling
-# nth dimentional models
-
-# TODO: Data quality that comes off the machine
-# then data quality that the data analist has
-
-# TODO: Noise, instrument noise, operator noise, and detector noise
-
-
-
-# Quality of the data is how well the ruler is read
-# If the beam is off the stream then the ruler getts messed up
-# How far away it is from the peak - is data quality
-# If operator does a bad job peak chasing still get data but lower quality
-# Quality is on peak centering
-# Mean distance
-
-# ----------------------
-
-# Add agenda - does the EM have the agenda
-# Jet Tracking - current 10 - 15 mins
-# 12 hour scale add that layer to the program
-# System stability, affect attention level
+# TODO: Add system stability affect attention level
 # If the system is unstable attention should increase, if system is stable attention will decrease
 # If something happens for a shift there is a transition time
 # We know what the status of the system is use this to callibrate the system
 # begining they will be focused, not exausted yet, 4pm things go wrong and they are tired
+
+
+
+
+
+
+
+# TODO: Improve graph at end with extra values
+# TODO: Current Sample needs to be updated in a different place so that nowhere needs current sample + 1
+# TODO: Dont worry about but only gets a subset of samples
+# TODO: After the production is done shortly after then they can analyse
+# TODO: Dynamic sample scheduling
+# TODO: nth dimentional models
+
+
+# TODO: Data quality that comes off the machine
+# then data quality that the data analist has
+
+# ----------------------
 
 # Based on the button distance getting worse and worse scans
 # Kinda a cheat different purpose, model how bad the UI would be if buttons were far away

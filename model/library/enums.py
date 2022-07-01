@@ -18,6 +18,11 @@ class InstrumentRunState(Enum):
     STOPPED = False
     RUNNING = True
 
+class ExperimentState(Enum):
+    """Different States of the Instrument"""
+    STOPED = False
+    STARTED = True
+
 class SampleType(Enum):
     """Enum to specify the type of sample"""
     S1 = "S1"

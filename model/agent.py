@@ -8,40 +8,83 @@ from model.library.objects import Agenda, Context, SampleData
 class Person:
     """Agent Parent Class"""
     agent_type = ""
-    # TODO: begining they will be focused, not exausted yet, 4pm things go wrong and they are tired
-    focus_meter = None
     # TODO: Add Attention
-    attention = None
+    # TODO: begining they will be focused, not exausted yet, 4pm things go wrong and they are tired
+    energy_meter:float = None
+    # 1.0 / 0.002 = 8.3, total level of energy / minutes = 8.3 total hours of energy
+    energy_degradation:float = 0.002
+
+    attention_meter:float = None
+
+
+    previous_check:timedelta = None
+    noticing_delay:float = 1.0  # 100 ms
+    decision_delay:float = 1.0  # 100 ms -- FFF incorporate differential switch time
+    functional_acuity:float = 0.01
 
     def __init__(self, agent_type):
         self.agent_type = agent_type
+        self.energy_meter = 1.0
+        self.attention_meter = 1.0
+        self.previous_check = timedelta(0)
+
+    def get_energy(self):
+        """get the level of energy"""
+        return self.energy_meter
+
+    def get_attention(self):
+        """get the level of attention"""
+        return self.attention_meter
+
+    def update(self, context:Context):
+        """Update attention and focus"""
+        # TODO: energy degredation on a curve
+        delta:timedelta = context.current_time - self.previous_check
+        if delta >= timedelta(minutes=1):
+            self.energy_meter -= self.energy_degradation
+            self.previous_check = context.current_time
+        self.noticing_delay = 1 + (1 - self.energy_meter)
+        self.decision_delay = 1 + (1 - self.energy_meter)
 
 class DataAnalyst(Person):
     """Retrives data from the instrument"""
     def __init__(self):
         super().__init__(AgentType.DA)
+        self.last_sample_with_enough_data = None
 
-    def analyse_data(self, context:Context):
-        """determine if the output of the instrument is good"""
-        context.messages.concat("Check if data is good\n")
+    def check_if_enough_data_to_analyse(self, context:Context) -> bool:
+        """Check if there is enough data to start analysing, right now this is a constant"""
+        s_goal:SampleData = context.goal.samples[context.instrument_cxi.current_sample][0]
+        if len(s_goal.data) >= (s_goal.datapoints_needed * 0.2):
+            if self.last_sample_with_enough_data is None:
+                self.last_sample_with_enough_data = context.instrument_cxi.current_sample
+                context.file_write(f"DA: Data from run {context.instrument_cxi.run_number} has enough data to analyse")
+            elif self.last_sample_with_enough_data != context.instrument_cxi.current_sample:
+                self.last_sample_with_enough_data = context.instrument_cxi.current_sample
+                context.file_write(f"DA: Data from run {context.instrument_cxi.run_number} has enough data to analyse")
+            context.messages.concat(f"DA: Data from run {context.instrument_cxi.run_number} {colored('has enough data to analyse', 'green')}\n")
+            return True
+        else:
+            return False
 
     def check_if_data_is_sufficient(self, context:Context):
         """Check if data is good"""
         # TODO: Ask Instrument scientist to see what is the real decision logic stopping criteria
         s_goal:SampleData = context.goal.samples[context.instrument_cxi.current_sample][0]
-        # good_data_count:int = 0
-        # for data in s_goal.data:
-        #     if data.quality == 100:
-        #         good_data_count += 1
         total_data_count:float = 0.0
         for data in s_goal.data:
             total_data_count += data.quality
-        if total_data_count >= s_goal.datapoints_needed:
-            context.file.write(f"{context.current_time} | DA: Data from run {context.instrument_cxi.run_number} is good\n")
-            context.messages.concat(f"DA: Data from run {context.instrument_cxi.run_number} {colored('is good', 'green')}\n")
-            context.agent_em.agenda.add_event(context.instrument_cxi.run_number, context.instrument_cxi.run_start_time, context.current_time)
-            context.instrument_cxi.collecting_data = False
-
+        # Accounting for the noticing delay
+        if random.uniform(0.0, self.noticing_delay) >= 0.1:
+            if total_data_count >= s_goal.datapoints_needed:
+                # Accounting for the decision delay
+                if random.uniform(0.0, self.decision_delay) >= 0.1:
+                    context.file_write(f"DA: Data from run {context.instrument_cxi.run_number} is good")
+                    context.messages.concat(f"DA: Data from run {context.instrument_cxi.run_number} {colored('is good', 'green')}\n")
+                    context.agent_em.agenda.add_event(context.instrument_cxi.run_number, context.instrument_cxi.run_start_time, context.current_time)
+                    context.file_write("DA: Tell operator to stop collecting data")
+                    context.messages.concat(f"DA: {colored('Tell operator to stop collecting data', 'blue')}\n")
+                    context.agent_op.stop_collecting_data(context)
 
     def check_if_experiment_is_compleated(self, context:Context):
         """Check if experiment is compleated"""
@@ -58,8 +101,6 @@ class Operator(Person):
     """Operator reponse delay combines noticing, attention shifting to button, decision delay,
     moving to the button, and pressing it (Possibly also need attention shift into the
     display, but we're leaving that out bcs it can be arbitrarily large)"""
-    noticing_delay = 1  # 100 ms
-    decision_delay = 1  # 100 ms -- FFF incorporate differential switch time
     # attention shifting to button has to be computed from where we are and where the buttons are
     # current_eye_position = 0
     # left_button_position = -2 # we're actually not gonna use these but just use a fixed shift time
@@ -68,15 +109,20 @@ class Operator(Person):
     button_press_delay = 1  # ms
     button_distance = 0  # cm
     which_button_were_on = "<<"  # or ">>"
-    functional_acuity = 0.01
 
     def __init__(self):
         super().__init__(AgentType.OP)
 
+    def stop_collecting_data(self, context:Context):
+        """Stop Collecting Data"""
+        context.file_write("OP: Stop Collecting Data")
+        context.messages.concat(f"OP: {colored('Stop Collecting Data', 'blue')}\n")
+        context.instrument_cxi.collecting_data = False
+
     def start_peak_chasing(self, context:Context) -> bool:
         """True: communication sucessful and instrument started, False: Instrumnent not started"""
         if context.instrument_cxi.run_peak_chasing(context):
-            context.file.write(f"{context.current_time} | OP: Start Peak Chasing\n")
+            context.file_write("OP: Start Peak Chasing")
             context.messages.concat(f"OP: {colored('Start Peak Chasing', 'green')}\n")
             return True
         else:
@@ -90,35 +136,50 @@ class Operator(Person):
     def tracker_tool(self, context:Context):
         """FFF This should use a model of visual UI-mediated visual acuity,
         rather than just exact operators."""
-        which_way = self.which_way_do_we_need_to_shift(context.instrument_cxi.stream_status.stream_pos, context.instrument_cxi.beam_status.beam_pos)
+        which_way = self.which_way_do_we_need_to_shift(context)
         if which_way == "none":
             context.instrument_cxi.instrument_status.msg = context.instrument_cxi.instrument_status.msg + "(FA)"
             return context.instrument_cxi.beam_status.beam_pos
         elif which_way == "<<":
-            context.file.write(f"{context.current_time} | OP: Move Beam <<\n")
+            context.file_write("OP: Move Beam <<")
             context.messages.concat(f"OP: {colored('Move Beam <<', 'blue')}\n")
             context.instrument_cxi.instrument_status.msg = context.instrument_cxi.instrument_status.msg + "<<"
             return context.instrument_cxi.beam_status.beam_pos - context.instrument_cxi.beam_status.beam_shift_amount
         else:
-            context.file.write(f"{context.current_time} | OP: Move Beam >>\n")
+            context.file_write("OP: Move Beam >>")
             context.messages.concat(f"OP: {colored('Move Beam >>', 'blue')}\n")
             context.instrument_cxi.instrument_status.msg = context.instrument_cxi.instrument_status.msg + ">>"
             return context.instrument_cxi.beam_status.beam_pos + context.instrument_cxi.beam_status.beam_shift_amount
 
-    def which_way_do_we_need_to_shift(self, par_stream_pos, par_beam_pos):
+    def which_way_do_we_need_to_shift(self, context:Context):
         """Used in various places, returns '<<', '>>', 'none'"""
-        delta = abs(par_beam_pos - par_stream_pos)
+        delta = abs(context.instrument_cxi.beam_status.beam_pos - context.instrument_cxi.stream_status.stream_pos)
         if delta < self.functional_acuity:
             return "none"
-        elif par_beam_pos > par_stream_pos:
+        elif context.instrument_cxi.beam_status.beam_pos > context.instrument_cxi.stream_status.stream_pos:
             return "<<"
         else:
             return ">>"
 
+    def operator_response_delay(self, context:Context):
+        """operator_response_delay() uses the current eye position and button distances to decide
+        how many cycles it takes to hit the button, which is either short
+        (you're there already), or long (you're not), the longer using the
+        button distance to delay. It return an integer number of cycles to
+        wait before the input arrives."""
+        way = self.which_way_do_we_need_to_shift(context)
+        if way == self.which_button_were_on:
+            context.messages.concat(f"[{str(self.button_press_delay + self.decision_delay + self.noticing_delay)}]")
+            return self.button_press_delay + self.decision_delay + self.noticing_delay
+        else:
+            self.which_button_were_on = way
+            context.messages.concat(f"[{str((self.button_distance * self.switch_button_delay_per_cm) + self.button_press_delay + self.decision_delay + self.noticing_delay)}]")
+            return (self.button_distance * self.switch_button_delay_per_cm) + self.button_press_delay + self.decision_delay + self.noticing_delay
 class ExperimentManager(Person):
     """High level GAP Goal Agenda Plan"""
+    # TODO: does the EM have the agenda
     agenda:Agenda = None
-    
+
     previous_transition_check:timedelta = None
     transition_time:timedelta = timedelta(minutes=1)
     current_transition_time:timedelta = None
@@ -133,7 +194,7 @@ class ExperimentManager(Person):
 
     def start_experiment(self, context:Context):
         """determine if the output of the instrument is good"""
-        context.file.write(f"{context.current_time} | EM: Start Experiment\n")
+        context.file_write("EM: Start Experiment")
         context.messages.concat(f"EM: {colored('Start Experiment', 'green')}\n")
         context.instrument_cxi.start()
 
@@ -149,11 +210,11 @@ class ExperimentManager(Person):
             if self.previous_sample.type == next_sample.type:
                 if self.current_transition_time is None:
                     self.current_transition_time = timedelta(minutes=random.uniform(0.2, 2.0))
+                    context.file_write(f"Instrument transition: {self.current_transition_time}")
                 if self.current_transition_time > timedelta(0):
                     if self.previous_transition_check is None:
                         self.previous_transition_check = context.current_time
                     else:
-                        context.file.write(f"{context.current_time} | Instrument transition: {self.current_transition_time}\n")
                         context.messages.concat(f"Instrument transition: {colored(f'{self.current_transition_time}', 'blue')}\n")
                         self.current_transition_time -= context.current_time - self.previous_transition_check
                         self.previous_transition_check = context.current_time
@@ -180,10 +241,17 @@ class ExperimentManager(Person):
     def tell_operator_start_data_collection(self, context:Context):
         """Communicate with operator to start collecting data"""
         if context.agent_op.start_peak_chasing(context):
-            context.file.write(f"{context.current_time} | EM: Communicate with Operator\n")
+            context.file_write("EM: Communicate with Operator")
             context.messages.concat(f"EM: {colored('Communicate with Operator', 'green')}\n")
         else:
             context.messages.concat(f"EM: {colored('Instrument cannot start', 'blue')}\n")
+
+    def check_if_data_is_sufficient(self, context:Context):
+        """Communiate with the data analyst to see if the run has enough
+        data or if the run needs to continue, if so tell the operator to continue
+        the run for longer"""
+        if context.agent_da.check_if_enough_data_to_analyse(context):
+            context.agent_da.check_if_data_is_sufficient(context)
 
 class RemoteUser(Person):
     """A user who is not present on site"""
