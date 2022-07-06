@@ -14,7 +14,6 @@ class Instrument:
     beam_status:Beam = None
     collecting_data = False
     run_start_time:timedelta = None
-    run_timedelta:timedelta = timedelta(minutes=5)
     run_number:int = None
     run_start_frame = False
     data_per_second:int = None
@@ -51,7 +50,8 @@ class Instrument:
         Pretty straight-forward refactoring would pull them apart. Also, the hit scoring
         is unfortunately, based on whether a * would be displayed, which in turn depends
         on the display increment, which is clearly wrong. UUU FFF Clean this up!!"""
-        # TODO: Where exact beam|jet match is tested with ==, replace with a more "perceptually" accurate model
+        # TODO: Where exact beam|jet match is tested with ==, replace with a
+        # more "perceptually" accurate model
         return_string = ""
         show_width = 80
         show_incr = 2.0 / show_width
@@ -80,7 +80,8 @@ class Instrument:
             else:
                 char = " "
             return_string += f"{char}"
-        return_string += f"] stream:{self.stream_status.stream_pos} beam:{self.beam_status.beam_pos} {self.instrument_status.msg}"
+        return_string += (f"] stream:{self.stream_status.stream_pos} "+
+            f"beam:{self.beam_status.beam_pos} {self.instrument_status.msg}")
         self.instrument_status.msg = ""
         return return_string
 
@@ -103,15 +104,15 @@ class Instrument:
                 self.stream_status.crazy_ivan_shift_amount * random.choice(
                     [i for i in range(-1, 2) if i not in [0]])), 4)
             if self.stream_status.allow_response_cycle == 99999999999:
-                self.stream_status.allow_response_cycle = self.stream_status.cycle
-                #  \ + context.agent_op.operator_response_delay(context)
+                self.stream_status.allow_response_cycle = self.stream_status.cycle \
+                    + context.agent_op.operator_response_delay(context)
         elif random.random() < self.stream_status.p_stream_shift:
             self.stream_status.stream_pos = round(self.stream_status.stream_pos + (
                 self.stream_status.stream_shift_amount * random.choice(
                     [i for i in range(-1, 2) if i not in [0]])), 4)
             if self.stream_status.allow_response_cycle == 99999999999:
-                self.stream_status.allow_response_cycle = self.stream_status.cycle
-                #  \    + context.agent_op.operator_response_delay(context)
+                self.stream_status.allow_response_cycle = self.stream_status.cycle \
+                    + context.agent_op.operator_response_delay(context)
         context.messages.concatbegining(f"{self.show_pos()}\n{get_current_datapoints(context)}\n")
         if self.stream_status.cycle >= self.stream_status.allow_response_cycle:
             self.instrument_status.msg = self.instrument_status.msg + "<?>"
@@ -123,22 +124,24 @@ class Instrument:
     def update(self, context:Context):
         "update vars in relation to time"
         if self.collecting_data:
+            self.stream_frame_update(context)
             if self.run_start_frame:
-                self.stream_frame_update(context)
                 self.run_start_frame = False
             else:
-                context.messages.concat(f"Run {self.run_number} {colored('Collecting Data', 'green')}\n")
-                self.stream_frame_update(context)
+                context.messages.concat(f"Run {self.run_number} "+
+                    f"{colored('Collecting Data', 'green')}\n")
             # Normal Distribution of quality based on how far away beam pos(user controller)
             # is away from the stream pos (instrument beam)
             # Farthest away is 2 beam on one side and stream on other
             # Closest is 0 right on top of each other
+            # TODO: allow this to work with less than 1 second time steps
             delta:timedelta = context.current_time - self.last_data_update
             distance = abs(self.stream_status.stream_pos - self.beam_status.beam_pos)
             for _ in range(int(delta.total_seconds()) * self.data_per_second):
-                s_goal:SampleData = context.ami.samples[self.current_sample][0]
-                s_goal.append(DataPoint(get_gaussian(distance) * s_goal.preformance_quality \
-                    + (random.uniform(-0.01, 0.01) if random.randrange(1, 5) == 1 else 0) \
+                context.ami.samples[self.current_sample].append(
+                    DataPoint(get_gaussian(distance) * \
+                        context.ami.samples[self.current_sample].preformance_quality \
+                        + (random.uniform(-0.01, 0.01) if random.randrange(1, 5) == 1 else 0) \
                         + (random.uniform(-0.1, 0.1) if random.randrange(1, 1000) == 1 else 0)))
             self.last_data_update = context.current_time
 
@@ -150,7 +153,6 @@ class CXI(Instrument):
 
     def __init__(self):
         super().__init__(InstrumentType.CXI)
-        # TODO: Need to get n events, from elog data
         self.data_per_second = 100
 
     def run_peak_chasing(self, context:Context) -> bool:
@@ -166,9 +168,8 @@ class CXI(Instrument):
         self.last_data_update = context.current_time
         self.stream_status.cycle = 0
         for index, sample_goal in enumerate(context.ami.samples):
-            s_goal:SampleData = sample_goal[0]
-            if len(s_goal.data) < s_goal.datapoints_needed:
+            if len(sample_goal.data) < sample_goal.data_needed:
                 self.current_sample = index
                 break
-        self.previous_sample = context.ami.samples[self.current_sample][0]
+        self.previous_sample = context.ami.samples[self.current_sample]
         return True

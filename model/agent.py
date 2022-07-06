@@ -3,7 +3,7 @@ from datetime import timedelta
 import random
 from termcolor import colored
 from model.library.enums import AgentType
-from model.library.objects import Agenda, Context, SampleData
+from model.library.objects import Context, SampleData
 
 class Person:
     """Agent Parent Class"""
@@ -56,72 +56,48 @@ class DataAnalyst(Person):
 
     def check_if_enough_data_to_analyse(self, context:Context) -> bool:
         """Check if there is enough data to start analysing, right now this is a constant"""
-        s_goal:SampleData = context.ami.samples[context.instrument_cxi.current_sample][0]
-        if len(s_goal.data) >= (s_goal.datapoints_needed * 0.8):
+        if len(context.ami.samples[context.instrument.current_sample].data) >= (
+            context.ami.samples[context.instrument.current_sample].data_needed * 0.8):
             if self.last_sample_with_enough_data is None:
-                self.last_sample_with_enough_data = context.instrument_cxi.current_sample
-                context.file_write(f"DA: Data from run {context.instrument_cxi.run_number} has enough data to analyse")
-            elif self.last_sample_with_enough_data != context.instrument_cxi.current_sample:
-                self.last_sample_with_enough_data = context.instrument_cxi.current_sample
-                context.file_write(f"DA: Data from run {context.instrument_cxi.run_number} has enough data to analyse")
-            context.messages.concat(f"DA: Data from run {context.instrument_cxi.run_number} {colored('has enough data to analyse', 'green')}\n")
+                self.last_sample_with_enough_data = context.instrument.current_sample
+                context.file_write(f"DA: Data from run {context.instrument.run_number} has enough data to analyse")
+            elif self.last_sample_with_enough_data != context.instrument.current_sample:
+                self.last_sample_with_enough_data = context.instrument.current_sample
+                context.file_write(f"DA: Data from run {context.instrument.run_number} has enough data to analyse")
+            context.messages.concat(f"DA: Data from run {context.instrument.run_number} {colored('has enough data to analyse', 'green')}\n")
             return True
         else:
             return False
-
-    # def check_if_data_is_sufficient(self, context:Context) -> bool:
-    #     """If there is enough data True, else False to ask to keep running"""
-    #     s_goal:SampleData = context.goal.samples[context.instrument_cxi.current_sample][0]
-    #     x = []
-    #     for data in s_goal.data:
-    #         x.append(data.quality)
-    #     mean = np.mean(x)
-    #     m2 = np.sum(np.subtract(x, [mean] * len(x))**2)
-
-    #     # Accounting for the noticing delay
-    #     if random.uniform(0.0, self.noticing_delay) >= 0.1:
-    #         if total_data_count >= s_goal.datapoints_needed:
-    #             # Accounting for the decision delay
-    #             if random.uniform(0.0, self.decision_delay) >= 0.1:
-    #                 context.file_write(f"DA: Data from run {context.instrument_cxi.run_number} is good")
-    #                 context.messages.concat(f"DA: Data from run {context.instrument_cxi.run_number} {colored('is good', 'green')}\n")
-    #                 context.agent_em.agenda.add_event(context.instrument_cxi.run_number, context.instrument_cxi.run_start_time, context.current_time)
-    #                 return True
-    #     context.file_write(f"DA: More data needed from run {context.instrument_cxi.run_number}")
-    #     context.messages.concat(f"DA: {colored('More data needed from run', 'yellow')} {context.instrument_cxi.run_number}\n")
-    #     return False
 
     def check_if_data_is_sufficient(self, context:Context) -> bool:
         """If there is enough data True, else False to ask to keep running"""
         # TODO: Ask Instrument scientist to see what is the real decision logic stopping criteria
         # TODO _: Check for standard deviation for run in more sophisticated way
-        s_goal:SampleData = context.ami.samples[context.instrument_cxi.current_sample][0]
         total_data_count:float = 0.0
-        for data in s_goal.data:
+        for data in context.ami.samples[context.instrument.current_sample].data:
             total_data_count += data.quality
         # Accounting for the noticing delay
         if random.uniform(0.0, self.noticing_delay) >= 0.1:
-            if total_data_count >= s_goal.datapoints_needed:
+            if total_data_count >= context.ami.samples[context.instrument.current_sample].data_needed:
                 # Accounting for the decision delay
                 if random.uniform(0.0, self.decision_delay) >= 0.1:
-                    context.file_write(f"DA: Data from run {context.instrument_cxi.run_number} is good")
-                    context.messages.concat(f"DA: Data from run {context.instrument_cxi.run_number} {colored('is good', 'green')}\n")
-                    context.agent_em.agenda.add_event(context.instrument_cxi.run_number, context.instrument_cxi.run_start_time, context.current_time)
+                    context.file_write(f"DA: Data from run {context.instrument.run_number} is good")
+                    context.messages.concat(f"DA: Data from run {context.instrument.run_number} {colored('is good', 'green')}\n")
+                    context.agenda.add_event(context.instrument.run_number, context.instrument.run_start_time, context.current_time)
                     return True
-        context.file_write(f"DA: More data needed from run {context.instrument_cxi.run_number}")
-        context.messages.concat(f"DA: {colored('More data needed from run', 'yellow')} {context.instrument_cxi.run_number}\n")
+        context.file_write(f"DA: More data needed from run {context.instrument.run_number}")
+        context.messages.concat(f"DA: {colored('More data needed from run', 'yellow')} {context.instrument.run_number}\n")
         return False
 
     def check_if_experiment_is_compleated(self, context:Context):
         """Check if experiment is compleated"""
         current_sample = None
         for index, sample_goal in enumerate(context.ami.samples):
-            s_goal:SampleData = sample_goal[0]
-            if len(s_goal.data) < s_goal.datapoints_needed:
+            if len(sample_goal.data) < sample_goal.data_needed:
                 current_sample = index
                 break
         if current_sample is None:
-            context.ami.finished()
+            context.agenda.finished()
 
 class Operator(Person):
     """Operator reponse delay combines noticing, attention shifting to button, decision delay,
@@ -143,11 +119,11 @@ class Operator(Person):
         """Stop Collecting Data"""
         context.file_write("OP: Stop Collecting Data")
         context.messages.concat(f"OP: {colored('Stop Collecting Data', 'blue')}\n")
-        context.instrument_cxi.collecting_data = False
+        context.instrument.collecting_data = False
 
     def start_peak_chasing(self, context:Context) -> bool:
         """True: communication sucessful and instrument started, False: Instrumnent not started"""
-        if context.instrument_cxi.run_peak_chasing(context):
+        if context.instrument.run_peak_chasing(context):
             context.file_write("OP: Start Peak Chasing")
             context.messages.concat(f"OP: {colored('Start Peak Chasing', 'green')}\n")
             return True
@@ -157,32 +133,32 @@ class Operator(Person):
 
     def track_stream_position(self, context:Context):
         "Move beam"
-        context.instrument_cxi.beam_status.beam_pos = round(self.tracker_tool(context), 4)
+        context.instrument.beam_status.beam_pos = round(self.tracker_tool(context), 4)
 
     def tracker_tool(self, context:Context):
         """FFF This should use a model of visual UI-mediated visual acuity,
         rather than just exact operators."""
         which_way = self.which_way_do_we_need_to_shift(context)
         if which_way == "none":
-            context.instrument_cxi.instrument_status.msg = context.instrument_cxi.instrument_status.msg + "(FA)"
-            return context.instrument_cxi.beam_status.beam_pos
+            context.instrument.instrument_status.msg = context.instrument.instrument_status.msg + "(FA)"
+            return context.instrument.beam_status.beam_pos
         elif which_way == "<<":
             context.file_write("OP: Move Beam <<")
             context.messages.concat(f"OP: {colored('Move Beam <<', 'blue')}\n")
-            context.instrument_cxi.instrument_status.msg = context.instrument_cxi.instrument_status.msg + "<<"
-            return context.instrument_cxi.beam_status.beam_pos - context.instrument_cxi.beam_status.beam_shift_amount
+            context.instrument.instrument_status.msg = context.instrument.instrument_status.msg + "<<"
+            return context.instrument.beam_status.beam_pos - context.instrument.beam_status.beam_shift_amount
         else:
             context.file_write("OP: Move Beam >>")
             context.messages.concat(f"OP: {colored('Move Beam >>', 'blue')}\n")
-            context.instrument_cxi.instrument_status.msg = context.instrument_cxi.instrument_status.msg + ">>"
-            return context.instrument_cxi.beam_status.beam_pos + context.instrument_cxi.beam_status.beam_shift_amount
+            context.instrument.instrument_status.msg = context.instrument.instrument_status.msg + ">>"
+            return context.instrument.beam_status.beam_pos + context.instrument.beam_status.beam_shift_amount
 
     def which_way_do_we_need_to_shift(self, context:Context):
         """Used in various places, returns '<<', '>>', 'none'"""
-        delta = abs(context.instrument_cxi.beam_status.beam_pos - context.instrument_cxi.stream_status.stream_pos)
+        delta = abs(context.instrument.beam_status.beam_pos - context.instrument.stream_status.stream_pos)
         if delta < self.functional_acuity:
             return "none"
-        elif context.instrument_cxi.beam_status.beam_pos > context.instrument_cxi.stream_status.stream_pos:
+        elif context.instrument.beam_status.beam_pos > context.instrument.stream_status.stream_pos:
             return "<<"
         else:
             return ">>"
@@ -204,9 +180,6 @@ class Operator(Person):
 
 class ExperimentManager(Person):
     """High level GAP Goal Agenda Plan"""
-    # TODO: does the EM have the agenda
-    agenda:Agenda = None
-
     previous_transition_check:timedelta = None
     transition_time:timedelta = timedelta(minutes=1)
     current_transition_time:timedelta = None
@@ -219,24 +192,23 @@ class ExperimentManager(Person):
     previous_data_check:timedelta = None
     data_check_wait:timedelta = timedelta(minutes=1)
 
-    def __init__(self, experiment_time:timedelta):
+    def __init__(self):
         super().__init__(AgentType.EM)
-        self.agenda = Agenda(experiment_time)
 
     def start_experiment(self, context:Context):
         """determine if the output of the instrument is good"""
         context.file_write("EM: Start Experiment")
         context.messages.concat(f"EM: {colored('Start Experiment', 'green')}\n")
-        context.instrument_cxi.start()
+        context.instrument.start()
 
     def check_if_next_run_can_be_started(self, context:Context) -> bool:
         """Check to see if the sample needs to be changed if so wait"""
         # TODO: Ask person to change sample
         # TODO: Simplify
-        if context.instrument_cxi.current_sample is None:
-            next_sample:SampleData = context.ami.samples[0][0]
-        elif context.instrument_cxi.current_sample is not None:
-            next_sample:SampleData = context.ami.samples[context.instrument_cxi.current_sample+1][0]
+        if context.instrument.current_sample is None:
+            next_sample:SampleData = context.ami.samples[0]
+        elif context.instrument.current_sample is not None:
+            next_sample:SampleData = context.ami.samples[context.instrument.current_sample+1]
         if self.previous_sample is not None:
             if self.previous_sample.type == next_sample.type:
                 if self.current_transition_time is None:
@@ -261,12 +233,12 @@ class ExperimentManager(Person):
             self.current_sample_switch_time = next_sample.setup_time
         self.current_sample_switch_time -= context.current_time - self.previous_switch_check
         self.previous_switch_check = context.current_time
-        context.messages.concat(f"Sample: {0 if context.instrument_cxi.current_sample is None else context.instrument_cxi.current_sample + 1}, Setting up: {colored(f'{self.current_sample_switch_time}', 'blue')}\n")
-        if self.current_sample_switch_time == timedelta(0):
+        if self.current_sample_switch_time <= timedelta(0):
             self.current_sample_switch_time = None
             self.previous_sample = next_sample
             return True
         else:
+            context.messages.concat(f"Sample: {0 if context.instrument.current_sample is None else context.instrument.current_sample + 1}, Setting up: {colored(f'{self.current_sample_switch_time}', 'blue')}\n")
             return False
 
     def tell_operator_start_data_collection(self, context:Context):

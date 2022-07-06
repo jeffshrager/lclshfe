@@ -8,12 +8,12 @@ from model.agent import DataAnalyst, ExperimentManager, Operator
 from model.instrument import CXI
 from model.library.functions import create_experiment_figure, experiment_stats, \
     goal_agenda_plan, experiment_is_not_over
-from model.library.objects import CommunicationObject, Context, AMI
+from model.library.objects import Agenda, CommunicationObject, Context, AMI
 
-NUMBER_OF_SAMPLES:int = 3
+NUMBER_OF_SAMPLES:int = 1
 EXPERIMENT_TIME:timedelta = timedelta(hours=8)
 STEP_THROUGH_TIME:timedelta = timedelta(seconds=5)
-CYCLE_SLEEP_TIME:int = 0
+CYCLE_SLEEP_TIME:int = 0.1
 
 def run(display:bool):
     """Run CXI Simulation"""
@@ -22,8 +22,9 @@ def run(display:bool):
     with open(filename, "w", encoding="utf-8") as file:
         context:Context = Context(
             AMI(NUMBER_OF_SAMPLES),
+            Agenda(EXPERIMENT_TIME),
             DataAnalyst(),
-            ExperimentManager(EXPERIMENT_TIME),
+            ExperimentManager(),
             Operator(),
             CXI(),
             CommunicationObject(),
@@ -34,16 +35,16 @@ def run(display:bool):
             context.messages.reset()
             print(goal_agenda_plan(context))
             context.update()
-            if not context.agent_em.agenda.is_started():
-                context.agent_em.agenda.start_experiment()
-            elif context.agent_em.agenda.is_started():
-                if not context.instrument_cxi.is_running():
+            if not context.agenda.is_started():
+                context.agenda.start_experiment()
+            elif context.agenda.is_started():
+                if not context.instrument.is_running():
                     context.agent_em.start_experiment(context)
-                elif context.instrument_cxi.is_running():
-                    if not context.instrument_cxi.is_collecting_data():
+                elif context.instrument.is_running():
+                    if not context.instrument.is_collecting_data():
                         if context.agent_em.check_if_next_run_can_be_started(context):
                             context.agent_em.tell_operator_start_data_collection(context)
-                    elif context.instrument_cxi.is_collecting_data():
+                    elif context.instrument.is_collecting_data():
                         context.agent_op.track_stream_position(context)
                         context.agent_em.check_if_data_is_sufficient(context)
             print(context.messages)
@@ -54,9 +55,10 @@ def run(display:bool):
         context.file.write(f"\n{experiment_stats(context)}\nFinished")
         print(f"{experiment_stats(context)}\n{colored('Finished', 'green')}")
         create_experiment_figure(context, display)
-run(True)
+run(False)
 
-# TODO: Start plotting 3d graphs
+# TODO: Startc plotting 3d graphs
+# TODO: Make jig
 
 # TODO: Attention/ exaustion/ focus controlls for ever person
 # TODO: operator noise and ✓(detector noise)

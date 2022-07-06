@@ -106,26 +106,14 @@ class SampleData:
     # TODO: Add weights
     # Dozens of targets
     # N shaped dynamics
-    # TODO: Generate these based on gausian
-    sampleTypeMapper = {
-        SampleType.S1: {'preformance_quality': 0.95,
-                        'datapoints_needed': 10000,
-                        'weight': .90,
-                        'setup_time': timedelta(minutes=1)},
-        SampleType.S2: {'preformance_quality': 0.90,
-                        'datapoints_needed': 11000,
-                        'weight': .20,
-                        'setup_time': timedelta(minutes=1)},
-        SampleType.S3: {'preformance_quality': 0.85,
-                        'datapoints_needed': 12000,
-                        'weight': .70,
-                        'setup_time': timedelta(minutes=1)}}
 
-    def __init__(self, sample_type:SampleType):
-        values = self.sampleTypeMapper.get(sample_type)
-        self.preformance_quality:float = values.get("preformance_quality")
-        self.datapoints_needed:int = values.get("datapoints_needed")
-        self.setup_time:timedelta = values.get("setup_time")
+    def __init__(self, sample_type:SampleType, preformance_quality:float,
+            weight:float, data_needed:float, setup_time:timedelta):
+        self.preformance_quality:float = preformance_quality
+        # TODO: Remove This
+        self.data_needed:int = data_needed
+        self.weight:float = weight
+        self.setup_time:timedelta = setup_time
         self.type:SampleType = sample_type
         self.data:List[DataPoint] = []
         self.hit_number:int = 0
@@ -151,60 +139,44 @@ class SampleData:
         self.err = self.sdev/sqrt(self.count)
 
     def __str__(self):
+        # TODO: Clean this up
         if self.count == 0:
             return "mean:0, err:0, var:0, dev:0"
-        return (f"mean:{self.mean:.3f}, err:{self.err:.3f},"+
-            f" var:{self.variance:.3f}, dev:{self.sdev:.3f}")
+        return (f"mean:{self.mean:.6f}, err:{self.err:.6f},"+
+            f" var:{self.variance:.6f}, dev:{self.sdev:.6f}")
 
 class AMI:
     """Contains the data of the samples"""
     samples:List[SampleData] = []
-    status = None
 
     def __init__(self, number_of_samples:int):
-        self.samples = [SampleData(SampleType.S1) for _ in range(0, number_of_samples)]
-        # self.samples = [[SampleData(SampleType.S1)] for _ in range(0, number_of_samples//3)]
-        # self.samples += [[SampleData(SampleType.S2)] for _ in range((number_of_samples//3)+1, ((number_of_samples//3)*2) + 1)]
-        # self.samples += [[SampleData(SampleType.S3)] for _ in range(((number_of_samples//3)*2) + 2, number_of_samples+2)]
+        self.samples = [SampleData(SampleType.S1, random.gauss(0.90, 0.08),
+            random.gauss(0.80, 0.20), int(random.gauss(150000, 500)),
+            timedelta(minutes=random.gauss(1, 0.5))) for _ in range(0, number_of_samples)]
 
-    def finished(self):
-        """Finished experiment"""
-        self.status = "compleated"
+    def get_current_sample(self, context:Context) -> SampleData:
+        """Get current Sample"""
+        return self.samples[context.instrument.current_sample]
 
     def __str__(self):
-        # TODO: clean this up
+        # TODO: Clean this up
         return_string = "["
-        for index, sample in enumerate(self.samples):
-            if index == len(self.samples)-1:
-                s_goal:SampleData = sample[0]
-                return_string += f'{s_goal.type.value: >5}'
-            else:
-                s_goal:SampleData = sample[0]
-                return_string += f'{s_goal.type.value: >5},'
+        for sample in self.samples:
+            return_string += f'{sample.type.value: >5}'
         return_string += "]\n["
-        for index, sample in enumerate(self.samples):
-            if index == len(self.samples)-1:
-                s_goal:SampleData = sample[0]
-                return_string += f'{len(s_goal.data): >5}'
-            else:
-                s_goal:SampleData = sample[0]
-                return_string += f'{len(s_goal.data): >5},'
+        for sample in self.samples:
+            return_string += f'{len(sample.data): >5}'
         return_string += "]\n["
-        for index, sample in enumerate(self.samples):
-            if index == len(self.samples)-1:
-                s_goal:SampleData = sample[0]
-                return_string += f'{s_goal}'
-            else:
-                s_goal:SampleData = sample[0]
-                return_string += f'{s_goal},'
-        return_string += "]\n"
-        return return_string
+        for sample in self.samples:
+            return_string += f'{sample} '
+        return return_string + "]\n"
 
 class Agenda:
     """High Level Schedule of events for acheiving the goal"""
-    experimental_time = timedelta(0)
-    event_timeline = []
-    experiment_status = ExperimentState.STOPED
+    experimental_time:timedelta = timedelta(0)
+    event_timeline:List[Event] = []
+    experiment_status:ExperimentState = ExperimentState.STOPED
+    status = None
 
     def __init__(self, experimental_time):
         self.experimental_time = experimental_time
@@ -218,45 +190,58 @@ class Agenda:
         """check if experiment has been started"""
         return self.experiment_status
 
-    # TODO: event object
-    def add_event(self, run_number:int, start_time:timedelta, end_time:timedelta):
-        """Add event to agenda timeline"""
-        self.event_timeline.append({"run_number":run_number,
-                "start_time":start_time, "end_time":end_time})
+    def finished(self):
+        """Finished experiment"""
+        self.status = "compleated"
 
     def __str__(self):
         return f"Experimental Time: {self.experimental_time}"
 
+    def add_event(self, run_number:int, start_time:timedelta, end_time:timedelta):
+        """Add event to agenda timeline"""
+        self.event_timeline.append(Event(run_number, start_time, end_time))
+
     def get_timeline(self):
         """return final timeline string"""
-        return_string = ""
-        for event in self.event_timeline:
-            return_string+=(f"Run: {event['run_number']: >2},"+
-                f" Start: {event['start_time']}, End: {event['end_time']},"+
-                f" Duration: {event['end_time'] - event['start_time']}\n")
-        return return_string
+        return ''.join(map(str, self.event_timeline))
+
+class Event:
+    """Object to specify the information from each event(run)"""
+    run_number:int = None
+    start_time:timedelta = None
+    end_time:timedelta = None
+
+    def __init__(self, run_number:int, start_time:timedelta, end_time:timedelta):
+        self.run_number = run_number
+        self.start_time = start_time
+        self.end_time = end_time
+
+    def __str__(self):
+        return (f"Run: {self.run_number: >2}, Start: {self.start_time}, "+
+            f"End: {self.end_time}, Duration: {self.end_time - self.start_time}\n")
 
 class Context:
     """http://www.corej2eepatterns.com/ContextObject.htm"""
     current_time:timedelta = None
     ami:AMI = None
+    agenda:Agenda = None # TODO: does the EM have the agenda
     agent_da:DataAnalyst = None
     agent_em:ExperimentManager= None
     agent_op:Operator = None
-    instrument_cxi:CXI = None
+    instrument:CXI = None
     messages:CommunicationObject = None
     file:TextIOWrapper = None
     start_time:datetime = None
 
-    def __init__(self, ami:AMI, agent_da:DataAnalyst, agent_em:ExperimentManager,
-            agent_op:Operator, instrument_cxi:CXI, messages:CommunicationObject,
-            file:TextIOWrapper):
+    def __init__(self, ami:AMI, agenda:Agenda, agent_da:DataAnalyst, agent_em:ExperimentManager,
+            agent_op:Operator, instrument:CXI, messages:CommunicationObject, file:TextIOWrapper):
         self.current_time = timedelta(0)
         self.ami = ami
+        self.agenda = agenda
         self.agent_da = agent_da
         self.agent_em = agent_em
         self.agent_op = agent_op
-        self.instrument_cxi = instrument_cxi
+        self.instrument = instrument
         self.messages = messages
         self.file = file
         self.start_time = datetime.now()
@@ -271,6 +256,6 @@ class Context:
 
     def update(self):
         """Make sure all objects are updated"""
-        self.instrument_cxi.update(self)
+        self.instrument.update(self)
         self.agent_da.update(self)
         self.agent_op.update(self)
