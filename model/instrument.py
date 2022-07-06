@@ -20,7 +20,7 @@ class Instrument:
     data_per_second:int = None
     last_data_update:timedelta = None
     current_sample:int = None
-    # TODO: add system stability
+    # TODO _: add system stability
     system_stability = None
 
     def __init__(self, instrument):
@@ -91,7 +91,7 @@ class Instrument:
         self.instrument_status.msg = ""
         # Stop if it hits the wall on either side
         if abs(self.stream_status.stream_pos)>1.0:
-            # TODO: End run and handle all events that would end the run early
+            # TODO _: End run and handle all events that would end the run early
             return
         if random.random() < self.stream_status.p_crazy_ivan:
             self.instrument_status.n_crazy_ivans = self.instrument_status.n_crazy_ivans + 1
@@ -103,15 +103,15 @@ class Instrument:
                 self.stream_status.crazy_ivan_shift_amount * random.choice(
                     [i for i in range(-1, 2) if i not in [0]])), 4)
             if self.stream_status.allow_response_cycle == 99999999999:
-                self.stream_status.allow_response_cycle = self.stream_status.cycle \
-                    + context.agent_op.operator_response_delay(context)
+                self.stream_status.allow_response_cycle = self.stream_status.cycle
+                #  \ + context.agent_op.operator_response_delay(context)
         elif random.random() < self.stream_status.p_stream_shift:
             self.stream_status.stream_pos = round(self.stream_status.stream_pos + (
                 self.stream_status.stream_shift_amount * random.choice(
                     [i for i in range(-1, 2) if i not in [0]])), 4)
             if self.stream_status.allow_response_cycle == 99999999999:
-                self.stream_status.allow_response_cycle = self.stream_status.cycle \
-                    + context.agent_op.operator_response_delay(context)
+                self.stream_status.allow_response_cycle = self.stream_status.cycle
+                #  \    + context.agent_op.operator_response_delay(context)
         context.messages.concatbegining(f"{self.show_pos()}\n{get_current_datapoints(context)}\n")
         if self.stream_status.cycle >= self.stream_status.allow_response_cycle:
             self.instrument_status.msg = self.instrument_status.msg + "<?>"
@@ -136,7 +136,7 @@ class Instrument:
             delta:timedelta = context.current_time - self.last_data_update
             distance = abs(self.stream_status.stream_pos - self.beam_status.beam_pos)
             for _ in range(int(delta.total_seconds()) * self.data_per_second):
-                s_goal:SampleData = context.goal.samples[self.current_sample][0]
+                s_goal:SampleData = context.ami.samples[self.current_sample][0]
                 s_goal.append(DataPoint(get_gaussian(distance) * s_goal.preformance_quality \
                     + (random.uniform(-0.01, 0.01) if random.randrange(1, 5) == 1 else 0) \
                         + (random.uniform(-0.1, 0.1) if random.randrange(1, 1000) == 1 else 0)))
@@ -165,10 +165,10 @@ class CXI(Instrument):
         self.run_start_frame = True
         self.last_data_update = context.current_time
         self.stream_status.cycle = 0
-        for index, sample_goal in enumerate(context.goal.samples):
+        for index, sample_goal in enumerate(context.ami.samples):
             s_goal:SampleData = sample_goal[0]
             if len(s_goal.data) < s_goal.datapoints_needed:
                 self.current_sample = index
                 break
-        self.previous_sample = context.goal.samples[self.current_sample][0]
+        self.previous_sample = context.ami.samples[self.current_sample][0]
         return True

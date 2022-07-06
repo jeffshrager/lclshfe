@@ -1,12 +1,12 @@
 """Collection of functions"""
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 from math import e, pi, sqrt
 import plotly.express as px
 import pandas as pd
 from termcolor import colored
 if TYPE_CHECKING:
-    from model.library.objects import Context, Goal, SampleData
+    from model.library.objects import Context, AMI, SampleData
 
 def get_simulation_parameters(context:Context) -> str:
     """get the simulation parameters"""
@@ -16,15 +16,9 @@ def get_simulation_parameters(context:Context) -> str:
         f"beam_shift_amount={context.instrument_cxi.beam_status.beam_shift_amount}, "+
         f"p_crazy_ivan={context.instrument_cxi.stream_status.p_crazy_ivan}")
 
-def calculate_roi(goal:Goal) -> str:
+def calculate_roi(ami:AMI) -> str:
     """Determine the retun of investment data / time"""
-    roi = 0
-    for i in goal.samples:
-        s_goal:SampleData = i[0]
-        if len(s_goal.data) >= s_goal.datapoints_needed:
-            roi += 1
-    percent_string = '{:.0%}'
-    return percent_string.format(roi/len(goal.samples))
+    return f'{sum(len(sample[0].data) >= sample[0].datapoints_needed for sample in ami.samples)/len(ami.samples):.0%}'
 
 def get_line() -> str:
     """return string line"""
@@ -32,18 +26,18 @@ def get_line() -> str:
 
 def goal_agenda_plan(context:Context) -> str:
     "Return out GAP: Goal Agenda Plan"
-    return (f"{get_simulation_parameters(context)}\n{context.goal}\n"+
+    return (f"{get_simulation_parameters(context)}\n{context.ami}\n"+
     f"Current Time: {context.current_time} {context.agent_em.agenda}\n{get_line()}")
 
 def experiment_stats(context:Context) -> str:
     "Write out statistics of the experiment"
-    return (f"{context.goal}\nCurrent Time: {context.current_time} {context.agent_em.agenda}\n"+
-    f"{get_line()}\nROI: {calculate_roi(context.goal)}\n{context.agent_em.agenda.get_timeline()}")
+    return (f"{context.ami}\nCurrent Time: {context.current_time} {context.agent_em.agenda}\n"+
+    f"{get_line()}\nROI: {calculate_roi(context.ami)}\n{context.agent_em.agenda.get_timeline()}")
 
 def experiment_is_not_over(context:Context) -> bool:
     """True: Experiment is over, False: Experiment is still running"""
     return (context.current_time < context.agent_em.agenda.experimental_time
-    ) and (len(context.agent_em.agenda.event_timeline) != len(context.goal.samples))
+    ) and (len(context.agent_em.agenda.event_timeline) != len(context.ami.samples))
 
 def create_experiment_figure(context:Context, display:bool):
     """Create plotly timeline figure and display it"""
@@ -65,7 +59,7 @@ def get_all_datapoints(context:Context) -> str:
     """get all datapoints of all samples in a string"""
     line_counter:int = 0
     return_string = "\n"
-    for sample in context.goal.samples:
+    for sample in context.ami.samples:
         s_goal:SampleData = sample[0]
         return_string += f"{s_goal.type}\n"
         for data in s_goal.data:
@@ -88,7 +82,7 @@ def get_current_datapoints(context:Context) -> str:
     row_counter:int = 0
     line_counter:int = 0
     return_string = ""
-    s_goal:SampleData = context.goal.samples[context.instrument_cxi.current_sample][0]
+    s_goal:SampleData = context.ami.samples[context.instrument_cxi.current_sample][0]
     for data in s_goal.data[::-1]:
         if data.quality >= s_goal.preformance_quality:
             return_string += f"{colored(f'{data}', 'green')}, "
@@ -111,3 +105,7 @@ def get_gaussian(distance:float) -> float:
     value_floor = 1.0 - (0.125 / (0.05 * sqrt(2 * pi))) * pow(e, -0.5 * pow(0 / 0.05, 2))
     data_distance = (0.125 / (0.05 * sqrt(2 * pi))) * pow(e, -0.5 * pow(distance / 0.05, 2))
     return data_distance + value_floor
+
+def generate_samples() -> List[SampleData]:
+    """generate samples"""
+    return None

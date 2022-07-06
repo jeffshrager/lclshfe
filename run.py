@@ -8,9 +8,9 @@ from model.agent import DataAnalyst, ExperimentManager, Operator
 from model.instrument import CXI
 from model.library.functions import create_experiment_figure, experiment_stats, \
     goal_agenda_plan, experiment_is_not_over
-from model.library.objects import CommunicationObject, Context, Goal
+from model.library.objects import CommunicationObject, Context, AMI
 
-NUMBER_OF_SAMPLES:int = 18
+NUMBER_OF_SAMPLES:int = 3
 EXPERIMENT_TIME:timedelta = timedelta(hours=8)
 STEP_THROUGH_TIME:timedelta = timedelta(seconds=5)
 CYCLE_SLEEP_TIME:int = 0
@@ -21,7 +21,7 @@ def run(display:bool):
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     with open(filename, "w", encoding="utf-8") as file:
         context:Context = Context(
-            Goal(NUMBER_OF_SAMPLES),
+            AMI(NUMBER_OF_SAMPLES),
             DataAnalyst(),
             ExperimentManager(EXPERIMENT_TIME),
             Operator(),
@@ -30,6 +30,8 @@ def run(display:bool):
             file)
         context.file.write(f"{goal_agenda_plan(context)}\n")
         while experiment_is_not_over(context):
+            os.system('cls' if os.name == 'nt' else 'clear')
+            context.messages.reset()
             print(goal_agenda_plan(context))
             context.update()
             if not context.agent_em.agenda.is_started():
@@ -48,11 +50,13 @@ def run(display:bool):
             context.agent_da.check_if_experiment_is_compleated(context)
             context.current_time += STEP_THROUGH_TIME
             sleep(CYCLE_SLEEP_TIME)
-            os.system('cls' if os.name == 'nt' else 'clear')
+        os.system('cls' if os.name == 'nt' else 'clear')
         context.file.write(f"\n{experiment_stats(context)}\nFinished")
         print(f"{experiment_stats(context)}\n{colored('Finished', 'green')}")
         create_experiment_figure(context, display)
-run(False)
+run(True)
+
+# TODO: Start plotting 3d graphs
 
 # TODO: Attention/ exaustion/ focus controlls for ever person
 # TODO: operator noise and ✓(detector noise)
@@ -69,9 +73,7 @@ run(False)
 # begining they will be focused, not exausted yet, 4pm things go wrong and they are tired
 
 
-
-
-
+# ----------------------
 
 
 # TODO: Improve graph at end with extra values
@@ -85,7 +87,6 @@ run(False)
 # TODO: Data quality that comes off the machine
 # then data quality that the data analist has
 
-# ----------------------
 
 # Based on the button distance getting worse and worse scans
 # Kinda a cheat different purpose, model how bad the UI would be if buttons were far away

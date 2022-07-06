@@ -8,8 +8,9 @@ from model.library.objects import Agenda, Context, SampleData
 class Person:
     """Agent Parent Class"""
     agent_type = ""
-    # TODO: Add Attention
+    # TODO _: Add Attention
     # TODO: begining they will be focused, not exausted yet, 4pm things go wrong and they are tired
+    # TODO: Cognative temperature
     energy_meter:float = None
     # 1.0 / 0.002 = 8.3, total level of energy / minutes = 8.3 total hours of energy
     energy_degradation:float = 0.002
@@ -38,7 +39,8 @@ class Person:
 
     def update(self, context:Context):
         """Update attention and focus"""
-        # TODO: energy degredation on a curve
+        # TODO _: energy degredation on a curve
+        # TODO: coupled also on a curve
         delta:timedelta = context.current_time - self.previous_check
         if delta >= timedelta(minutes=1):
             self.energy_meter -= self.energy_degradation
@@ -54,8 +56,8 @@ class DataAnalyst(Person):
 
     def check_if_enough_data_to_analyse(self, context:Context) -> bool:
         """Check if there is enough data to start analysing, right now this is a constant"""
-        s_goal:SampleData = context.goal.samples[context.instrument_cxi.current_sample][0]
-        if len(s_goal.data) >= (s_goal.datapoints_needed * 0.2):
+        s_goal:SampleData = context.ami.samples[context.instrument_cxi.current_sample][0]
+        if len(s_goal.data) >= (s_goal.datapoints_needed * 0.8):
             if self.last_sample_with_enough_data is None:
                 self.last_sample_with_enough_data = context.instrument_cxi.current_sample
                 context.file_write(f"DA: Data from run {context.instrument_cxi.run_number} has enough data to analyse")
@@ -67,10 +69,33 @@ class DataAnalyst(Person):
         else:
             return False
 
-    def check_if_data_is_sufficient(self, context:Context):
-        """Check if data is good"""
+    # def check_if_data_is_sufficient(self, context:Context) -> bool:
+    #     """If there is enough data True, else False to ask to keep running"""
+    #     s_goal:SampleData = context.goal.samples[context.instrument_cxi.current_sample][0]
+    #     x = []
+    #     for data in s_goal.data:
+    #         x.append(data.quality)
+    #     mean = np.mean(x)
+    #     m2 = np.sum(np.subtract(x, [mean] * len(x))**2)
+
+    #     # Accounting for the noticing delay
+    #     if random.uniform(0.0, self.noticing_delay) >= 0.1:
+    #         if total_data_count >= s_goal.datapoints_needed:
+    #             # Accounting for the decision delay
+    #             if random.uniform(0.0, self.decision_delay) >= 0.1:
+    #                 context.file_write(f"DA: Data from run {context.instrument_cxi.run_number} is good")
+    #                 context.messages.concat(f"DA: Data from run {context.instrument_cxi.run_number} {colored('is good', 'green')}\n")
+    #                 context.agent_em.agenda.add_event(context.instrument_cxi.run_number, context.instrument_cxi.run_start_time, context.current_time)
+    #                 return True
+    #     context.file_write(f"DA: More data needed from run {context.instrument_cxi.run_number}")
+    #     context.messages.concat(f"DA: {colored('More data needed from run', 'yellow')} {context.instrument_cxi.run_number}\n")
+    #     return False
+
+    def check_if_data_is_sufficient(self, context:Context) -> bool:
+        """If there is enough data True, else False to ask to keep running"""
         # TODO: Ask Instrument scientist to see what is the real decision logic stopping criteria
-        s_goal:SampleData = context.goal.samples[context.instrument_cxi.current_sample][0]
+        # TODO _: Check for standard deviation for run in more sophisticated way
+        s_goal:SampleData = context.ami.samples[context.instrument_cxi.current_sample][0]
         total_data_count:float = 0.0
         for data in s_goal.data:
             total_data_count += data.quality
@@ -82,20 +107,21 @@ class DataAnalyst(Person):
                     context.file_write(f"DA: Data from run {context.instrument_cxi.run_number} is good")
                     context.messages.concat(f"DA: Data from run {context.instrument_cxi.run_number} {colored('is good', 'green')}\n")
                     context.agent_em.agenda.add_event(context.instrument_cxi.run_number, context.instrument_cxi.run_start_time, context.current_time)
-                    context.file_write("DA: Tell operator to stop collecting data")
-                    context.messages.concat(f"DA: {colored('Tell operator to stop collecting data', 'blue')}\n")
-                    context.agent_op.stop_collecting_data(context)
+                    return True
+        context.file_write(f"DA: More data needed from run {context.instrument_cxi.run_number}")
+        context.messages.concat(f"DA: {colored('More data needed from run', 'yellow')} {context.instrument_cxi.run_number}\n")
+        return False
 
     def check_if_experiment_is_compleated(self, context:Context):
         """Check if experiment is compleated"""
         current_sample = None
-        for index, sample_goal in enumerate(context.goal.samples):
+        for index, sample_goal in enumerate(context.ami.samples):
             s_goal:SampleData = sample_goal[0]
             if len(s_goal.data) < s_goal.datapoints_needed:
                 current_sample = index
                 break
         if current_sample is None:
-            context.goal.finished()
+            context.ami.finished()
 
 class Operator(Person):
     """Operator reponse delay combines noticing, attention shifting to button, decision delay,
@@ -175,6 +201,7 @@ class Operator(Person):
             self.which_button_were_on = way
             context.messages.concat(f"[{str((self.button_distance * self.switch_button_delay_per_cm) + self.button_press_delay + self.decision_delay + self.noticing_delay)}]")
             return (self.button_distance * self.switch_button_delay_per_cm) + self.button_press_delay + self.decision_delay + self.noticing_delay
+
 class ExperimentManager(Person):
     """High level GAP Goal Agenda Plan"""
     # TODO: does the EM have the agenda
@@ -188,6 +215,10 @@ class ExperimentManager(Person):
     previous_switch_check:timedelta = timedelta(0)
     previous_sample:SampleData = None
 
+    # current_data_check_time:timedelta = None
+    previous_data_check:timedelta = None
+    data_check_wait:timedelta = timedelta(minutes=1)
+
     def __init__(self, experiment_time:timedelta):
         super().__init__(AgentType.EM)
         self.agenda = Agenda(experiment_time)
@@ -199,13 +230,13 @@ class ExperimentManager(Person):
         context.instrument_cxi.start()
 
     def check_if_next_run_can_be_started(self, context:Context) -> bool:
-        """Check to see if the sample needs to be changed if so wait
-        TODO: Ask person to change sample"""
+        """Check to see if the sample needs to be changed if so wait"""
+        # TODO: Ask person to change sample
         # TODO: Simplify
         if context.instrument_cxi.current_sample is None:
-            next_sample:SampleData = context.goal.samples[0][0]
+            next_sample:SampleData = context.ami.samples[0][0]
         elif context.instrument_cxi.current_sample is not None:
-            next_sample:SampleData = context.goal.samples[context.instrument_cxi.current_sample+1][0]
+            next_sample:SampleData = context.ami.samples[context.instrument_cxi.current_sample+1][0]
         if self.previous_sample is not None:
             if self.previous_sample.type == next_sample.type:
                 if self.current_transition_time is None:
@@ -250,8 +281,22 @@ class ExperimentManager(Person):
         """Communiate with the data analyst to see if the run has enough
         data or if the run needs to continue, if so tell the operator to continue
         the run for longer"""
+        # TODO _: Check if run should be stopped as something is wrong with Standard deviation
         if context.agent_da.check_if_enough_data_to_analyse(context):
-            context.agent_da.check_if_data_is_sufficient(context)
+            # TODO: Timer
+            if self.previous_data_check is None:
+                self.previous_data_check = context.current_time
+            elif self.previous_data_check + self.data_check_wait <= context.current_time:
+                self.previous_data_check = context.current_time
+            else:
+                return False
+            context.file_write("EM: Ask DA if data is sufficient")
+            context.messages.concat(f"EM: {colored('Ask DA if data is sufficient', 'green')}\n")
+            if context.agent_da.check_if_data_is_sufficient(context):
+                context.file_write("EM: Tell operator to stop collecting data")
+                context.messages.concat(f"EM: {colored('Tell operator to stop collecting data', 'blue')}\n")
+                context.agent_op.stop_collecting_data(context)
+            # TODO _: Does operator keep going until told to stop or do they need to be told to keep going
 
 class RemoteUser(Person):
     """A user who is not present on site"""
