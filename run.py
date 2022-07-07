@@ -1,39 +1,36 @@
-"""High Level Controller
-Round Robbin processes of classes, Synchronous simulation"""
+"""High Level Controller: Round Robbin processes of classes, Synchronous simulation"""
+import copy
 from datetime import timedelta
 import os
 from time import sleep, time
 from termcolor import colored
 from model.agent import DataAnalyst, ExperimentManager, Operator
 from model.instrument import CXI
-from model.library.functions import create_experiment_figure, experiment_stats, \
-    goal_agenda_plan, experiment_is_not_over
+from model.library.functions import create_experiment_figure, \
+    experiment_stats, goal_agenda_plan, experiment_is_not_over
 from model.library.objects import Agenda, CommunicationObject, Context, AMI
 
-NUMBER_OF_SAMPLES:int = 1
+NUMBER_OF_SAMPLES:int = 10
 EXPERIMENT_TIME:timedelta = timedelta(hours=8)
 STEP_THROUGH_TIME:timedelta = timedelta(seconds=5)
-CYCLE_SLEEP_TIME:int = 0.1
+CYCLE_SLEEP_TIME:float = 0
 
-def run(display:bool):
+def model(display:bool, number_of_samples:int,
+          experiment_time:timedelta, step_through_time:timedelta,
+          cycle_sleep_time:float) -> AMI:
     """Run CXI Simulation"""
     filename = f"results/r{str(time())}.tsv"
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     with open(filename, "w", encoding="utf-8") as file:
         context:Context = Context(
-            AMI(NUMBER_OF_SAMPLES),
-            Agenda(EXPERIMENT_TIME),
-            DataAnalyst(),
-            ExperimentManager(),
-            Operator(),
-            CXI(),
-            CommunicationObject(),
-            file)
+            AMI(number_of_samples), Agenda(experiment_time),
+            DataAnalyst(), ExperimentManager(), Operator(),
+            CXI(), CommunicationObject(), file)
         context.file.write(f"{goal_agenda_plan(context)}\n")
         while experiment_is_not_over(context):
             os.system('cls' if os.name == 'nt' else 'clear')
             context.messages.reset()
-            print(goal_agenda_plan(context))
+            print(goal_agenda_plan(context) if display else 'running')
             context.update()
             if not context.agenda.is_started():
                 context.agenda.start_experiment()
@@ -47,16 +44,20 @@ def run(display:bool):
                     elif context.instrument.is_collecting_data():
                         context.agent_op.track_stream_position(context)
                         context.agent_em.check_if_data_is_sufficient(context)
-            print(context.messages)
+            print(context.messages if display else 'running')
             context.agent_da.check_if_experiment_is_compleated(context)
-            context.current_time += STEP_THROUGH_TIME
-            sleep(CYCLE_SLEEP_TIME)
+            context.current_time += step_through_time
+            sleep(cycle_sleep_time)
         os.system('cls' if os.name == 'nt' else 'clear')
         context.file.write(f"\n{experiment_stats(context)}\nFinished")
-        print(f"{experiment_stats(context)}\n{colored('Finished', 'green')}")
+        print(f"{experiment_stats(context)}\n{colored('Finished','green')}" if display else 'running')
         create_experiment_figure(context, display)
-run(False)
+        return copy.deepcopy(context.ami)
+# model(True, NUMBER_OF_SAMPLES, EXPERIMENT_TIME, STEP_THROUGH_TIME, CYCLE_SLEEP_TIME)
 
+
+
+# TTT, todo, FFF, future, WWW, warning, III, important. 3 letter codes
 # TODO: Startc plotting 3d graphs
 # TODO: Make jig
 

@@ -63,7 +63,7 @@ class Stream:
     stream_shift_amount = 0.01  # Minimal unit of stream shift
     p_stream_shift = 0.15  # prob. of stream shift per cycle
     # A crazy ivan is when the stream goes haywire; It should happen very rarely.
-    p_crazy_ivan = 0.001  # About 0.0001 gives you one/10k
+    p_crazy_ivan = 0.0001  # About 0.0001 gives you one/10k
     crazy_ivan_shift_amount = round(random.uniform(0.1, 0.2), 2)  # 0.2
     # If the beam doesn't hit a wall before this, we cut the run off here.
     default_max_cycles = 10000
@@ -103,15 +103,14 @@ class SampleData:
     Sample attributes are stored in dict sampleTypeMapper
     Preformance Quality, different natural signal response
     when data is on peak data * PQ"""
-    # TODO: Add weights
-    # Dozens of targets
-    # N shaped dynamics
+    data:List[DataPoint] = []
 
+    # TODO: make weights affect rescheduling
+    # TODO: What was this N shaped dynamics
     def __init__(self, sample_type:SampleType, preformance_quality:float,
-            weight:float, data_needed:float, setup_time:timedelta):
+            weight:float, setup_time:timedelta):
+        self.compleated:bool = False
         self.preformance_quality:float = preformance_quality
-        # TODO: Remove This
-        self.data_needed:int = data_needed
         self.weight:float = weight
         self.setup_time:timedelta = setup_time
         self.type:SampleType = sample_type
@@ -124,6 +123,8 @@ class SampleData:
         self.variance:float = 0.0
         self.sdev:float = 0.0
         self.err:float = 0.0
+        self.count_array = []
+        self.err_array = []
 
     def append(self, data:DataPoint):
         """Append new data point run Welford's algorithm calculations
@@ -137,22 +138,28 @@ class SampleData:
         self.variance = self.m_2 / self.count
         self.sdev = sqrt(self.variance)
         self.err = self.sdev/sqrt(self.count)
+        self.count_array.append(self.count)
+        self.err_array.append(self.err)
 
     def __str__(self):
         # TODO: Clean this up
         if self.count == 0:
-            return "mean:0, err:0, var:0, dev:0"
-        return (f"mean:{self.mean:.6f}, err:{self.err:.6f},"+
+            return "pq:0.000000, mean:0.000000, err:0.000000, var:0.000000, dev:0.000000"
+        return (f"pq:{self.preformance_quality:.6f}, mean:{self.mean:.6f}, err:{self.err:.6f},"+
             f" var:{self.variance:.6f}, dev:{self.sdev:.6f}")
 
 class AMI:
     """Contains the data of the samples"""
+    # TODO: Sort by PQ lowest first, EM
+    # TODO: Wan-Lin's discomfort: seperate PQ and Importance
+    # Were using PQ as double meaning, one is quality of sample, also using as inverse proxy as importance
     samples:List[SampleData] = []
 
     def __init__(self, number_of_samples:int):
-        self.samples = [SampleData(SampleType.S1, random.gauss(0.90, 0.08),
-            random.gauss(0.80, 0.20), int(random.gauss(150000, 500)),
-            timedelta(minutes=random.gauss(1, 0.5))) for _ in range(0, number_of_samples)]
+        # TODO: max of .99 around PQ
+        # TODO: min of 0
+        self.samples = [SampleData(SampleType.S1, random.gauss(0.90, 0.05), random.gauss(0.80, 0.20),
+            timedelta(minutes=random.gauss(1, 0.5))) for _ in range(number_of_samples)]
 
     def get_current_sample(self, context:Context) -> SampleData:
         """Get current Sample"""
@@ -166,10 +173,10 @@ class AMI:
         return_string += "]\n["
         for sample in self.samples:
             return_string += f'{len(sample.data): >5}'
-        return_string += "]\n["
+        return_string += "]\n"
         for sample in self.samples:
-            return_string += f'{sample} '
-        return return_string + "]\n"
+            return_string += f'{sample}\n'
+        return return_string
 
 class Agenda:
     """High Level Schedule of events for acheiving the goal"""
@@ -179,7 +186,10 @@ class Agenda:
     status = None
 
     def __init__(self, experimental_time):
-        self.experimental_time = experimental_time
+        self.experimental_time:timedelta = experimental_time
+        self.event_timeline:List[Event] = []
+        self.experiment_status:ExperimentState = ExperimentState.STOPED
+        self.status = None
 
     def start_experiment(self):
         """Start the experiment if it has not been started"""

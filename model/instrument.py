@@ -3,7 +3,7 @@ import random
 from datetime import timedelta
 from termcolor import colored
 from model.library.enums import InstrumentType
-from model.library.functions import get_current_datapoints, get_gaussian
+from model.library.functions import get_current_datapoints, aquire_data
 from model.library.objects import Beam, Context, DataPoint, InstrumentStatus, SampleData, Stream
 
 class Instrument:
@@ -92,7 +92,7 @@ class Instrument:
         self.instrument_status.msg = ""
         # Stop if it hits the wall on either side
         if abs(self.stream_status.stream_pos)>1.0:
-            # TODO _: End run and handle all events that would end the run early
+            # TODO: End run and handle all events that would end the run early
             return
         if random.random() < self.stream_status.p_crazy_ivan:
             self.instrument_status.n_crazy_ivans = self.instrument_status.n_crazy_ivans + 1
@@ -139,8 +139,11 @@ class Instrument:
             distance = abs(self.stream_status.stream_pos - self.beam_status.beam_pos)
             for _ in range(int(delta.total_seconds()) * self.data_per_second):
                 context.ami.samples[self.current_sample].append(
-                    DataPoint(get_gaussian(distance) * \
+                    # TODO: aquire_data name changed
+                    DataPoint(aquire_data(distance) * \
                         context.ami.samples[self.current_sample].preformance_quality \
+                        # This is additional pipeline noise not dependent on the sample or anything else
+                        # FFF: Model this someday
                         + (random.uniform(-0.01, 0.01) if random.randrange(1, 5) == 1 else 0) \
                         + (random.uniform(-0.1, 0.1) if random.randrange(1, 1000) == 1 else 0)))
             self.last_data_update = context.current_time
@@ -168,7 +171,7 @@ class CXI(Instrument):
         self.last_data_update = context.current_time
         self.stream_status.cycle = 0
         for index, sample_goal in enumerate(context.ami.samples):
-            if len(sample_goal.data) < sample_goal.data_needed:
+            if not sample_goal.compleated:
                 self.current_sample = index
                 break
         self.previous_sample = context.ami.samples[self.current_sample]

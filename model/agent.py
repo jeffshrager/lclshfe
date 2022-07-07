@@ -2,6 +2,7 @@
 from datetime import timedelta
 import random
 from termcolor import colored
+from scipy.stats import linregress
 from model.library.enums import AgentType
 from model.library.objects import Context, SampleData
 
@@ -50,41 +51,38 @@ class Person:
 
 class DataAnalyst(Person):
     """Retrives data from the instrument"""
+    projected_intercept:float = None
     def __init__(self):
         super().__init__(AgentType.DA)
         self.last_sample_with_enough_data = None
 
     def check_if_enough_data_to_analyse(self, context:Context) -> bool:
         """Check if there is enough data to start analysing, right now this is a constant"""
-        if len(context.ami.samples[context.instrument.current_sample].data) >= (
-            context.ami.samples[context.instrument.current_sample].data_needed * 0.8):
-            if self.last_sample_with_enough_data is None:
-                self.last_sample_with_enough_data = context.instrument.current_sample
+        current_sample = context.ami.samples[context.instrument.current_sample]
+        if current_sample.count > 10000:
+            if self.projected_intercept is None:
+                # TODO: This is for timing
+                self.projected_intercept = abs(linregress(current_sample.err_array[-100:], current_sample.count_array[-100:]).intercept)
+            elif self.projected_intercept <= current_sample.count:
+                self.projected_intercept = abs(linregress(current_sample.err_array[-100:], current_sample.count_array[-100:]).intercept)
                 context.file_write(f"DA: Data from run {context.instrument.run_number} has enough data to analyse")
-            elif self.last_sample_with_enough_data != context.instrument.current_sample:
-                self.last_sample_with_enough_data = context.instrument.current_sample
-                context.file_write(f"DA: Data from run {context.instrument.run_number} has enough data to analyse")
-            context.messages.concat(f"DA: Data from run {context.instrument.run_number} {colored('has enough data to analyse', 'green')}\n")
-            return True
-        else:
-            return False
+                context.messages.concat(f"DA: Data from run {context.instrument.run_number} {colored('has enough data to analyse', 'green')}\n")
+                return True
+        return False
 
     def check_if_data_is_sufficient(self, context:Context) -> bool:
         """If there is enough data True, else False to ask to keep running"""
         # TODO: Ask Instrument scientist to see what is the real decision logic stopping criteria
-        # TODO _: Check for standard deviation for run in more sophisticated way
-        total_data_count:float = 0.0
-        for data in context.ami.samples[context.instrument.current_sample].data:
-            total_data_count += data.quality
-        # Accounting for the noticing delay
-        if random.uniform(0.0, self.noticing_delay) >= 0.1:
-            if total_data_count >= context.ami.samples[context.instrument.current_sample].data_needed:
-                # Accounting for the decision delay
-                if random.uniform(0.0, self.decision_delay) >= 0.1:
-                    context.file_write(f"DA: Data from run {context.instrument.run_number} is good")
-                    context.messages.concat(f"DA: Data from run {context.instrument.run_number} {colored('is good', 'green')}\n")
-                    context.agenda.add_event(context.instrument.run_number, context.instrument.run_start_time, context.current_time)
-                    return True
+        current_sample = context.ami.samples[context.instrument.current_sample]
+        # TODO: DA does not have access to preformance quality
+        #  Determine that the mean is settling
+        if current_sample.err <= 0.0001:
+            context.file_write(f"DA: Data from run {context.instrument.run_number} is good")
+            context.messages.concat(f"DA: Data from run {context.instrument.run_number} {colored('is good', 'green')}\n")
+            context.agenda.add_event(context.instrument.run_number, context.instrument.run_start_time, context.current_time)
+            current_sample.compleated = True
+            self.projected_intercept = None
+            return True
         context.file_write(f"DA: More data needed from run {context.instrument.run_number}")
         context.messages.concat(f"DA: {colored('More data needed from run', 'yellow')} {context.instrument.run_number}\n")
         return False
@@ -93,7 +91,7 @@ class DataAnalyst(Person):
         """Check if experiment is compleated"""
         current_sample = None
         for index, sample_goal in enumerate(context.ami.samples):
-            if len(sample_goal.data) < sample_goal.data_needed:
+            if not sample_goal.compleated:
                 current_sample = index
                 break
         if current_sample is None:
@@ -111,6 +109,7 @@ class Operator(Person):
     button_press_delay = 1  # ms
     button_distance = 0  # cm
     which_button_were_on = "<<"  # or ">>"
+    running_peak_chasing = False
 
     def __init__(self):
         super().__init__(AgentType.OP)

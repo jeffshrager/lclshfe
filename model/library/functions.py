@@ -18,7 +18,7 @@ def get_parameters(context:Context) -> str:
 
 def calculate_roi(ami:AMI) -> str:
     """Determine the retun of investment data / time"""
-    return sum(len(sample.data) >= sample.data_needed for sample in ami.samples) / len(ami.samples)
+    return sum(sample.compleated for sample in ami.samples) / len(ami.samples)
 
 def get_line() -> str:
     """return string line"""
@@ -45,29 +45,31 @@ def get_current_datapoints(context:Context) -> str:
     for index, data in enumerate(context.ami.get_current_sample(context).data[-60:]):
         return_string += (colored(f'{data}', 'green'
         if data.quality >= context.ami.get_current_sample(context).preformance_quality
-        else 'yellow' if data.quality >= get_gaussian(0.03) else 'red') +
+        else 'yellow' if data.quality >= aquire_data(0.03) else 'red') +
         ("\n" if index == 19 or index == 39 else " "))
     return return_string
 
-def get_gaussian(distance:float) -> float:
+def aquire_data(distance:float) -> float:
     """given distance calculate gaussian according to this:
     https://www.desmos.com/calculator/1dc980vuj1"""
+    # TODO: 1-PQ of sample is a(0.05)
+    # Ones with bad PQ have shallower slopes
     value_floor = 1.0 - (0.125 / (0.05 * sqrt(2 * pi))) * pow(e, -0.5 * pow(0 / 0.05, 2))
     data_distance = (0.125 / (0.05 * sqrt(2 * pi))) * pow(e, -0.5 * pow(distance / 0.05, 2))
     return data_distance + value_floor
 
 def create_experiment_figure(context:Context, display:bool):
     """Create plotly timeline figure and display it"""
-    data_frame = pd.DataFrame([])
-    for event in context.agenda.event_timeline:
-        data_frame = pd.concat([data_frame, pd.DataFrame.from_records([{
-            "Start":f"{context.start_time + event.start_time}",
-            "Finish":f"{context.start_time + event.end_time}",
-            "Task": "task",
-            "Run": f"Run: {event.run_number}"}])])
-    fig = px.timeline(data_frame,
-        x_start="Start", x_end="Finish",
-        y="Task", hover_name="Run")
-    fig.update_yaxes(autorange="reversed")
     if display:
+        data_frame = pd.DataFrame([])
+        for event in context.agenda.event_timeline:
+            data_frame = pd.concat([data_frame, pd.DataFrame.from_records([{
+                "Start":f"{context.start_time + event.start_time}",
+                "Finish":f"{context.start_time + event.end_time}",
+                "Task": "task",
+                "Run": f"Run: {event.run_number}"}])])
+        fig = px.timeline(data_frame,
+            x_start="Start", x_end="Finish",
+            y="Task", hover_name="Run")
+        fig.update_yaxes(autorange="reversed")
         fig.show()
