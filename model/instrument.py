@@ -3,7 +3,7 @@ import random
 from datetime import timedelta
 from termcolor import colored
 from model.library.enums import InstrumentType
-from model.library.functions import get_current_datapoints, aquire_data
+from model.library.functions import clamp, get_current_datapoints, aquire_data, get_line
 from model.library.objects import Beam, Context, DataPoint, InstrumentStatus, SampleData, Stream
 
 class Instrument:
@@ -11,6 +11,7 @@ class Instrument:
     instrument_type = ""
     instrument_status:InstrumentStatus = None
     stream_status:Stream = None
+    time_out_value:int = None
     beam_status:Beam = None
     collecting_data = False
     run_start_time:timedelta = None
@@ -20,6 +21,8 @@ class Instrument:
     last_data_update:timedelta = None
     current_sample:int = None
     # TODO _: add system stability
+    # System is unstable then gets to a stable period
+    # then it fluctuates
     system_stability = None
 
     def __init__(self, instrument):
@@ -28,6 +31,7 @@ class Instrument:
         self.instrument_status = InstrumentStatus()
         self.stream_status = Stream()
         self.beam_status = Beam()
+        self.time_out_value = 200000
 
     def start(self):
         """Start the Instrumnet"""
@@ -50,7 +54,7 @@ class Instrument:
         Pretty straight-forward refactoring would pull them apart. Also, the hit scoring
         is unfortunately, based on whether a * would be displayed, which in turn depends
         on the display increment, which is clearly wrong. UUU FFF Clean this up!!"""
-        # TODO: Where exact beam|jet match is tested with ==, replace with a
+        # FFF: Where exact beam|jet match is tested with ==, replace with a
         # more "perceptually" accurate model
         return_string = ""
         show_width = 80
@@ -92,7 +96,7 @@ class Instrument:
         self.instrument_status.msg = ""
         # Stop if it hits the wall on either side
         if abs(self.stream_status.stream_pos)>1.0:
-            # TODO: End run and handle all events that would end the run early
+            # FFF: End run and handle all events that would end the run early
             return
         if random.random() < self.stream_status.p_crazy_ivan:
             self.instrument_status.n_crazy_ivans = self.instrument_status.n_crazy_ivans + 1
@@ -130,23 +134,33 @@ class Instrument:
             else:
                 context.messages.concat(f"Run {self.run_number} "+
                     f"{colored('Collecting Data', 'green')}\n")
-            # Normal Distribution of quality based on how far away beam pos(user controller)
-            # is away from the stream pos (instrument beam)
-            # Farthest away is 2 beam on one side and stream on other
-            # Closest is 0 right on top of each other
-            # TODO: allow this to work with less than 1 second time steps
-            delta:timedelta = context.current_time - self.last_data_update
-            distance = abs(self.stream_status.stream_pos - self.beam_status.beam_pos)
-            for _ in range(int(delta.total_seconds()) * self.data_per_second):
-                context.ami.samples[self.current_sample].append(
-                    # TODO: aquire_data name changed
-                    DataPoint(aquire_data(distance) * \
-                        context.ami.samples[self.current_sample].preformance_quality \
-                        # This is additional pipeline noise not dependent on the sample or anything else
-                        # FFF: Model this someday
-                        + (random.uniform(-0.01, 0.01) if random.randrange(1, 5) == 1 else 0) \
-                        + (random.uniform(-0.1, 0.1) if random.randrange(1, 1000) == 1 else 0)))
-            self.last_data_update = context.current_time
+            
+            current_sample = context.ami.samples[self.current_sample]
+            if len(current_sample.data) > self.time_out_value:
+                context.printer(f"{colored('Warning', 'yellow')}: To many data points timeout", "Warning: To many data points timeout")
+                context.agenda.add_event(context.instrument.run_number, context.instrument.run_start_time, context.current_time, True)
+                current_sample.timeout = True
+                self.collecting_data = False
+            else:
+                # Normal Distribution of quality based on how far away beam pos(user controller)
+                # is away from the stream pos (instrument beam)
+                # Farthest away is 2 beam on one side and stream on other
+                # Closest is 0 right on top of each other
+                # FFF: allow this to work with less than 1 second time steps
+                delta:timedelta = context.current_time - self.last_data_update
+                distance = abs(self.stream_status.stream_pos - self.beam_status.beam_pos)
+                for _ in range(int(delta.total_seconds()) * self.data_per_second):
+                    datapoint:DataPoint = DataPoint(clamp((aquire_data(distance,
+                            current_sample.preformance_quality) * 0.98) \
+                            # QQQ: Do we need this, line below?
+                            # * current_sample.preformance_quality \
+                            # Additional pipeline noise not dependent on the sample or anything else
+                            # FFF: Model this someday
+                            + (random.uniform(-0.01, 0.01) if random.randrange(1, 5) == 1 else 0) \
+                            + (random.uniform(-0.1, 0.1) if random.randrange(1, 1000) == 1 else 0), 0.0, 1.0))
+                    context.data_file.write(f"{datapoint.quality}\n")
+                    current_sample.append(datapoint)
+                self.last_data_update = context.current_time
 
 class CXI(Instrument):
     """CXI"""
@@ -163,16 +177,17 @@ class CXI(Instrument):
         self.transition_write = False
         self.previous_transition_check = None
         self.run_number += 1
-        context.file_write(f"Start Run {self.run_number}")
-        context.messages.concat(f"{colored('Start', 'green')} Run {self.run_number}\n")
+        context.printer(f"{colored('Start', 'green')} Run {self.run_number}",
+            f"Start Run {self.run_number}")
         self.run_start_time = context.current_time
         self.collecting_data = True
         self.run_start_frame = True
         self.last_data_update = context.current_time
         self.stream_status.cycle = 0
         for index, sample_goal in enumerate(context.ami.samples):
-            if not sample_goal.compleated:
+            if not sample_goal.compleated and not sample_goal.timeout:
                 self.current_sample = index
                 break
+        context.data_file.write(f"Current_Sample, {self.current_sample},\n")
         self.previous_sample = context.ami.samples[self.current_sample]
         return True

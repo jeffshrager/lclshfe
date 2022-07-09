@@ -6,7 +6,7 @@ import plotly.express as px
 import pandas as pd
 from termcolor import colored
 if TYPE_CHECKING:
-    from model.library.objects import Context, AMI, SampleData
+    from model.library.objects import Context, AMI
 
 def get_parameters(context:Context) -> str:
     """get the simulation parameters"""
@@ -18,7 +18,8 @@ def get_parameters(context:Context) -> str:
 
 def calculate_roi(ami:AMI) -> str:
     """Determine the retun of investment data / time"""
-    return sum(sample.compleated for sample in ami.samples) / len(ami.samples)
+    return (sum(sample.compleated for sample in ami.samples) / len(ami.samples
+    ) if len(ami.samples) > 0 else 0)
 
 def get_line() -> str:
     """return string line"""
@@ -35,28 +36,41 @@ def experiment_stats(context:Context) -> str:
     f"{get_line()}\nROI: {calculate_roi(context.ami):.0%}\n{context.agenda.get_timeline()}")
 
 def experiment_is_not_over(context:Context) -> bool:
-    """True: Experiment is over, False: Experiment is still running"""
+    """True: Experiment is not over, False: Experiment is over"""
     return (context.current_time < context.agenda.experimental_time
-    ) and (len(context.agenda.event_timeline) != len(context.ami.samples))
+    ) and (len(context.agenda.event_timeline) != len(context.ami.samples)
+    ) if (len(context.agenda.event_timeline) != 0
+    ) else True
 
 def get_current_datapoints(context:Context) -> str:
     """Gets the datapoints live"""
+    current_sample = context.ami.get_current_sample(context)
     return_string = ""
-    for index, data in enumerate(context.ami.get_current_sample(context).data[-60:]):
+    for index, data in enumerate(current_sample.data[-60:]):
         return_string += (colored(f'{data}', 'green'
-        if data.quality >= context.ami.get_current_sample(context).preformance_quality
-        else 'yellow' if data.quality >= aquire_data(0.03) else 'red') +
-        ("\n" if index == 19 or index == 39 else " "))
+        if data.quality >= current_sample.preformance_quality
+        else 'yellow' if data.quality >= aquire_data(0.03, current_sample.preformance_quality
+        ) else 'red') + ("\n" if index == 19 or index == 39 else " "))
     return return_string
 
-def aquire_data(distance:float) -> float:
+def aquire_data(distance:float, preformance_quality:float) -> float:
     """given distance calculate gaussian according to this:
     https://www.desmos.com/calculator/1dc980vuj1"""
-    # TODO: 1-PQ of sample is a(0.05)
     # Ones with bad PQ have shallower slopes
-    value_floor = 1.0 - (0.125 / (0.05 * sqrt(2 * pi))) * pow(e, -0.5 * pow(0 / 0.05, 2))
-    data_distance = (0.125 / (0.05 * sqrt(2 * pi))) * pow(e, -0.5 * pow(distance / 0.05, 2))
-    return data_distance + value_floor
+    # QQQ: Why is it not taking less time for HIgh quality samples
+    a = 1 - preformance_quality
+    value_floor = 1.0 - (0.125 / (a * sqrt(2 * pi))) * pow(e, -0.1 * pow(0 / a, 2))
+    data_distance = (0.125 / (a * sqrt(2 * pi))) * pow(e, -0.1 * pow(distance / a, 2))
+    return abs(data_distance + value_floor)
+
+def cognative_temperature_curve(x_pos:float) -> float:
+    """Agent cognitive temperature decrease
+    https://www.desmos.com/calculator/cva2pdjqvq"""
+    return 0.9 * pow(x_pos, 2) - 1.9 * x_pos + 1
+
+def clamp(num:float, min_value:float, max_value:float):
+    """Clamp a number to a minimum and maximum value"""
+    return max(min(num, max_value), min_value)
 
 def create_experiment_figure(context:Context, display:bool):
     """Create plotly timeline figure and display it"""

@@ -1,10 +1,38 @@
 """Jig"""
 from datetime import timedelta
+from numpy import mean
 import plotly.graph_objects as go
 from model.library.objects import AMI, DataPoint, SampleData
 from run import model
 
-runs = [model(False, 50, timedelta(hours=1), timedelta(seconds=5), 0) for _ in range(10)]
+# TODO: Mean of results over the set of number of runs
+
+# Repeat the simulation with the same samples
+# TODO: array of samples replace number of samples
+number = 2
+runs = [model(True, number, timedelta(hours=5), timedelta(seconds=5), 0) for _ in range(5)]
+
+# TODO: Add abort for overruns - 500,000 cycles
+# FFF QQQ: Auto Remove outliers
+# Samples with higher PQ, should run for less time beacause it should take less time
+
+# TODO: PUll out erros from runs
+
+# TODO: print out the mean and deviation of N of all runs
+# Make the output a spreadsheet
+
+# mean = 0.0
+# TODO: Standard Deviation
+for s in range(number):
+    ns = [len(run.samples[s].data) for run in runs]
+    print(f"{ns}: {mean(ns)}")
+    # for r in runs:
+    #     mean += r.samples[s].data
+        # print(runs[s].samples[s].mean())
+
+# for run in runs:
+#     for sample in samples:
+
 
 x = []
 y = []

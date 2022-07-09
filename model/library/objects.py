@@ -3,9 +3,10 @@ from __future__ import annotations
 from math import sqrt
 from typing import TYPE_CHECKING, List
 from io import TextIOWrapper
-from datetime import datetime, timedelta
 import random
+from datetime import datetime, timedelta
 from model.library.enums import ExperimentState, InstrumentRunState, SampleType
+from model.library.functions import clamp
 if TYPE_CHECKING:
     from model.agent import DataAnalyst, ExperimentManager, Operator
     from model.instrument import CXI
@@ -110,6 +111,7 @@ class SampleData:
     def __init__(self, sample_type:SampleType, preformance_quality:float,
             weight:float, setup_time:timedelta):
         self.compleated:bool = False
+        self.timeout:bool = False
         self.preformance_quality:float = preformance_quality
         self.weight:float = weight
         self.setup_time:timedelta = setup_time
@@ -131,74 +133,78 @@ class SampleData:
         https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance"""
         self.count += 1
         delta = data.quality - self.mean
-        self.mean += delta /self.count
+        self.mean += delta / self.count
         delta2 = data.quality - self.mean
         self.m_2 += delta * delta2
         self.data.append(data)
         self.variance = self.m_2 / self.count
         self.sdev = sqrt(self.variance)
-        self.err = self.sdev/sqrt(self.count)
+        self.err = self.sdev / sqrt(self.count)
         self.count_array.append(self.count)
         self.err_array.append(self.err)
 
     def __str__(self):
-        # TODO: Clean this up
-        if self.count == 0:
-            return "pq:0.000000, mean:0.000000, err:0.000000, var:0.000000, dev:0.000000"
         return (f"pq:{self.preformance_quality:.6f}, mean:{self.mean:.6f}, err:{self.err:.6f},"+
-            f" var:{self.variance:.6f}, dev:{self.sdev:.6f}")
+            f" var:{self.variance:.6f}, dev:{self.sdev:.6f}" if self.count != 0 else
+            "pq:0.000000, mean:0.000000, err:0.000000, var:0.000000, dev:0.000000")
 
 class AMI:
     """Contains the data of the samples"""
-    # TODO: Sort by PQ lowest first, EM
+    # FFF: AMI only gets a subset of samples
+    # AMI is different than data pipeline
+
     # TODO: Wan-Lin's discomfort: seperate PQ and Importance
-    # Were using PQ as double meaning, one is quality of sample, also using as inverse proxy as importance
+    # Were using PQ as double meaning, one is quality of sample,
+    # also using as inverse proxy as importance
     samples:List[SampleData] = []
 
-    def __init__(self, number_of_samples:int):
-        # TODO: max of .99 around PQ
-        # TODO: min of 0
-        self.samples = [SampleData(SampleType.S1, random.gauss(0.90, 0.05), random.gauss(0.80, 0.20),
-            timedelta(minutes=random.gauss(1, 0.5))) for _ in range(number_of_samples)]
+    def __init__(self):
+        self.samples:List[SampleData] = []
+
+    def load_samples(self, number_of_samples:int):
+        """Load the samples using a random distribution"""
+        self.samples = [SampleData(SampleType.S1, clamp(random.gauss(0.90, 0.2), 0.00, 0.99),
+            random.gauss(0.80, 0.20), timedelta(minutes=random.gauss(1, 0.5)))
+            for _ in range(number_of_samples)]
+
+    def sort_samples(self):
+        """Sort the samples by PQ"""
+        self.samples.sort(key=lambda x: x.preformance_quality)
 
     def get_current_sample(self, context:Context) -> SampleData:
         """Get current Sample"""
         return self.samples[context.instrument.current_sample]
 
     def __str__(self):
-        # TODO: Clean this up
-        return_string = "["
+        return_string = ""
         for sample in self.samples:
-            return_string += f'{sample.type.value: >5}'
-        return_string += "]\n["
-        for sample in self.samples:
-            return_string += f'{len(sample.data): >5}'
-        return_string += "]\n"
-        for sample in self.samples:
-            return_string += f'{sample}\n'
+            # pq, mean, err, var, dev
+            return_string += f'N: {len(sample.data): >6} - {sample}\n'
         return return_string
 
 class Agenda:
     """High Level Schedule of events for acheiving the goal"""
     experimental_time:timedelta = timedelta(0)
+    number_of_samples:int = 0
     event_timeline:List[Event] = []
     experiment_status:ExperimentState = ExperimentState.STOPED
     status = None
 
-    def __init__(self, experimental_time):
+    def __init__(self, experimental_time, number_of_samples):
         self.experimental_time:timedelta = experimental_time
         self.event_timeline:List[Event] = []
         self.experiment_status:ExperimentState = ExperimentState.STOPED
         self.status = None
+        self.number_of_samples = number_of_samples
 
     def start_experiment(self):
         """Start the experiment if it has not been started"""
-        if not self.experiment_status:
+        if not self.experiment_status.value:
             self.experiment_status = ExperimentState.STARTED
 
     def is_started(self):
         """check if experiment has been started"""
-        return self.experiment_status
+        return self.experiment_status.value
 
     def finished(self):
         """Finished experiment"""
@@ -207,9 +213,9 @@ class Agenda:
     def __str__(self):
         return f"Experimental Time: {self.experimental_time}"
 
-    def add_event(self, run_number:int, start_time:timedelta, end_time:timedelta):
+    def add_event(self, run_number:int, start_time:timedelta, end_time:timedelta, time_out:bool):
         """Add event to agenda timeline"""
-        self.event_timeline.append(Event(run_number, start_time, end_time))
+        self.event_timeline.append(Event(run_number, start_time, end_time, time_out))
 
     def get_timeline(self):
         """return final timeline string"""
@@ -220,31 +226,34 @@ class Event:
     run_number:int = None
     start_time:timedelta = None
     end_time:timedelta = None
+    time_out:bool = None
 
-    def __init__(self, run_number:int, start_time:timedelta, end_time:timedelta):
+    def __init__(self, run_number:int, start_time:timedelta, end_time:timedelta, time_out:bool):
         self.run_number = run_number
         self.start_time = start_time
         self.end_time = end_time
+        self.time_out = time_out
 
     def __str__(self):
-        return (f"Run: {self.run_number: >2}, Start: {self.start_time}, "+
+        return (f"Run: {self.run_number: >2}, Timeout: {self.time_out}, Start: {self.start_time}, "+
             f"End: {self.end_time}, Duration: {self.end_time - self.start_time}\n")
 
 class Context:
     """http://www.corej2eepatterns.com/ContextObject.htm"""
     current_time:timedelta = None
     ami:AMI = None
-    agenda:Agenda = None # TODO: does the EM have the agenda
+    agenda:Agenda = None
     agent_da:DataAnalyst = None
     agent_em:ExperimentManager= None
     agent_op:Operator = None
     instrument:CXI = None
     messages:CommunicationObject = None
     file:TextIOWrapper = None
+    data_file:TextIOWrapper = None
     start_time:datetime = None
 
     def __init__(self, ami:AMI, agenda:Agenda, agent_da:DataAnalyst, agent_em:ExperimentManager,
-            agent_op:Operator, instrument:CXI, messages:CommunicationObject, file:TextIOWrapper):
+            agent_op:Operator, instrument:CXI, messages:CommunicationObject, file:TextIOWrapper, data_file:TextIOWrapper):
         self.current_time = timedelta(0)
         self.ami = ami
         self.agenda = agenda
@@ -254,15 +263,24 @@ class Context:
         self.instrument = instrument
         self.messages = messages
         self.file = file
+        self.data_file = data_file
         self.start_time = datetime.now()
 
     def file_write(self, message:str):
         """write file method"""
         self.file.write(f"{self.current_time} |"+
         f" DA_E:{self.agent_da.get_energy():.2f} "+
-        f"DA_A:{self.agent_da.noticing_delay:.2f},"+
-        f" OP_E:{self.agent_op.get_energy():.2f} "+
-        f"OP_A:{self.agent_op.noticing_delay:.2f} | {message}\n")
+        f" OP_E:{self.agent_da.get_attention():.2f} | {message}\n")
+        # self.file.write(f"{self.current_time} |"+
+        # f" DA_E:{self.agent_da.get_energy():.2f} "+
+        # f"DA_A:{self.agent_da.noticing_delay:.2f},"+
+        # f" OP_E:{self.agent_op.get_energy():.2f} "+
+        # f"OP_A:{self.agent_op.noticing_delay:.2f} | {message}\n")
+
+    def printer(self, console:str, file:str):
+        """Print message to console"""
+        self.messages.concat(f"{console}\n")
+        self.file_write(file)
 
     def update(self):
         """Make sure all objects are updated"""

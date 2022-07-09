@@ -4,15 +4,25 @@ import random
 from termcolor import colored
 from scipy.stats import linregress
 from model.library.enums import AgentType
+from model.library.functions import clamp, cognative_temperature_curve
 from model.library.objects import Context, SampleData
 
 class Person:
     """Agent Parent Class"""
     agent_type = ""
+    # TODO: Add system stability affect attention level
+    # If the system is unstable attention should increase, if system is stable attention will decrease
+    # We know what the status of the system is use this to callibrate the system
+    # begining they will be focused, not exausted yet, 4pm things go wrong and they are tired
+
+    # TODO: Analygous attentional properties will attach to data analyst
+    # Hot vs cold cognition, hot rappid makes more mistakes, cold slower more accurate
+    # Eventually check when worrying check all the time, when not check once in a while
+    # TODO: Attention/ exaustion/ focus controlls for ever person
     # TODO _: Add Attention
     # TODO: begining they will be focused, not exausted yet, 4pm things go wrong and they are tired
-    # TODO: Cognative temperature
-    energy_meter:float = None
+    cognative_temperature:float = None
+    cogtemp_curve:float = None
     # 1.0 / 0.002 = 8.3, total level of energy / minutes = 8.3 total hours of energy
     energy_degradation:float = 0.002
 
@@ -26,17 +36,18 @@ class Person:
 
     def __init__(self, agent_type):
         self.agent_type = agent_type
-        self.energy_meter = 1.0
+        self.cognative_temperature = 1.0
+        self.cogtemp_curve = 0.0
         self.attention_meter = 1.0
         self.previous_check = timedelta(0)
 
     def get_energy(self):
         """get the level of energy"""
-        return self.energy_meter
+        return self.cognative_temperature
 
     def get_attention(self):
         """get the level of attention"""
-        return self.attention_meter
+        return self.cogtemp_curve
 
     def update(self, context:Context):
         """Update attention and focus"""
@@ -44,10 +55,11 @@ class Person:
         # TODO: coupled also on a curve
         delta:timedelta = context.current_time - self.previous_check
         if delta >= timedelta(minutes=1):
-            self.energy_meter -= self.energy_degradation
+            self.cogtemp_curve = clamp(self.cogtemp_curve + self.energy_degradation, 0.0, 1.0)
+            self.cognative_temperature = clamp(cognative_temperature_curve(self.cogtemp_curve), 0.01, 1.0)
             self.previous_check = context.current_time
-        self.noticing_delay = 1 + (1 - self.energy_meter)
-        self.decision_delay = 1 + (1 - self.energy_meter)
+        self.noticing_delay = 1 + (1 - self.cognative_temperature)
+        self.decision_delay = 1 + (1 - self.cognative_temperature)
 
 class DataAnalyst(Person):
     """Retrives data from the instrument"""
@@ -58,17 +70,17 @@ class DataAnalyst(Person):
 
     def check_if_enough_data_to_analyse(self, context:Context) -> bool:
         """Check if there is enough data to start analysing, right now this is a constant"""
-        current_sample = context.ami.samples[context.instrument.current_sample]
-        if current_sample.count > 10000:
-            if self.projected_intercept is None:
-                # TODO: This is for timing
-                self.projected_intercept = abs(linregress(current_sample.err_array[-100:], current_sample.count_array[-100:]).intercept)
-            elif self.projected_intercept <= current_sample.count:
-                self.projected_intercept = abs(linregress(current_sample.err_array[-100:], current_sample.count_array[-100:]).intercept)
-                context.file_write(f"DA: Data from run {context.instrument.run_number} has enough data to analyse")
-                context.messages.concat(f"DA: Data from run {context.instrument.run_number} {colored('has enough data to analyse', 'green')}\n")
-                return True
-        return False
+        return True
+        # current_sample = context.ami.samples[context.instrument.current_sample]
+        # if current_sample.count > 10000:
+        #     if self.projected_intercept is None:
+        #         # TODO: This is for timing
+        #         self.projected_intercept = linregress(current_sample.err_array[-100:], current_sample.count_array[-100:]).intercept
+        #     elif self.projected_intercept <= current_sample.count:
+        #         self.projected_intercept = linregress(current_sample.err_array[-100:], current_sample.count_array[-100:]).intercept
+        #         context.printer(f"DA: Data from run {context.instrument.run_number} {colored('has enough data to analyse', 'green')}", f"DA: Data from run {context.instrument.run_number} has enough data to analyse")
+        #         return True
+        # return False
 
     def check_if_data_is_sufficient(self, context:Context) -> bool:
         """If there is enough data True, else False to ask to keep running"""
@@ -77,14 +89,12 @@ class DataAnalyst(Person):
         # TODO: DA does not have access to preformance quality
         #  Determine that the mean is settling
         if current_sample.err <= 0.0001:
-            context.file_write(f"DA: Data from run {context.instrument.run_number} is good")
-            context.messages.concat(f"DA: Data from run {context.instrument.run_number} {colored('is good', 'green')}\n")
-            context.agenda.add_event(context.instrument.run_number, context.instrument.run_start_time, context.current_time)
+            context.printer(f"DA: Data from run {context.instrument.run_number} {colored('is good', 'green')}", f"DA: Data from run {context.instrument.run_number} is good")
+            context.agenda.add_event(context.instrument.run_number, context.instrument.run_start_time, context.current_time, False)
             current_sample.compleated = True
             self.projected_intercept = None
             return True
-        context.file_write(f"DA: More data needed from run {context.instrument.run_number}")
-        context.messages.concat(f"DA: {colored('More data needed from run', 'yellow')} {context.instrument.run_number}\n")
+        context.printer(f"DA: {colored('More data needed from run', 'yellow')} {context.instrument.run_number}", f"DA: More data needed from run {context.instrument.run_number}")
         return False
 
     def check_if_experiment_is_compleated(self, context:Context):
@@ -116,15 +126,13 @@ class Operator(Person):
 
     def stop_collecting_data(self, context:Context):
         """Stop Collecting Data"""
-        context.file_write("OP: Stop Collecting Data")
-        context.messages.concat(f"OP: {colored('Stop Collecting Data', 'blue')}\n")
+        context.printer(f"OP: {colored('Stop Collecting Data', 'blue')}", "OP: Stop Collecting Data")
         context.instrument.collecting_data = False
 
     def start_peak_chasing(self, context:Context) -> bool:
         """True: communication sucessful and instrument started, False: Instrumnent not started"""
         if context.instrument.run_peak_chasing(context):
-            context.file_write("OP: Start Peak Chasing")
-            context.messages.concat(f"OP: {colored('Start Peak Chasing', 'green')}\n")
+            context.printer(f"OP: {colored('Start Peak Chasing', 'green')}", "OP: Start Peak Chasing")
             return True
         else:
             context.messages.concat(f"OP: {colored('Instrument transition', 'blue')}\n")
@@ -142,13 +150,11 @@ class Operator(Person):
             context.instrument.instrument_status.msg = context.instrument.instrument_status.msg + "(FA)"
             return context.instrument.beam_status.beam_pos
         elif which_way == "<<":
-            context.file_write("OP: Move Beam <<")
-            context.messages.concat(f"OP: {colored('Move Beam <<', 'blue')}\n")
+            context.printer(f"OP: {colored('Move Beam <<', 'blue')}", "OP: Move Beam <<")
             context.instrument.instrument_status.msg = context.instrument.instrument_status.msg + "<<"
             return context.instrument.beam_status.beam_pos - context.instrument.beam_status.beam_shift_amount
         else:
-            context.file_write("OP: Move Beam >>")
-            context.messages.concat(f"OP: {colored('Move Beam >>', 'blue')}\n")
+            context.printer(f"OP: {colored('Move Beam >>', 'blue')}", "OP: Move Beam >>")
             context.instrument.instrument_status.msg = context.instrument.instrument_status.msg + ">>"
             return context.instrument.beam_status.beam_pos + context.instrument.beam_status.beam_shift_amount
 
@@ -195,18 +201,27 @@ class ExperimentManager(Person):
         super().__init__(AgentType.EM)
 
     def start_experiment(self, context:Context):
+        """Start Experiment and load samples"""
+        context.agenda.start_experiment()
+        context.printer(f"EM: {colored('Load Samples', 'green')}", 'EM: Load Samples')
+        context.ami.load_samples(context.agenda.number_of_samples)
+        context.printer('EM: sort samples by PQ in decending order',
+         'EM: sort samples by PQ in decending order')
+        context.ami.sort_samples()
+
+    def start_instrument(self, context:Context):
         """determine if the output of the instrument is good"""
-        context.file_write("EM: Start Experiment")
-        context.messages.concat(f"EM: {colored('Start Experiment', 'green')}\n")
+        context.printer(f"EM: {colored('Start Instrument', 'green')}", 'EM: Start Instrument')
         context.instrument.start()
 
     def check_if_next_run_can_be_started(self, context:Context) -> bool:
         """Check to see if the sample needs to be changed if so wait"""
         # TODO: Ask person to change sample
-        # TODO: Simplify
         if context.instrument.current_sample is None:
             next_sample:SampleData = context.ami.samples[0]
         elif context.instrument.current_sample is not None:
+            if len(context.ami.samples) == (context.instrument.current_sample + 1):
+                return False
             next_sample:SampleData = context.ami.samples[context.instrument.current_sample+1]
         if self.previous_sample is not None:
             if self.previous_sample.type == next_sample.type:
@@ -243,10 +258,9 @@ class ExperimentManager(Person):
     def tell_operator_start_data_collection(self, context:Context):
         """Communicate with operator to start collecting data"""
         if context.agent_op.start_peak_chasing(context):
-            context.file_write("EM: Communicate with Operator")
-            context.messages.concat(f"EM: {colored('Communicate with Operator', 'green')}\n")
+            context.printer(f"EM: {colored('Communicate with Operator', 'green')}", 'EM: Communicate with Operator')
         else:
-            context.messages.concat(f"EM: {colored('Instrument cannot start', 'blue')}\n")
+            context.messages.concat(f"EM: {colored('Instrument cannot start', 'blue')}")
 
     def check_if_data_is_sufficient(self, context:Context):
         """Communiate with the data analyst to see if the run has enough
@@ -261,11 +275,9 @@ class ExperimentManager(Person):
                 self.previous_data_check = context.current_time
             else:
                 return False
-            context.file_write("EM: Ask DA if data is sufficient")
-            context.messages.concat(f"EM: {colored('Ask DA if data is sufficient', 'green')}\n")
+            context.printer(f"EM: {colored('Ask DA if data is sufficient', 'green')}", "EM: Ask DA if data is sufficient")
             if context.agent_da.check_if_data_is_sufficient(context):
-                context.file_write("EM: Tell operator to stop collecting data")
-                context.messages.concat(f"EM: {colored('Tell operator to stop collecting data', 'blue')}\n")
+                context.printer(f"EM: {colored('Tell operator to stop collecting data', 'blue')}", "EM: Tell operator to stop collecting data")
                 context.agent_op.stop_collecting_data(context)
             # TODO _: Does operator keep going until told to stop or do they need to be told to keep going
 
