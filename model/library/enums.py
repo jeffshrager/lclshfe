@@ -22,9 +22,3 @@ class ExperimentState(Enum):
     """Different States of the Instrument"""
     STOPED = False
     STARTED = True
-
-class SampleType(Enum):
-    """Enum to specify the type of sample"""
-    S1 = "S1"
-    S2 = "S2"
-    S3 = "S3"

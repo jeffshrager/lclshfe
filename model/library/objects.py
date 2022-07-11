@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, List
 from io import TextIOWrapper
 import random
 from datetime import datetime, timedelta
-from model.library.enums import ExperimentState, InstrumentRunState, SampleType
+from model.library.enums import ExperimentState, InstrumentRunState
 from model.library.functions import clamp
 if TYPE_CHECKING:
     from model.agent import DataAnalyst, ExperimentManager, Operator
@@ -108,17 +108,14 @@ class SampleData:
 
     # TODO: make weights affect rescheduling
     # TODO: What was this N shaped dynamics
-    def __init__(self, sample_type:SampleType, preformance_quality:float,
+    def __init__(self, preformance_quality:float,
             weight:float, setup_time:timedelta):
         self.compleated:bool = False
         self.timeout:bool = False
         self.preformance_quality:float = preformance_quality
         self.weight:float = weight
         self.setup_time:timedelta = setup_time
-        self.type:SampleType = sample_type
         self.data:List[DataPoint] = []
-        self.hit_number:int = 0
-        self.miss_number:int = 0
         self.count:float = 0.0
         self.mean:float = 0.0
         self.m_2:float = 0.0
@@ -137,11 +134,30 @@ class SampleData:
         delta2 = data.quality - self.mean
         self.m_2 += delta * delta2
         self.data.append(data)
+
         self.variance = self.m_2 / self.count
         self.sdev = sqrt(self.variance)
         self.err = self.sdev / sqrt(self.count)
         self.count_array.append(self.count)
         self.err_array.append(self.err)
+
+    def reset(self):
+        """Reset the data"""
+        self.compleated = False
+        self.timeout = False
+        self.data = []
+        self.count = 0.0
+        self.mean = 0.0
+        self.m_2 = 0.0
+        self.variance = 0.0
+        self.sdev = 0.0
+        self.err = 0.0
+        self.count_array = []
+        self.err_array = []
+
+    def file_string(self) -> str:
+        """Return a string that can be written to a file"""
+        return f'{self.preformance_quality}, {self.weight}, {self.mean:.15f}, {self.m_2:.15f}, {self.variance:.15f}, {self.sdev:.15f}, {self.err:.15f}'
 
     def __str__(self):
         return (f"pq:{self.preformance_quality:.6f}, mean:{self.mean:.6f}, err:{self.err:.6f},"+
@@ -157,15 +173,23 @@ class AMI:
     # Were using PQ as double meaning, one is quality of sample,
     # also using as inverse proxy as importance
     samples:List[SampleData] = []
+    random_samples:bool = None
 
-    def __init__(self):
+    def __init__(self, samples, random_samples):
         self.samples:List[SampleData] = []
+        self.random_samples = random_samples
+        if not random_samples:
+            sample:SampleData
+            for sample in samples:
+                sample.reset()
+            self.samples = samples
 
     def load_samples(self, number_of_samples:int):
         """Load the samples using a random distribution"""
-        self.samples = [SampleData(SampleType.S1, clamp(random.gauss(0.90, 0.2), 0.00, 0.99),
-            random.gauss(0.80, 0.20), timedelta(minutes=random.gauss(1, 0.5)))
-            for _ in range(number_of_samples)]
+        if self.random_samples: 
+            self.samples = [SampleData(clamp(random.gauss(0.90, 0.2), 0.00, 0.99),
+                random.gauss(0.80, 0.20), timedelta(minutes=random.gauss(1, 0.5)))
+                for _ in range(number_of_samples)]
 
     def sort_samples(self):
         """Sort the samples by PQ"""

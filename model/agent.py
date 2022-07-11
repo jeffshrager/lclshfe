@@ -70,17 +70,17 @@ class DataAnalyst(Person):
 
     def check_if_enough_data_to_analyse(self, context:Context) -> bool:
         """Check if there is enough data to start analysing, right now this is a constant"""
-        return True
-        # current_sample = context.ami.samples[context.instrument.current_sample]
-        # if current_sample.count > 10000:
-        #     if self.projected_intercept is None:
-        #         # TODO: This is for timing
-        #         self.projected_intercept = linregress(current_sample.err_array[-100:], current_sample.count_array[-100:]).intercept
-        #     elif self.projected_intercept <= current_sample.count:
-        #         self.projected_intercept = linregress(current_sample.err_array[-100:], current_sample.count_array[-100:]).intercept
-        #         context.printer(f"DA: Data from run {context.instrument.run_number} {colored('has enough data to analyse', 'green')}", f"DA: Data from run {context.instrument.run_number} has enough data to analyse")
-        #         return True
-        # return False
+        current_sample = context.ami.samples[context.instrument.current_sample]
+        if current_sample.count > 10000:
+            return True
+            # if self.projected_intercept is None:
+            #     # TODO: This is for timing
+            #     self.projected_intercept = linregress(current_sample.err_array[-100:], current_sample.count_array[-100:]).intercept
+            # elif self.projected_intercept <= current_sample.count:
+            #     self.projected_intercept = linregress(current_sample.err_array[-100:], current_sample.count_array[-100:]).intercept
+            #     context.printer(f"DA: Data from run {context.instrument.run_number} {colored('has enough data to analyse', 'green')}", f"DA: Data from run {context.instrument.run_number} has enough data to analyse")
+            #     return True
+        return False
 
     def check_if_data_is_sufficient(self, context:Context) -> bool:
         """If there is enough data True, else False to ask to keep running"""
@@ -88,7 +88,7 @@ class DataAnalyst(Person):
         current_sample = context.ami.samples[context.instrument.current_sample]
         # TODO: DA does not have access to preformance quality
         #  Determine that the mean is settling
-        if current_sample.err <= 0.0001:
+        if current_sample.err <= 0.00001:
             context.printer(f"DA: Data from run {context.instrument.run_number} {colored('is good', 'green')}", f"DA: Data from run {context.instrument.run_number} is good")
             context.agenda.add_event(context.instrument.run_number, context.instrument.run_start_time, context.current_time, False)
             current_sample.compleated = True
@@ -224,25 +224,22 @@ class ExperimentManager(Person):
                 return False
             next_sample:SampleData = context.ami.samples[context.instrument.current_sample+1]
         if self.previous_sample is not None:
-            if self.previous_sample.type == next_sample.type:
-                if self.current_transition_time is None:
-                    self.current_transition_time = timedelta(minutes=random.uniform(0.2, 2.0))
-                    context.file_write(f"Instrument transition: {self.current_transition_time}")
-                if self.current_transition_time > timedelta(0):
-                    if self.previous_transition_check is None:
-                        self.previous_transition_check = context.current_time
-                    else:
-                        context.messages.concat(f"Instrument transition: {colored(f'{self.current_transition_time}', 'blue')}\n")
-                        self.current_transition_time -= context.current_time - self.previous_transition_check
-                        self.previous_transition_check = context.current_time
-                        return False
+            if self.current_transition_time is None:
+                self.current_transition_time = timedelta(minutes=random.uniform(0.2, 2.0))
+                context.file_write(f"Instrument transition: {self.current_transition_time}")
+            if self.current_transition_time > timedelta(0):
+                if self.previous_transition_check is None:
+                    self.previous_transition_check = context.current_time
                 else:
-                    self.previous_transition_check = None
-                    self.current_transition_time = None
-                    return True
-                return False
-            self.previous_switch_check = context.current_time
-            self.previous_sample = None
+                    context.messages.concat(f"Instrument transition: {colored(f'{self.current_transition_time}', 'blue')}\n")
+                    self.current_transition_time -= context.current_time - self.previous_transition_check
+                    self.previous_transition_check = context.current_time
+                    return False
+            else:
+                self.previous_transition_check = None
+                self.current_transition_time = None
+                return True
+            return False
         if self.current_sample_switch_time is None:
             self.current_sample_switch_time = next_sample.setup_time
         self.current_sample_switch_time -= context.current_time - self.previous_switch_check

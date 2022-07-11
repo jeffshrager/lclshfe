@@ -3,7 +3,7 @@ import random
 from datetime import timedelta
 from termcolor import colored
 from model.library.enums import InstrumentType
-from model.library.functions import clamp, get_current_datapoints, aquire_data, get_line
+from model.library.functions import clamp, get_current_datapoints, aquire_data
 from model.library.objects import Beam, Context, DataPoint, InstrumentStatus, SampleData, Stream
 
 class Instrument:
@@ -150,15 +150,15 @@ class Instrument:
                 delta:timedelta = context.current_time - self.last_data_update
                 distance = abs(self.stream_status.stream_pos - self.beam_status.beam_pos)
                 for _ in range(int(delta.total_seconds()) * self.data_per_second):
-                    datapoint:DataPoint = DataPoint(clamp((aquire_data(distance,
-                            current_sample.preformance_quality) * 0.98) \
+                    datapoint:DataPoint = DataPoint(clamp(aquire_data(distance,
+                            current_sample.preformance_quality) \
                             # QQQ: Do we need this, line below?
                             # * current_sample.preformance_quality \
                             # Additional pipeline noise not dependent on the sample or anything else
                             # FFF: Model this someday
                             + (random.uniform(-0.01, 0.01) if random.randrange(1, 5) == 1 else 0) \
                             + (random.uniform(-0.1, 0.1) if random.randrange(1, 1000) == 1 else 0), 0.0, 1.0))
-                    context.data_file.write(f"{datapoint.quality}\n")
+                    context.data_file.write(f"{self.current_sample}, {current_sample.count}, {datapoint.quality:.15f}, {current_sample.file_string()}\n")
                     current_sample.append(datapoint)
                 self.last_data_update = context.current_time
 
@@ -188,6 +188,6 @@ class CXI(Instrument):
             if not sample_goal.compleated and not sample_goal.timeout:
                 self.current_sample = index
                 break
-        context.data_file.write(f"Current_Sample, {self.current_sample},\n")
+        context.data_file.write("sample #, count, data, preformance quality, weight, mean, m2, variance, sdev, err \n")
         self.previous_sample = context.ami.samples[self.current_sample]
         return True

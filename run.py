@@ -3,29 +3,30 @@ import copy
 from datetime import timedelta
 import os
 from time import sleep, time
+from typing import List
 from termcolor import colored
 from model.agent import DataAnalyst, ExperimentManager, Operator
 from model.instrument import CXI
 from model.library.functions import create_experiment_figure, \
     experiment_stats, goal_agenda_plan, experiment_is_not_over
-from model.library.objects import Agenda, CommunicationObject, Context, AMI
+from model.library.objects import Agenda, CommunicationObject, Context, AMI, SampleData
 
-NUMBER_OF_SAMPLES:int = 10
+NUMBER_OF_SAMPLES:int = 5
 EXPERIMENT_TIME:timedelta = timedelta(hours=5)
 STEP_THROUGH_TIME:timedelta = timedelta(seconds=5)
 CYCLE_SLEEP_TIME:float = 0
 
-def model(display:bool, number_of_samples:int,
+def model(display:bool, folder:str, samples:List[SampleData], random_samples:bool, number_of_samples:int,
           experiment_time:timedelta, step_through_time:timedelta,
           cycle_sleep_time:float) -> AMI:
     """Run CXI Simulation"""
     filename = str(time())
-    os.makedirs(os.path.dirname(f"results/model/r{filename}.tsv"), exist_ok=True)
-    os.makedirs(os.path.dirname(f"results/data/r{filename}.tsv"), exist_ok=True)
-    with open(f"results/model/r{filename}.tsv", "w", encoding="utf-8") as file:
-        with open(f"results/data/r{filename}.tsv", "w", encoding="utf-8") as data_file:
+    os.makedirs(os.path.dirname(f"results{folder}/model/r{filename}.tsv"), exist_ok=True)
+    os.makedirs(os.path.dirname(f"results{folder}/data/r{filename}.tsv"), exist_ok=True)
+    with open(f"results{folder}/model/r{filename}.tsv", "w", encoding="utf-8") as file:
+        with open(f"results{folder}/data/r{filename}.csv", "w", encoding="utf-8") as data_file:
             context:Context = Context(
-                AMI(), Agenda(experiment_time, number_of_samples),
+                AMI(samples, random_samples), Agenda(experiment_time, number_of_samples),
                 DataAnalyst(), ExperimentManager(), Operator(),
                 CXI(), CommunicationObject(), file, data_file)
             context.file.write(f"{goal_agenda_plan(context)}\n")
@@ -55,7 +56,7 @@ def model(display:bool, number_of_samples:int,
             print(f"{experiment_stats(context)}\n{colored('Finished','green')}" if display else '--')
             create_experiment_figure(context, False)
             return copy.deepcopy(context.ami)
-model(True, NUMBER_OF_SAMPLES, EXPERIMENT_TIME, STEP_THROUGH_TIME, CYCLE_SLEEP_TIME)
+# model(True, '', [], True, NUMBER_OF_SAMPLES, EXPERIMENT_TIME, STEP_THROUGH_TIME, CYCLE_SLEEP_TIME)
 
 # TODO: Improve graph at end with extra values
 # TODO: After the production is done shortly after then they can analyse

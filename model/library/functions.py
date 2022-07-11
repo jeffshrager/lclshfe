@@ -48,8 +48,8 @@ def get_current_datapoints(context:Context) -> str:
     return_string = ""
     for index, data in enumerate(current_sample.data[-60:]):
         return_string += (colored(f'{data}', 'green'
-        if data.quality >= current_sample.preformance_quality
-        else 'yellow' if data.quality >= aquire_data(0.03, current_sample.preformance_quality
+        if data.quality >= aquire_data(0.001, current_sample.preformance_quality
+        ) else 'yellow' if data.quality >= aquire_data(0.03, current_sample.preformance_quality
         ) else 'red') + ("\n" if index == 19 or index == 39 else " "))
     return return_string
 
@@ -58,10 +58,14 @@ def aquire_data(distance:float, preformance_quality:float) -> float:
     https://www.desmos.com/calculator/1dc980vuj1"""
     # Ones with bad PQ have shallower slopes
     # QQQ: Why is it not taking less time for HIgh quality samples
-    a = 1 - preformance_quality
-    value_floor = 1.0 - (0.125 / (a * sqrt(2 * pi))) * pow(e, -0.1 * pow(0 / a, 2))
-    data_distance = (0.125 / (a * sqrt(2 * pi))) * pow(e, -0.1 * pow(distance / a, 2))
-    return abs(data_distance + value_floor)
+    # a = 1 - preformance_quality
+    a = 0.05
+    if preformance_quality < 0.85:
+        slope = -0.1
+    else:
+        slope = -0.0001
+    data_distance = (0.12283 / (a * sqrt(2 * pi))) * pow(e, slope * pow(distance / a, 2))
+    return data_distance
 
 def cognative_temperature_curve(x_pos:float) -> float:
     """Agent cognitive temperature decrease
