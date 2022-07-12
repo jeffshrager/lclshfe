@@ -207,8 +207,8 @@ class Stream:
 
 
 def run(show_f):  # _f is a flag
-    default_reps = 20
-    button_distances = 10
+    default_reps = 30
+    button_distances = 100
 
     f = open("results/r" + str(time.time()) + ".tsv", "w")
     if show_f:
@@ -248,4 +248,4 @@ def run(show_f):  # _f is a flag
 
 
 # If display is true, we only do one rep and only allow it to run 1000 cycles
-run(True)
+run(False)
