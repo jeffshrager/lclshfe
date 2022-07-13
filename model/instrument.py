@@ -4,7 +4,8 @@ from datetime import timedelta
 from termcolor import colored
 from model.library.enums import InstrumentType
 from model.library.functions import clamp, get_current_datapoints, aquire_data
-from model.library.objects import Beam, Context, DataPoint, InstrumentStatus, SampleData, Stream
+from model.library.objects import Beam, Config, Context, DataPoint, \
+    InstrumentStatus, SampleData, Stream
 
 class Instrument:
     """Instrument Parent Class"""
@@ -28,10 +29,10 @@ class Instrument:
     def __init__(self, instrument):
         self.instrument_type = instrument
         self.run_number = 0
-        self.instrument_status = InstrumentStatus()
-        self.stream_status = Stream()
-        self.beam_status = Beam()
-        self.time_out_value = 200000
+        # self.instrument_status = InstrumentStatus()
+        # self.stream_status = Stream()
+        # self.beam_status = Beam()
+        # self.time_out_value = 600000
 
     def start(self):
         """Start the Instrumnet"""
@@ -156,21 +157,29 @@ class Instrument:
                             # * current_sample.preformance_quality \
                             # Additional pipeline noise not dependent on the sample or anything else
                             # FFF: Model this someday
-                            + (random.uniform(-0.01, 0.01) if random.randrange(1, 5) == 1 else 0) \
-                            + (random.uniform(-0.1, 0.1) if random.randrange(1, 1000) == 1 else 0), 0.0, 1.0))
-                    context.data_file.write(f"{self.current_sample}, {current_sample.count}, {datapoint.quality:.15f}, {current_sample.file_string()}\n")
+                            # + (random.uniform(-0.01, 0.01) if random.randrange(1, 5) == 1 else 0) \
+                            # + (random.uniform(-0.1, 0.1) if random.randrange(1, 1000) == 1 else 0)
+                            , 0.0, 1.0),
+                            # Tik Tak Toe Board Data
+                            [[1.0, 0.0, 1.0], [0.0, None, 0.0], [1.0, 0.0, 1.0]]
+                            )
+                    context.data_file.write(f"{self.current_sample}\t{current_sample.count}\t{datapoint.quality:.15f}\t{current_sample.file_string()}\n")
                     current_sample.append(datapoint)
                 self.last_data_update = context.current_time
 
 class CXI(Instrument):
     """CXI"""
     transition_write:bool = False
-    previous_transition_check:timedelta = None
+    previous_transition_check:timedelta = None 
     previous_sample:SampleData = None
 
-    def __init__(self):
+    def __init__(self, config:Config):
         super().__init__(InstrumentType.CXI)
-        self.data_per_second = 100
+        self.data_per_second = config.cxi_data_per_second
+        self.instrument_status = InstrumentStatus(config)
+        self.stream_status = Stream(config)
+        self.beam_status = Beam(config)
+        self.time_out_value = config.cxi_time_out_value
 
     def run_peak_chasing(self, context:Context) -> bool:
         """True: peak chasing started, False: not started"""
@@ -188,6 +197,6 @@ class CXI(Instrument):
             if not sample_goal.compleated and not sample_goal.timeout:
                 self.current_sample = index
                 break
-        context.data_file.write("sample #, count, data, preformance quality, weight, mean, m2, variance, sdev, err \n")
+        context.data_file.write("sample #\tcount\tdata\tpreformance quality\tweight\tmean\tm2\tvariance\tsdev\terr\n")
         self.previous_sample = context.ami.samples[self.current_sample]
         return True

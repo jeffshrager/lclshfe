@@ -5,7 +5,7 @@ from termcolor import colored
 from scipy.stats import linregress
 from model.library.enums import AgentType
 from model.library.functions import clamp, cognative_temperature_curve
-from model.library.objects import Context, SampleData
+from model.library.objects import Config, Context, SampleData
 
 class Person:
     """Agent Parent Class"""
@@ -64,22 +64,29 @@ class Person:
 class DataAnalyst(Person):
     """Retrives data from the instrument"""
     projected_intercept:float = None
-    def __init__(self):
+    target_error:float = None
+    predictions:list = []
+
+    def __init__(self, config:Config):
         super().__init__(AgentType.DA)
         self.last_sample_with_enough_data = None
+        self.target_error = config.da_target_error
 
     def check_if_enough_data_to_analyse(self, context:Context) -> bool:
         """Check if there is enough data to start analysing, right now this is a constant"""
         current_sample = context.ami.samples[context.instrument.current_sample]
-        if current_sample.count > 10000:
+        if current_sample.count > 100:
+            # Over 1000, skip 10
+            if self.projected_intercept is None or self.projected_intercept <= current_sample.count:
+                last_count_array = current_sample.count_array[-500:]
+                last_err_array = current_sample.err_array[-500:]
+                regression = linregress(last_count_array, last_err_array)
+                # regression = linregress(last_count_array[::10], last_err_array[::10])
+                self.projected_intercept = (self.target_error - regression.intercept) / regression.slope
+                context.ami.samples[context.instrument.current_sample].projected_intercept = self.projected_intercept
+                if self.projected_intercept <= current_sample.count:
+                    context.printer(f"DA: Data from run {context.instrument.run_number} {colored('has enough data to analyse', 'green')}", f"DA: Data from run {context.instrument.run_number} has enough data to analyse")
             return True
-            # if self.projected_intercept is None:
-            #     # TODO: This is for timing
-            #     self.projected_intercept = linregress(current_sample.err_array[-100:], current_sample.count_array[-100:]).intercept
-            # elif self.projected_intercept <= current_sample.count:
-            #     self.projected_intercept = linregress(current_sample.err_array[-100:], current_sample.count_array[-100:]).intercept
-            #     context.printer(f"DA: Data from run {context.instrument.run_number} {colored('has enough data to analyse', 'green')}", f"DA: Data from run {context.instrument.run_number} has enough data to analyse")
-            #     return True
         return False
 
     def check_if_data_is_sufficient(self, context:Context) -> bool:
@@ -88,7 +95,7 @@ class DataAnalyst(Person):
         current_sample = context.ami.samples[context.instrument.current_sample]
         # TODO: DA does not have access to preformance quality
         #  Determine that the mean is settling
-        if current_sample.err <= 0.00001:
+        if current_sample.err <= self.target_error:
             context.printer(f"DA: Data from run {context.instrument.run_number} {colored('is good', 'green')}", f"DA: Data from run {context.instrument.run_number} is good")
             context.agenda.add_event(context.instrument.run_number, context.instrument.run_start_time, context.current_time, False)
             current_sample.compleated = True
@@ -115,14 +122,17 @@ class Operator(Person):
     # current_eye_position = 0
     # left_button_position = -2 # we're actually not gonna use these but just use a fixed shift time
     # right_button_position = +2
-    switch_button_delay_per_cm = 1  # ms
-    button_press_delay = 1  # ms
-    button_distance = 0  # cm
+    switch_button_delay_per_cm = None  # ms
+    button_press_delay = None  # ms
+    button_distance = None  # cm
     which_button_were_on = "<<"  # or ">>"
     running_peak_chasing = False
 
-    def __init__(self):
+    def __init__(self, config:Config):
         super().__init__(AgentType.OP)
+        self.switch_button_delay_per_cm = config.op_switch_button_delay_per_cm
+        self.button_press_delay = config.op_button_press_delay
+        self.button_distance = config.op_button_distance
 
     def stop_collecting_data(self, context:Context):
         """Stop Collecting Data"""
@@ -265,6 +275,7 @@ class ExperimentManager(Person):
         the run for longer"""
         # TODO _: Check if run should be stopped as something is wrong with Standard deviation
         if context.agent_da.check_if_enough_data_to_analyse(context):
+        # and 0 == random.randint(0, 30):
             # TODO: Timer
             if self.previous_data_check is None:
                 self.previous_data_check = context.current_time

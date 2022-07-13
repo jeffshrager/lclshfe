@@ -1,7 +1,7 @@
 """Collection of functions"""
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from math import e, pi, sqrt
+from numpy import random
 import plotly.express as px
 import pandas as pd
 from termcolor import colored
@@ -39,8 +39,7 @@ def experiment_is_not_over(context:Context) -> bool:
     """True: Experiment is not over, False: Experiment is over"""
     return (context.current_time < context.agenda.experimental_time
     ) and (len(context.agenda.event_timeline) != len(context.ami.samples)
-    ) if (len(context.agenda.event_timeline) != 0
-    ) else True
+    ) if (len(context.agenda.event_timeline) != 0) else True
 
 def get_current_datapoints(context:Context) -> str:
     """Gets the datapoints live"""
@@ -56,15 +55,9 @@ def get_current_datapoints(context:Context) -> str:
 def aquire_data(distance:float, preformance_quality:float) -> float:
     """given distance calculate gaussian according to this:
     https://www.desmos.com/calculator/1dc980vuj1"""
-    # Ones with bad PQ have shallower slopes
-    # QQQ: Why is it not taking less time for HIgh quality samples
-    # a = 1 - preformance_quality
-    a = 0.05
-    if preformance_quality < 0.85:
-        slope = -0.1
-    else:
-        slope = -0.0001
-    data_distance = (0.12283 / (a * sqrt(2 * pi))) * pow(e, slope * pow(distance / a, 2))
+    a = 1 - preformance_quality
+    # TODO: add distance
+    data_distance = random.normal(loc=1.0, scale=a)
     return data_distance
 
 def cognative_temperature_curve(x_pos:float) -> float:
