@@ -3,9 +3,9 @@ from datetime import timedelta
 import random
 from termcolor import colored
 from scipy.stats import linregress
-from model.library.enums import AgentType
-from model.library.functions import clamp, cognative_temperature_curve
-from model.library.objects import Config, Context, SampleData
+from src.library.objects.enums import AgentType
+from src.library.functions.func import clamp, cognative_temperature_curve
+from src.library.objects.objs import Config, Context, SampleData
 
 class Person:
     """Agent Parent Class"""
@@ -40,6 +40,7 @@ class Person:
         self.cogtemp_curve = 0.0
         self.attention_meter = 1.0
         self.previous_check = timedelta(0)
+        
 
     def get_energy(self):
         """get the level of energy"""
@@ -70,23 +71,22 @@ class DataAnalyst(Person):
     def __init__(self, config:Config):
         super().__init__(AgentType.DA)
         self.last_sample_with_enough_data = None
-        self.target_error = config.da_target_error
+        self.target_error = config['da_target_error']
 
     def check_if_enough_data_to_analyse(self, context:Context) -> bool:
         """Check if there is enough data to start analysing, right now this is a constant"""
+        # III: Reconnect prediction to operation
         current_sample = context.ami.samples[context.instrument.current_sample]
         if current_sample.count > 100:
-            # Over 1000, skip 10
             if self.projected_intercept is None or self.projected_intercept <= current_sample.count:
-                last_count_array = current_sample.count_array[-500:]
-                last_err_array = current_sample.err_array[-500:]
-                regression = linregress(last_count_array, last_err_array)
-                # regression = linregress(last_count_array[::10], last_err_array[::10])
+                last_count_array = current_sample.count_array[-10000:]
+                last_err_array = current_sample.err_array[-10000:]
+                regression = linregress(last_count_array[::100], last_err_array[::100])
                 self.projected_intercept = (self.target_error - regression.intercept) / regression.slope
                 context.ami.samples[context.instrument.current_sample].projected_intercept = self.projected_intercept
                 if self.projected_intercept <= current_sample.count:
                     context.printer(f"DA: Data from run {context.instrument.run_number} {colored('has enough data to analyse', 'green')}", f"DA: Data from run {context.instrument.run_number} has enough data to analyse")
-            return True
+                    return True
         return False
 
     def check_if_data_is_sufficient(self, context:Context) -> bool:
@@ -130,9 +130,12 @@ class Operator(Person):
 
     def __init__(self, config:Config):
         super().__init__(AgentType.OP)
-        self.switch_button_delay_per_cm = config.op_switch_button_delay_per_cm
-        self.button_press_delay = config.op_button_press_delay
-        self.button_distance = config.op_button_distance
+        self.switch_button_delay_per_cm = config['op_switch_button_delay_per_cm']
+        self.button_press_delay = config['op_button_press_delay']
+        self.button_distance = config['op_button_distance']
+        self.functional_acuity = config['op_functional_acuity']
+        self.noticing_delay = config['op_noticing_delay']
+        self.decision_delay = config['op_decision_delay']
 
     def stop_collecting_data(self, context:Context):
         """Stop Collecting Data"""
@@ -179,6 +182,7 @@ class Operator(Person):
             return ">>"
 
     def operator_response_delay(self, context:Context):
+        # FFF Deconvolve this
         """operator_response_delay() uses the current eye position and button distances to decide
         how many cycles it takes to hit the button, which is either short
         (you're there already), or long (you're not), the longer using the
@@ -291,7 +295,7 @@ class ExperimentManager(Person):
 
 class RemoteUser(Person):
     """A user who is not present on site"""
-    # TODO: Who is communicating with the remote user from inside the hutch
+    # FFF: Who is communicating with the remote user from inside the hutch
     def __init__(self):
         super().__init__(AgentType.RU)
 
@@ -301,8 +305,8 @@ class RemoteUser(Person):
 
 class ACROperator(Person):
     """An operator who is in the Accelerator Controll Room"""
-    # TODO: who is the person talking to the ACR operator in the situation that the beam dissapears or has problems
-    # TODO: or they want to change the photon energy level
+    # FFF: who is the person talking to the ACR operator in the situation that the beam dissapears or has problems
+    # FFF: or they want to change the photon energy level
     def __init__(self):
         super().__init__(AgentType.ACR)
 

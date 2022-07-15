@@ -2,9 +2,9 @@
 import random
 from datetime import timedelta
 from termcolor import colored
-from model.library.enums import InstrumentType
-from model.library.functions import clamp, get_current_datapoints, aquire_data
-from model.library.objects import Beam, Config, Context, DataPoint, \
+from src.library.objects.enums import InstrumentType
+from src.library.functions.func import clamp, get_current_datapoints, aquire_data
+from src.library.objects.objs import Beam, Config, Context, DataPoint, \
     InstrumentStatus, SampleData, Stream
 
 class Instrument:
@@ -157,8 +157,9 @@ class Instrument:
                             # * current_sample.preformance_quality \
                             # Additional pipeline noise not dependent on the sample or anything else
                             # FFF: Model this someday
-                            # + (random.uniform(-0.01, 0.01) if random.randrange(1, 5) == 1 else 0) \
-                            # + (random.uniform(-0.1, 0.1) if random.randrange(1, 1000) == 1 else 0)
+                            # III: Bring these back in
+                            + (random.uniform(-0.01, 0.01) if random.randrange(1, 5) == 1 else 0) \
+                            + (random.uniform(-0.1, 0.1) if random.randrange(1, 1000) == 1 else 0)
                             , 0.0, 1.0),
                             # Tik Tak Toe Board Data
                             [[1.0, 0.0, 1.0], [0.0, None, 0.0], [1.0, 0.0, 1.0]]
@@ -175,11 +176,11 @@ class CXI(Instrument):
 
     def __init__(self, config:Config):
         super().__init__(InstrumentType.CXI)
-        self.data_per_second = config.cxi_data_per_second
-        self.instrument_status = InstrumentStatus(config)
+        self.data_per_second = config['cxi_data_per_second']
+        self.instrument_status = InstrumentStatus()
         self.stream_status = Stream(config)
         self.beam_status = Beam(config)
-        self.time_out_value = config.cxi_time_out_value
+        self.time_out_value = config['cxi_time_out_value']
 
     def run_peak_chasing(self, context:Context) -> bool:
         """True: peak chasing started, False: not started"""

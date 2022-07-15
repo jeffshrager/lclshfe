@@ -6,15 +6,7 @@ import plotly.express as px
 import pandas as pd
 from termcolor import colored
 if TYPE_CHECKING:
-    from model.library.objects import Context, AMI
-
-def get_parameters(context:Context) -> str:
-    """get the simulation parameters"""
-    return (f"Functional Acuity = {context.agent_op.functional_acuity} "+
-        f"stream_shift_amount= {context.instrument.stream_status.stream_shift_amount}, "+
-        f"p_stream_shift={context.instrument.stream_status.p_stream_shift}, "+
-        f"beam_shift_amount={context.instrument.beam_status.beam_shift_amount}, "+
-        f"p_crazy_ivan={context.instrument.stream_status.p_crazy_ivan}")
+    from src.library.objects.objs import Context, AMI
 
 def calculate_roi(ami:AMI) -> str:
     """Determine the retun of investment data / time"""
@@ -27,8 +19,8 @@ def get_line() -> str:
 
 def goal_agenda_plan(context:Context) -> str:
     "Return out GAP: Goal Agenda Plan"
-    return (f"{get_parameters(context)}\n{context.ami}\nCurrent Time: {context.current_time} "+
-    f"{context.agenda}\n{get_line()}")
+    return (f"{context.config.override_dictionary}\n{context.ami}\n"+
+    f"Current Time: {context.current_time} {context.agenda}\n{get_line()}")
 
 def experiment_stats(context:Context) -> str:
     "Write out statistics of the experiment"
@@ -55,10 +47,14 @@ def get_current_datapoints(context:Context) -> str:
 def aquire_data(distance:float, preformance_quality:float) -> float:
     """given distance calculate gaussian according to this:
     https://www.desmos.com/calculator/1dc980vuj1"""
-    a = 1 - preformance_quality
-    # TODO: add distance
-    data_distance = random.normal(loc=1.0, scale=a)
-    return data_distance
+    preformance_disquality = 1 - preformance_quality
+    # cumulative_deviation = (0.125 / (0.05 * sqrt(2 * pi))) * pow(e, -0.5 * pow(distance / 0.05, 2))
+    # FFF: Figure out what this should really be
+    cumulative_deviation = preformance_disquality + distance
+    # Gaussian distribution
+    # https://towardsdatascience.com/gaussian-mixture-models-with-python-36dabed6212a
+    data = random.normal(loc=1.0, scale=cumulative_deviation)
+    return data
 
 def cognative_temperature_curve(x_pos:float) -> float:
     """Agent cognitive temperature decrease

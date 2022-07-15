@@ -2,15 +2,16 @@
 from __future__ import annotations
 from math import sqrt
 import os
+from time import time
 from typing import TYPE_CHECKING, List
 from io import TextIOWrapper
 import random
 from datetime import datetime, timedelta
-from model.library.enums import ExperimentState, InstrumentRunState
-from model.library.functions import clamp
+from src.library.objects.enums import ExperimentState, InstrumentRunState
+from src.library.functions.func import clamp
 if TYPE_CHECKING:
-    from model.agent import DataAnalyst, ExperimentManager, Operator
-    from model.instrument import CXI
+    from src.library.objects.agent import DataAnalyst, ExperimentManager, Operator
+    from src.library.objects.instrument import CXI
 
 class CommunicationObject:
     """Object that stores the communication"""
@@ -43,8 +44,8 @@ class InstrumentStatus:
     # These are counted over all reps and then the mean is display at the end
     n_crazy_ivans = 0
 
-    def __init__(self, config:Config):
-        self.n_crazy_ivans = config.cxi_n_crazy_ivans
+    def __init__(self):
+        pass
 
     def start(self):
         """Start the Instrumnet"""
@@ -74,10 +75,10 @@ class Stream:
     cycle:int = 1
 
     def __init__(self, config:Config):
-        self.stream_shift_amount = config.cxi_stream_shift_amount
-        self.p_stream_shift = config.cxi_p_stream_shift
-        self.p_crazy_ivan = config.cxi_p_crazy_ivan
-        self.crazy_ivan_shift_amount = config.cxi_crazy_ivan_shift_amount
+        self.stream_shift_amount = config['cxi_stream_shift_amount']
+        self.p_stream_shift = config['cxi_p_stream_shift']
+        self.p_crazy_ivan = config['cxi_p_crazy_ivan']
+        # self.crazy_ivan_shift_amount = config['cxi_crazy_ivan_shift_amount']
 
 class Beam:
     """And the beam, which is under the control of the operator (or automation),
@@ -94,9 +95,8 @@ class Beam:
     beam_pos = 0.0
 
     def __init__(self, config:Config):
-        self.beam_shift_amount = config.cxi_beam_shift_amount
-        self.physical_acuity = config.cxi_physical_acuity
-        self.beam_pos = config.cxi_beam_pos
+        self.beam_shift_amount = config['cxi_beam_shift_amount']
+        self.physical_acuity = config['cxi_physical_acuity']
 
 class DataPoint:
     """Object to store all the data for each beam point"""
@@ -196,12 +196,12 @@ class AMI:
 
     def __init__(self, config:Config):
         self.samples:List[SampleData] = []
-        self.random_samples = config.random_samples
-        if not config.random_samples:
+        self.random_samples = config['random_samples']
+        if not config['random_samples']:
             sample:SampleData
-            for sample in config.samples:
+            for sample in config['samples']:
                 sample.reset()
-            self.samples = config.samples
+            self.samples = config['samples']
 
     def load_samples(self, number_of_samples:int):
         """Load the samples using a random distribution"""
@@ -234,11 +234,11 @@ class Agenda:
     status = None
 
     def __init__(self, config:Config):
-        self.experimental_time:timedelta = config.experimental_time
+        self.experimental_time:timedelta = config['experimental_time']
         self.event_timeline:List[Event] = []
         self.experiment_status:ExperimentState = ExperimentState.STOPED
         self.status = None
-        self.number_of_samples = config.number_of_samples
+        self.number_of_samples = config['number_of_samples']
 
     def start_experiment(self):
         """Start the experiment if it has not been started"""
@@ -283,71 +283,45 @@ class Event:
 
 class Config:
     """Contains the configuration of the experiment"""
-    start_time:str = None
+    override_dictionary = None
+    run_number:int = None
+    default_dictionary = None
 
-    number_of_samples:int = None
-    experimental_time:timedelta = None
-    step_through_time:timedelta = None
-    cycle_sleep_time:float = None
+    def __init__(self, override_dictionary, start_time, run_number):
+        self.default_dictionary = {
+        'name_of_experiment': 'run',
+        'start_time': start_time,
+        'reps': 1,
+        'number_of_samples': 5,
+        'experimental_time': timedelta(hours=5),
+        'step_through_time': timedelta(seconds=1),
+        'cycle_sleep_time': 0.0,
+        'display': True,
+        'folder': f"/{str(time())}",
+        'samples': [[SampleData(0.90, 0.80, timedelta(minutes=1))]],
+        'random_samples': False,
+        'da_target_error': 0.001,
+        'op_switch_button_delay_per_cm': 1,
+        'op_button_press_delay': 1,
+        'op_button_distance': 0,
+        'op_functional_acuity': 0.8, # Important
+        'op_noticing_delay': 1.0,
+        'op_decision_delay': 1.0,
+        'cxi_data_per_second': 100,
+        'cxi_time_out_value': 600000,
+        'cxi_stream_shift_amount': 0.05,
+        'cxi_p_stream_shift': 0.15,
+        'cxi_p_crazy_ivan': 0.0001,
+        'cxi_crazy_ivan_shift_amount': 0.0,
+        'cxi_beam_shift_amount': 0.1,
+        'cxi_physical_acuity': 0.2,
+        }
+        self.override_dictionary = override_dictionary
+        self.default_dictionary.update(self.override_dictionary)
+        self.run_number = run_number
 
-    display:bool = None
-    folder:str = None
-    samples:List[SampleData] = None
-    random_samples:bool = None
-
-    da_target_error:float = None
-
-    op_switch_button_delay_per_cm:int = None
-    op_button_press_delay:int = None
-    op_button_distance:int = None
-
-    cxi_data_per_second:int = None
-    cxi_time_out_value:int = None
-    cxi_n_crazy_ivans:int = None
-    cxi_stream_shift_amount:float = None
-    cxi_p_stream_shift:float = None
-    cxi_p_crazy_ivan:float = None
-    cxi_crazy_ivan_shift_amount:float = None
-    cxi_beam_shift_amount:float = None
-    cxi_physical_acuity:float = None
-    cxi_beam_pos:float = None
-
-    def __init__(self, start_time:str, number_of_samples:int = 5,
-        experimental_time:timedelta = timedelta(8),
-        step_through_time:timedelta = timedelta(seconds=1), cycle_sleep_time:float = 0.0,
-        display:bool = True, folder:str = '', samples:List[SampleData] = None,
-        random_samples:bool = True, da_target_error:float = 0.001,
-        op_switch_button_delay_per_cm:int = 1, op_button_press_delay:int = 1,
-        op_button_distance:int = 0, cxi_data_per_second:int = 100,
-        cxi_time_out_value:int = 600000, cxi_n_crazy_ivans:int = 0,
-        cxi_stream_shift_amount:float = 0.0, cxi_p_stream_shift:float = 0.0,
-        cxi_p_crazy_ivan:float = 0.0, cxi_crazy_ivan_shift_amount:float = 0.0,
-        cxi_beam_shift_amount:float = 0.0, cxi_physical_acuity:float = 0.2,
-        cxi_beam_pos:float = 0.0):
-
-        self.start_time = start_time
-        self.number_of_samples = number_of_samples
-        self.experimental_time = experimental_time
-        self.step_through_time = step_through_time
-        self.cycle_sleep_time = cycle_sleep_time
-        self.display = display
-        self.folder = folder
-        self.samples = samples
-        self.random_samples = random_samples
-        self.da_target_error = da_target_error
-        self.op_switch_button_delay_per_cm = op_switch_button_delay_per_cm
-        self.op_button_press_delay = op_button_press_delay
-        self.op_button_distance = op_button_distance
-        self.cxi_data_per_second = cxi_data_per_second
-        self.cxi_time_out_value = cxi_time_out_value
-        self.cxi_n_crazy_ivans = cxi_n_crazy_ivans
-        self.cxi_stream_shift_amount = cxi_stream_shift_amount
-        self.cxi_p_stream_shift = cxi_p_stream_shift
-        self.cxi_p_crazy_ivan = cxi_p_crazy_ivan
-        self.cxi_crazy_ivan_shift_amount = cxi_crazy_ivan_shift_amount
-        self.cxi_beam_shift_amount = cxi_beam_shift_amount
-        self.cxi_physical_acuity = cxi_physical_acuity
-        self.cxi_beam_pos = cxi_beam_pos
+    def __getitem__(self, key):
+        return self.default_dictionary[key]
 
     def make_dirs(self, directorys:List[str]) -> List[str]:
         """Make directories"""
@@ -356,6 +330,12 @@ class Config:
             os.makedirs(os.path.dirname(directory), exist_ok=True)
             return_list.append(directory)
         return return_list
+    
+    def __str__(self):
+        return_string = ""
+        for key, value in self.default_dictionary.items():
+            return_string += f'{key}\t{value}\n'
+        return return_string
 
 class Context:
     """http://www.corej2eepatterns.com/ContextObject.htm"""
