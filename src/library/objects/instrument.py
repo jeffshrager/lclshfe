@@ -2,10 +2,12 @@
 import random
 from datetime import timedelta
 from termcolor import colored
-from src.library.objects.enums import InstrumentType
+from src.enums.jig_enums import SaveType
+from src.enums.model_enums import InstrumentType
 from src.library.functions.func import clamp, get_current_datapoints, aquire_data
-from src.library.objects.objs import Beam, Config, Context, DataPoint, \
+from src.library.objects.objs import Beam, Context, DataPoint, \
     InstrumentStatus, SampleData, Stream
+from src.settings.config import Config
 
 class Instrument:
     """Instrument Parent Class"""
@@ -97,27 +99,19 @@ class Instrument:
         self.instrument_status.msg = ""
         # Stop if it hits the wall on either side
         if abs(self.stream_status.stream_pos)>1.0:
+            context.ami.samples[self.current_sample].wall_hits += 1
             # FFF: End run and handle all events that would end the run early
             return
         if random.random() < self.stream_status.p_crazy_ivan:
             self.instrument_status.n_crazy_ivans = self.instrument_status.n_crazy_ivans + 1
             self.instrument_status.msg = self.instrument_status.msg + "!!!"
-            # If response target has not already been set, it will be 99999999999.
-            # If it has been set, it will be whatever number it is (e.g., now+20)
-            # Only change the response cycle if it has not been set (i.e., 99999999999)
             self.stream_status.stream_pos = round(self.stream_status.stream_pos + (
                 self.stream_status.crazy_ivan_shift_amount * random.choice(
                     [i for i in range(-1, 2) if i not in [0]])), 4)
-            if self.stream_status.allow_response_cycle == 99999999999:
-                self.stream_status.allow_response_cycle = self.stream_status.cycle \
-                    + context.agent_op.operator_response_delay(context)
         elif random.random() < self.stream_status.p_stream_shift:
             self.stream_status.stream_pos = round(self.stream_status.stream_pos + (
                 self.stream_status.stream_shift_amount * random.choice(
                     [i for i in range(-1, 2) if i not in [0]])), 4)
-            if self.stream_status.allow_response_cycle == 99999999999:
-                self.stream_status.allow_response_cycle = self.stream_status.cycle \
-                    + context.agent_op.operator_response_delay(context)
         context.messages.concatbegining(f"{self.show_pos()}\n{get_current_datapoints(context)}\n")
         if self.stream_status.cycle >= self.stream_status.allow_response_cycle:
             self.instrument_status.msg = self.instrument_status.msg + "<?>"
@@ -164,7 +158,8 @@ class Instrument:
                             # Tik Tak Toe Board Data
                             [[1.0, 0.0, 1.0], [0.0, None, 0.0], [1.0, 0.0, 1.0]]
                             )
-                    context.data_file.write(f"{self.current_sample}\t{current_sample.count}\t{datapoint.quality:.15f}\t{current_sample.file_string()}\n")
+                    if context.config['save_type'] == SaveType.DETAILED:
+                        context.data_file.write(f"{self.current_sample}\t{current_sample.count}\t{datapoint.quality:.15f}\t{current_sample.file_string()}\n")
                     current_sample.append(datapoint)
                 self.last_data_update = context.current_time
 
@@ -198,6 +193,7 @@ class CXI(Instrument):
             if not sample_goal.compleated and not sample_goal.timeout:
                 self.current_sample = index
                 break
-        context.data_file.write("sample #\tcount\tdata\tpreformance quality\tweight\tmean\tm2\tvariance\tsdev\terr\n")
+        if context.config['save_type'] == SaveType.DETAILED:
+            context.data_file.write("sample #\tcount\tdata\tpreformance quality\tweight\tmean\tm2\tvariance\tsdev\terr\n")
         self.previous_sample = context.ami.samples[self.current_sample]
         return True

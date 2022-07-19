@@ -3,9 +3,11 @@ from datetime import timedelta
 import random
 from termcolor import colored
 from scipy.stats import linregress
-from src.library.objects.enums import AgentType
+from src.enums.jig_enums import SaveType
+from src.enums.model_enums import AgentType
 from src.library.functions.func import clamp, cognative_temperature_curve
-from src.library.objects.objs import Config, Context, SampleData
+from src.library.objects.objs import Context, SampleData
+from src.settings.config import Config
 
 class Person:
     """Agent Parent Class"""
@@ -24,7 +26,7 @@ class Person:
     cognative_temperature:float = None
     cogtemp_curve:float = None
     # 1.0 / 0.002 = 8.3, total level of energy / minutes = 8.3 total hours of energy
-    energy_degradation:float = 0.002
+    energy_degradation:float = 0.000
 
     attention_meter:float = None
 
@@ -54,13 +56,14 @@ class Person:
         """Update attention and focus"""
         # TODO _: energy degredation on a curve
         # TODO: coupled also on a curve
-        delta:timedelta = context.current_time - self.previous_check
-        if delta >= timedelta(minutes=1):
-            self.cogtemp_curve = clamp(self.cogtemp_curve + self.energy_degradation, 0.0, 1.0)
-            self.cognative_temperature = clamp(cognative_temperature_curve(self.cogtemp_curve), 0.01, 1.0)
-            self.previous_check = context.current_time
-        self.noticing_delay = 1 + (1 - self.cognative_temperature)
-        self.decision_delay = 1 + (1 - self.cognative_temperature)
+        pass
+        # delta:timedelta = context.current_time - self.previous_check
+        # if delta >= timedelta(minutes=1):
+        #     self.cogtemp_curve = clamp(self.cogtemp_curve + self.energy_degradation, 0.0, 1.0)
+        #     self.cognative_temperature = clamp(cognative_temperature_curve(self.cogtemp_curve), 0.01, 1.0)
+        #     self.previous_check = context.current_time
+        # self.noticing_delay = 1 + (1 - self.cognative_temperature)
+        # self.decision_delay = 1 + (1 - self.cognative_temperature)
 
 class DataAnalyst(Person):
     """Retrives data from the instrument"""
@@ -86,7 +89,7 @@ class DataAnalyst(Person):
                 context.ami.samples[context.instrument.current_sample].projected_intercept = self.projected_intercept
                 if self.projected_intercept <= current_sample.count:
                     context.printer(f"DA: Data from run {context.instrument.run_number} {colored('has enough data to analyse', 'green')}", f"DA: Data from run {context.instrument.run_number} has enough data to analyse")
-                    return True
+            return True
         return False
 
     def check_if_data_is_sufficient(self, context:Context) -> bool:
@@ -127,6 +130,7 @@ class Operator(Person):
     button_distance = None  # cm
     which_button_were_on = "<<"  # or ">>"
     running_peak_chasing = False
+    allow_response_cycle = 99999999999
 
     def __init__(self, config:Config):
         super().__init__(AgentType.OP)
@@ -153,7 +157,12 @@ class Operator(Person):
 
     def track_stream_position(self, context:Context):
         "Move beam"
-        context.instrument.beam_status.beam_pos = round(self.tracker_tool(context), 4)
+        if self.allow_response_cycle == 99999999999:
+            self.allow_response_cycle = context.instrument.stream_status.cycle + self.operator_response_delay(context)
+        if context.instrument.stream_status.cycle >= self.allow_response_cycle:
+            context.instrument.beam_status.beam_pos = round(self.tracker_tool(context), 4)
+        if abs(context.instrument.beam_status.beam_pos - context.instrument.stream_status.stream_pos) < self.functional_acuity:
+            self.allow_response_cycle = 99999999999
 
     def tracker_tool(self, context:Context):
         """FFF This should use a model of visual UI-mediated visual acuity,
@@ -161,6 +170,9 @@ class Operator(Person):
         which_way = self.which_way_do_we_need_to_shift(context)
         if which_way == "none":
             context.instrument.instrument_status.msg = context.instrument.instrument_status.msg + "(FA)"
+            delta = abs(context.instrument.beam_status.beam_pos - context.instrument.stream_status.stream_pos)
+            context.instrument.stream_status.stream_pos = 0.0 + delta
+            context.instrument.beam_status.beam_pos = 0.0
             return context.instrument.beam_status.beam_pos
         elif which_way == "<<":
             context.printer(f"OP: {colored('Move Beam <<', 'blue')}", "OP: Move Beam <<")
@@ -240,7 +252,8 @@ class ExperimentManager(Person):
         if self.previous_sample is not None:
             if self.current_transition_time is None:
                 self.current_transition_time = timedelta(minutes=random.uniform(0.2, 2.0))
-                context.file_write(f"Instrument transition: {self.current_transition_time}")
+                if context.config['save_type'] == SaveType.DETAILED:
+                    context.file_write(f"Instrument transition: {self.current_transition_time}")
             if self.current_transition_time > timedelta(0):
                 if self.previous_transition_check is None:
                     self.previous_transition_check = context.current_time
@@ -281,12 +294,12 @@ class ExperimentManager(Person):
         if context.agent_da.check_if_enough_data_to_analyse(context):
         # and 0 == random.randint(0, 30):
             # TODO: Timer
-            if self.previous_data_check is None:
-                self.previous_data_check = context.current_time
-            elif self.previous_data_check + self.data_check_wait <= context.current_time:
-                self.previous_data_check = context.current_time
-            else:
-                return False
+            # if self.previous_data_check is None:
+            #     self.previous_data_check = context.current_time
+            # elif self.previous_data_check + self.data_check_wait <= context.current_time:
+            #     self.previous_data_check = context.current_time
+            # else:
+            #     return False
             context.printer(f"EM: {colored('Ask DA if data is sufficient', 'green')}", "EM: Ask DA if data is sufficient")
             if context.agent_da.check_if_data_is_sufficient(context):
                 context.printer(f"EM: {colored('Tell operator to stop collecting data', 'blue')}", "EM: Tell operator to stop collecting data")

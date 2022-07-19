@@ -37,8 +37,10 @@ def config_print(dictionary:dict) -> str:
 
 def runs_to_xyz(config, runs):
     """Runs to xyz"""
-    y_axis = [y for y in range(len(config['samples'][0]))]
-    
+
+    # y_axis = [y for y in range(len(config['reps']))]
+    y_axis = [0, 1, 2, 3]
+
     max_count = 0
     run:AMI
     for sample in y_axis:

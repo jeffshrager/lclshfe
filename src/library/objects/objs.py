@@ -7,9 +7,12 @@ from typing import TYPE_CHECKING, List
 from io import TextIOWrapper
 import random
 from datetime import datetime, timedelta
-from src.library.objects.enums import ExperimentState, InstrumentRunState
+import numpy as np
+from src.enums.jig_enums import SaveType
+from src.enums.model_enums import ExperimentState, InstrumentRunState
 from src.library.functions.func import clamp
 if TYPE_CHECKING:
+    from src.settings.config import Config
     from src.library.objects.agent import DataAnalyst, ExperimentManager, Operator
     from src.library.objects.instrument import CXI
 
@@ -142,6 +145,7 @@ class SampleData:
         self.count_array = []
         self.err_array = []
         self.projected_intercept = 0.0
+        self.wall_hits = 0.0
 
     def append(self, data:DataPoint):
         """Append new data point run Welford's algorithm calculations
@@ -177,8 +181,12 @@ class SampleData:
         """Return a string that can be written to a file"""
         return (f'{self.preformance_quality}\t{self.weight}\t{self.mean:.15f}\t'+
         f'{self.m_2:.15f}\t{self.variance:.15f}\t{self.sdev:.15f}\t{self.err:.15f}')
-
+    
     def __str__(self):
+        return f"{self.preformance_quality:.2f}"
+
+    def get_stats(self):
+        """Return the stats of the data"""
         return (f"pq:{self.preformance_quality:.6f}, mean:{self.mean:.6f}, err:{self.err:.6f},"+
             f" var:{self.variance:.6f}, dev:{self.sdev:.6f} intercept:{self.projected_intercept}"
             if self.count != 0 else "pq:0.0, mean:0.0, err:0.0, var:0.0, dev:0.0, intercept:0.0")
@@ -218,11 +226,65 @@ class AMI:
         """Get current Sample"""
         return self.samples[context.instrument.current_sample]
 
+    def get_mean(self) -> List[float]:
+        """Return the mean of the samples"""
+        mean_list = []
+        for sample in self.samples:
+            sample_list = []
+            for data in sample.data:
+                sample_list.append(data.quality)
+            mean_list.append(np.mean(sample_list))
+        return mean_list
+    
+    def get_stdev(self) -> List[float]:
+        """Return the standard deviation of the samples"""
+        stdev_list = []
+        for sample in self.samples:
+            sample_list = []
+            for data in sample.data:
+                sample_list.append(data.quality)
+            stdev_list.append(np.std(sample_list))
+        return stdev_list
+    
+    def get_err(self) -> List[float]:
+        """Return the error of the samples"""
+        err_list = []
+        for sample in self.samples:
+            sample_list = []
+            for data in sample.data:
+                sample_list.append(data.quality)
+            err_list.append(np.std(sample_list) / sqrt(len(sample_list)))
+        return err_list
+    
+    def get_var(self) -> List[float]:
+        """Return the variance of the samples"""
+        variance_list = []
+        for sample in self.samples:
+            sample_list = []
+            for data in sample.data:
+                sample_list.append(data.quality)
+            variance_list.append(np.var(sample_list))
+        return variance_list
+    
+    def get_n(self) -> List[float]:
+        """Return the number of samples"""
+        n_list = []
+        for sample in self.samples:
+            n_list.append(len(sample.data))
+        return n_list
+    
+    def get_wall_hits(self) -> List[float]:
+        """Return the number of samples"""
+        wall_hit_list = []
+        for sample in self.samples:
+            wall_hit_list.append(sample.wall_hits)
+        return wall_hit_list
+
     def __str__(self):
         return_string = ""
         for sample in self.samples:
             # pq, mean, err, var, dev
-            return_string += f'N: {len(sample.data): >6} - {sample}\n'
+            return_string += f'N: {len(sample.data): >6} - {sample.get_stats()}\n'
         return return_string
 
 class Agenda:
@@ -281,62 +343,6 @@ class Event:
         return (f"Run: {self.run_number: >2}, Timeout: {self.time_out}, Start: {self.start_time}, "+
             f"End: {self.end_time}, Duration: {self.end_time - self.start_time}\n")
 
-class Config:
-    """Contains the configuration of the experiment"""
-    override_dictionary = None
-    run_number:int = None
-    default_dictionary = None
-
-    def __init__(self, override_dictionary, start_time, run_number):
-        self.default_dictionary = {
-        'name_of_experiment': 'run',
-        'start_time': start_time,
-        'reps': 1,
-        'number_of_samples': 5,
-        'experimental_time': timedelta(hours=5),
-        'step_through_time': timedelta(seconds=1),
-        'cycle_sleep_time': 0.0,
-        'display': True,
-        'folder': f"/{str(time())}",
-        'samples': [[SampleData(0.90, 0.80, timedelta(minutes=1))]],
-        'random_samples': False,
-        'da_target_error': 0.001,
-        'op_switch_button_delay_per_cm': 1,
-        'op_button_press_delay': 1,
-        'op_button_distance': 0,
-        'op_functional_acuity': 0.8, # Important
-        'op_noticing_delay': 1.0,
-        'op_decision_delay': 1.0,
-        'cxi_data_per_second': 100,
-        'cxi_time_out_value': 600000,
-        'cxi_stream_shift_amount': 0.05,
-        'cxi_p_stream_shift': 0.15,
-        'cxi_p_crazy_ivan': 0.0001,
-        'cxi_crazy_ivan_shift_amount': 0.0,
-        'cxi_beam_shift_amount': 0.1,
-        'cxi_physical_acuity': 0.2,
-        }
-        self.override_dictionary = override_dictionary
-        self.default_dictionary.update(self.override_dictionary)
-        self.run_number = run_number
-
-    def __getitem__(self, key):
-        return self.default_dictionary[key]
-
-    def make_dirs(self, directorys:List[str]) -> List[str]:
-        """Make directories"""
-        return_list:List[str]= []
-        for directory in directorys:
-            os.makedirs(os.path.dirname(directory), exist_ok=True)
-            return_list.append(directory)
-        return return_list
-    
-    def __str__(self):
-        return_string = ""
-        for key, value in self.default_dictionary.items():
-            return_string += f'{key}\t{value}\n'
-        return return_string
-
 class Context:
     """http://www.corej2eepatterns.com/ContextObject.htm"""
     current_time:timedelta = None
@@ -377,7 +383,8 @@ class Context:
     def printer(self, console:str, file:str):
         """Print message to console"""
         self.messages.concat(f"{console}\n")
-        self.file_write(file)
+        if self.config['save_type'] == SaveType.DETAILED:
+            self.file_write(file)
 
     def update(self):
         """Make sure all objects are updated"""

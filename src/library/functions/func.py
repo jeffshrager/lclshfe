@@ -66,7 +66,7 @@ def clamp(num:float, min_value:float, max_value:float):
     return max(min(num, max_value), min_value)
 
 def create_experiment_figure(context:Context, display:bool):
-    """Create plotly timeline figure and display it"""
+    """Depriciated: Create plotly timeline figure and display it"""
     if display:
         data_frame = pd.DataFrame([])
         for event in context.agenda.event_timeline:
