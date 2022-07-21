@@ -1,15 +1,13 @@
 """Collection of objects"""
 from __future__ import annotations
 from math import sqrt
-import os
-from time import time
 from typing import TYPE_CHECKING, List
 from io import TextIOWrapper
 import random
 from datetime import datetime, timedelta
 import numpy as np
-from src.enums.jig_enums import SaveType
-from src.enums.model_enums import ExperimentState, InstrumentRunState
+from src.library.enums.jig_enums import SaveType
+from src.library.enums.model_enums import ExperimentState, InstrumentRunState
 from src.library.functions.func import clamp
 if TYPE_CHECKING:
     from src.settings.config import Config
@@ -176,6 +174,7 @@ class SampleData:
         self.err = 0.0
         self.count_array = []
         self.err_array = []
+        self.wall_hits = 0.0
 
     def file_string(self) -> str:
         """Return a string that can be written to a file"""

@@ -1,5 +1,6 @@
 """Collection of functions"""
 from __future__ import annotations
+from math import tanh
 from typing import TYPE_CHECKING
 from numpy import random
 import plotly.express as px
@@ -39,20 +40,25 @@ def get_current_datapoints(context:Context) -> str:
     return_string = ""
     for index, data in enumerate(current_sample.data[-60:]):
         return_string += (colored(f'{data}', 'green'
-        if data.quality >= aquire_data(0.001, current_sample.preformance_quality
-        ) else 'yellow' if data.quality >= aquire_data(0.03, current_sample.preformance_quality
+        if data.quality >= aquire_data(0.001, current_sample.preformance_quality, context
+        ) else 'yellow' if data.quality >= aquire_data(0.03, current_sample.preformance_quality, context
         ) else 'red') + ("\n" if index == 19 or index == 39 else " "))
     return return_string
 
-def aquire_data(distance:float, preformance_quality:float) -> float:
+def aquire_data(distance:float, preformance_quality:float, context:Context) -> float:
     """given distance calculate gaussian according to this:
     https://www.desmos.com/calculator/1dc980vuj1"""
     preformance_disquality = 1 - preformance_quality
-    # cumulative_deviation = (0.125 / (0.05 * sqrt(2 * pi))) * pow(e, -0.5 * pow(distance / 0.05, 2))
+    # cumulative_deviation = (0.125 / (0.05 * sqrt(2 * pi))) * pow(e, -0.5 * pow(distance/ 0.05, 2))
     # FFF: Figure out what this should really be
-    cumulative_deviation = preformance_disquality + distance
+    # print(context.current_time.total_seconds()/1000)
+    # TODO: Add instument instability to config
+    # Have this reset for every shift change
+    instrument_instability = 1 - tanh(context.current_time.total_seconds()/10000)
+    cumulative_deviation = preformance_disquality + distance + instrument_instability
     # Gaussian distribution
     # https://towardsdatascience.com/gaussian-mixture-models-with-python-36dabed6212a
+    # Add system stability, hyperbolic tangent
     data = random.normal(loc=1.0, scale=cumulative_deviation)
     return data
 

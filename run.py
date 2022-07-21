@@ -1,42 +1,116 @@
 """Run File"""
-import dash
-from dash import html
-import dash_pivottable
 from datetime import timedelta
-from src.settings.jig import depriciated_display, jig, stats
-from src.enums.jig_enums import SaveType
+from src.jig import depriciated_display, jig, stats
+from src.library.enums.jig_enums import SaveType
 from src.library.objects.objs import SampleData
 
 override_dictionary = {
-    'name_of_experiment': ['op_delay1-20'],
+    'experiment_name': ['to_delete'],
     'save_type': [SaveType.COLLAPSED],
-    'reps': [x for x in range(20)],
-    'op_noticing_delay': [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 20.0],
+    'reps': [x for x in range(1)],
+    'op_noticing_delay': [1.0],
+    # 'cycle_sleep_time': [0.1],
+    # 'experimental_time': [timedelta(seconds=2500)],
     'samples': [
-        [SampleData(0.45, 0.80, timedelta(minutes=1)) for _ in range(10)],
-        [SampleData(0.50, 0.80, timedelta(minutes=1)) for _ in range(10)],
-        [SampleData(0.55, 0.80, timedelta(minutes=1)) for _ in range(10)],
-        [SampleData(0.60, 0.80, timedelta(minutes=1)) for _ in range(10)],
-        [SampleData(0.65, 0.80, timedelta(minutes=1)) for _ in range(10)],
-        [SampleData(0.70, 0.80, timedelta(minutes=1)) for _ in range(10)],
-        [SampleData(0.75, 0.80, timedelta(minutes=1)) for _ in range(10)],
-        [SampleData(0.80, 0.80, timedelta(minutes=1)) for _ in range(10)],
-        [SampleData(0.85, 0.80, timedelta(minutes=1)) for _ in range(10)],
-        [SampleData(0.90, 0.80, timedelta(minutes=1)) for _ in range(10)],
-        [SampleData(0.95, 0.80, timedelta(minutes=1)) for _ in range(10)],
+        # [SampleData(0.90, 0.80, timedelta(minutes=0)) for _ in range(25)],
+        [SampleData(0.75, 0.80, timedelta(minutes=1)) for _ in range(2)],
+        # [SampleData(0.80, 0.80, timedelta(minutes=1)) for _ in range(5)],
+        # [SampleData(0.85, 0.80, timedelta(minutes=1)) for _ in range(5)],
+        # [SampleData(0.90, 0.80, timedelta(minutes=1)) for _ in range(5)],
+        # [SampleData(0.95, 0.80, timedelta(minutes=1)) for _ in range(5)],
     ],
 }
 
-# display(jig(override_dictionary))
+# jig({})
 jig(override_dictionary)
+
+# display(jig(override_dictionary))
 # stats("Big_Set_1657959904.283649")
 # depriciated_display("op_delay1-7/1658207804.691573")
 
+# TODO: Create that file -
+
+
+# Jig generalization,
+# Every 50 added mean and stddev for the whole thing
+# PQ ond, 
+# Create a dictionary whos index is a tag array and has all the results of the run in it
+
+# Y is measure of overall run efficency
+# Worse data you can get it faster, total time for run independant variable
+# We really let it run, do planning as though it would get cut off but not
+
+# How effective is it to add reasoning support at these different levels
+# Over some set of parameterization it would change overall run preformance
+
+# Dependent accis is the avereage overall data quality modulated by importance
+# perfect is in time alloted 0.001 on all samples
+
+# use the esitmate for higher quality data
+# If it gets cut off you end with the data quality point you were at
+
+# 2 ways to get cut off the end, the EM might say this is going to take too long,
+
+# Command to cut off and switch samples
+
+
+# EM this is taking so long not able to take all bump error threshold, peak chasing end of experiment
+# EM has decision to change it, DA changes it
+# EM says to change it to 0.002
+
+
+# Precision calculation - goes into ROI
 
 
 
+# III
+# - Up Side
+# - What I have now and scheduling
+# - Sorting the samples by pq as a proxy for importance
+# - 3 catagorys of samples
+# Most Important, Less Important, Everything else, experimental
+# Scheduling, most data on most important things
+# Quality assurance error to 0.001
+# Very low quality data not important, you would abort that and do high importance
+# Oportunistic planning - Alwayse doing this
+# opportunity to replan
+# Stability of the machine
+# Data aquasition randomness
+
+# Good Bad
+# 5 care, 5 not
+# PQ does down by .25
 
 
+# Run 1s until stability
+# then run 2s after stable
+# only controll after switching is error threshold
+# Also prediction is important
+
+# At the higher level, over the whole 3-4 days
+# 25 samples, 5 different importance levels,
+# pq counting down by .1 for each sample
+# Importance is a step scale
+# 5 is most important 1 is least
+
+# 15 min delay
+
+# Label this one is done,
+
+# Map stability curve on experiment
+# very unstable
+
+
+# Run lowest preformance to take out the instability
+# get a sence of how long each sample takes once reaches asemptote
+# Then start running important sample
+
+# Running out with water instability
+# IF the thing is stable put most important sample in
+# Understand how long they are taking
+# Run one lowest quality
+# see how fast the error rate goes down update estimate
+# if its more than an hour for all of them, accept more error
 
 
 

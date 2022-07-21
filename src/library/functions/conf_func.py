@@ -1,5 +1,7 @@
 """Configuration Functions"""
 import itertools
+import os
+import pickle
 
 from src.library.objects.objs import AMI
 
@@ -18,6 +20,58 @@ def cartesian_product(**kwargs):
     vals = kwargs.values()
     for instance in itertools.product(*vals):
         yield dict(zip(keys, instance))
+
+def sort_combinations(override_dictionary:dict, dictionary:dict, raw_combinations:list):
+    """sort combinations"""
+    combinations = []
+    temp_list = list(cartesian_product(**override_dictionary)) if override_dictionary else {
+    'experiment_name': dictionary['experiment_name'][0]}
+    number_of_combinations:int = len(temp_list)
+    for com in range(number_of_combinations):
+        for rep in dictionary['reps']:
+            combinations.append(raw_combinations[com+(rep*number_of_combinations)])
+    return combinations
+
+def collapsed_file_setup(dictionary:dict, folder:str) -> bool:
+    """If savetype is collapsed setup file"""
+    os.makedirs(os.path.dirname(f"results/{folder}/collapsed.tsv"), exist_ok=True)
+    with open(f"results/{folder}/collapsed.tsv", "w", encoding="utf-8") as file:
+        for key in dictionary.keys():
+            file.write(f"{key}\t")
+        file.write("N\twall_hits\trun\tmean\tstdev\terr\tvar\tpq")
+        file.write("\n")
+
+def add_time_num(dictionary:dict, time:float, run_number:int) -> dict:
+    """Add Start Time and Run Number"""
+    dictionary.update({'start_time': time})
+    dictionary.update({'run_number': run_number})
+    return dictionary
+
+def dictionary_dump(dictionary:dict, name:str, folder:str) -> bool:
+    """pickle dump dictionary"""
+    os.makedirs(f"results/{folder}/dictionaries", exist_ok=True)
+    with open(f'results/{folder}/dictionaries/{name}.dictionary', 'wb') as file:
+        pickle.dump(dictionary, file)
+
+def combination_check(combinations:list):
+    """Show user the combinations to run and ask if correct"""
+    print(*(config_print(combination) for combination in combinations), sep='\n')
+    print(len(combinations))
+    val = input("run y/n: ")
+    if val != "y":
+        exit()
+
+def trim_override_dictionary(dictionary:dict) -> dict:
+    """Removing non repetitive items from dictionary"""
+    if 'reps' in dictionary:
+        del dictionary['reps']
+    if 'save_type' in dictionary:
+        del dictionary['save_type']
+    if 'start_time' in dictionary:
+        del dictionary['start_time']
+    if 'run_number' in dictionary:
+        del dictionary['run_number']
+    return dictionary
 
 def config_print(dictionary:dict) -> str:
     """Config print"""

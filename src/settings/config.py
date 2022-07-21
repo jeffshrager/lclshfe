@@ -3,29 +3,25 @@ from datetime import timedelta
 import os
 from time import time
 from typing import List
-from src.enums.jig_enums import SaveType
+from src.library.enums.jig_enums import SaveType
 from src.library.objects.objs import SampleData
 
 class Config:
     """Contains the configuration of the experiment"""
     override_dictionary = None
-    run_number:int = None
     default_dictionary = None
 
-    def __init__(self, override_dictionary, start_time, run_number):
-        # Add Ranges
+    def __init__(self, override_dictionary):
         self.default_dictionary = {
-        'name_of_experiment': ['default_run'],
-        'start_time': start_time,
-        'reps': 1,
+        'experiment_name': ['default_run'],
+        'reps': [0],
         'save_type': SaveType.COLLAPSED,
-        'number_of_samples': 5,
         'experimental_time': timedelta(hours=5),
         'step_through_time': timedelta(seconds=1),
         'cycle_sleep_time': 0.0,
         'display': True,
-        'folder': f"/{str(time())}",
-        'samples': [[SampleData(0.90, 0.80, timedelta(minutes=1))]],
+        'number_of_samples': 5,
+        'samples': [SampleData(0.90, 0.80, timedelta(minutes=1))],
         'random_samples': False,
         'da_target_error': 0.001,
         'op_switch_button_delay_per_cm': 1,
@@ -45,7 +41,6 @@ class Config:
         }
         self.override_dictionary = override_dictionary
         self.default_dictionary.update(self.override_dictionary)
-        self.run_number = run_number
 
     def __getitem__(self, key):
         return self.default_dictionary[key]

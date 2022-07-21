@@ -3,7 +3,7 @@ import copy
 import os
 from time import sleep
 from termcolor import colored
-from src.enums.jig_enums import SaveType
+from src.library.enums.jig_enums import SaveType
 from src.library.objects.objs import AMI, Agenda, CommunicationObject, Context
 from src.library.objects.agent import DataAnalyst, ExperimentManager, Operator
 from src.library.objects.instrument import CXI
@@ -17,13 +17,13 @@ def model(config:Config) -> AMI:
     c_data_file = None
     context:Context = None
     if config['save_type'] == SaveType.DETAILED:
-        config.make_dirs([f"results/{config['name_of_experiment']}/{config['start_time']}/run_{config.run_number + 1}/model/r{config['start_time']}.tsv",
-            f"results/{config['name_of_experiment']}_{config['start_time']}/run_{config.run_number + 1}/data/r{config['start_time']}.tsv"])
-        with open(f"results/{config['name_of_experiment']}/{config['start_time']}/run_{config.run_number + 1}/config.tsv", "w", encoding="utf-8") as config_file:
+        config.make_dirs([f"results/{config['experiment_name']}/{config['start_time']}/run_{config['run_number'] + 1}/model/r{config['start_time']}.tsv",
+            f"results/{config['experiment_name']}_{config['start_time']}/run_{config['run_number'] + 1}/data/r{config['start_time']}.tsv"])
+        with open(f"results/{config['experiment_name']}/{config['start_time']}/run_{config['run_number'] + 1}/config.tsv", "w", encoding="utf-8") as config_file:
             config_file.write(str(config))
-        with open(f"results/{config['name_of_experiment']}/{config['start_time']}/run_{config.run_number + 1}/model/r{config['start_time']}.tsv", "w", encoding="utf-8") as file:
+        with open(f"results/{config['experiment_name']}/{config['start_time']}/run_{config['run_number'] + 1}/model/r{config['start_time']}.tsv", "w", encoding="utf-8") as file:
             c_file = file
-        with open(f"results/{config['name_of_experiment']}/{config['start_time']}/run_{config.run_number + 1}/data/r{config['start_time']}.tsv", "w", encoding="utf-8") as data_file:
+        with open(f"results/{config['experiment_name']}/{config['start_time']}/run_{config['run_number'] + 1}/data/r{config['start_time']}.tsv", "w", encoding="utf-8") as data_file:
             c_data_file = data_file
 
     context = Context( AMI(config), Agenda(config), DataAnalyst(config),
@@ -79,7 +79,7 @@ def model(config:Config) -> AMI:
         header_list.append('wall_hits')
         value_list.append(context.ami.get_wall_hits())
         header_list.append('run')
-        value_list.append(context.config.run_number)
+        value_list.append(context.config['run_number'])
         # TODO: this should all be from sample
         header_list.append('mean')
         value_list.append(context.ami.get_mean())
@@ -92,8 +92,10 @@ def model(config:Config) -> AMI:
         header_list.append('pq')
         value_list.append(config['samples'][0].preformance_quality)
         condensed_dict = dict(zip(header_list, value_list))
-        
-        with open(f"results/{config['name_of_experiment']}/{config['start_time']}/collapsed.tsv", "a", encoding="utf-8") as file:
+
+        if isinstance(config['experiment_name'], list):
+            config.default_dictionary.update({'experiment_name':config['experiment_name'][0]})
+        with open(f"results/{config['experiment_name']}/{config['start_time']}/collapsed.tsv", "a", encoding="utf-8") as file:
             for sample_index, _ in enumerate(config.default_dictionary['samples']):
                 for index, _ in enumerate(header_list):
                     if isinstance(value_list[index], list):

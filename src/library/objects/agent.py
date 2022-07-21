@@ -3,9 +3,8 @@ from datetime import timedelta
 import random
 from termcolor import colored
 from scipy.stats import linregress
-from src.enums.jig_enums import SaveType
-from src.enums.model_enums import AgentType
-from src.library.functions.func import clamp, cognative_temperature_curve
+from src.library.enums.jig_enums import SaveType
+from src.library.enums.model_enums import AgentType
 from src.library.objects.objs import Context, SampleData
 from src.settings.config import Config
 
@@ -13,9 +12,10 @@ class Person:
     """Agent Parent Class"""
     agent_type = ""
     # TODO: Add system stability affect attention level
-    # If the system is unstable attention should increase, if system is stable attention will decrease
-    # We know what the status of the system is use this to callibrate the system
-    # begining they will be focused, not exausted yet, 4pm things go wrong and they are tired
+    # If the system is unstable attention should increase, if system is stable attention
+    # will decrease, We know what the status of the system is use this to callibrate
+    # the system, begining they will be focused, not exausted yet, 4pm things go
+    # wrong and they are tired
 
     # TODO: Analygous attentional properties will attach to data analyst
     # Hot vs cold cognition, hot rappid makes more mistakes, cold slower more accurate
@@ -42,7 +42,6 @@ class Person:
         self.cogtemp_curve = 0.0
         self.attention_meter = 1.0
         self.previous_check = timedelta(0)
-        
 
     def get_energy(self):
         """get the level of energy"""
@@ -312,17 +311,10 @@ class RemoteUser(Person):
     def __init__(self):
         super().__init__(AgentType.RU)
 
-    def do_stuff(self):
-        """determine if the output of the instrument is good"""
-        pass
-
 class ACROperator(Person):
     """An operator who is in the Accelerator Controll Room"""
-    # FFF: who is the person talking to the ACR operator in the situation that the beam dissapears or has problems
+    # FFF: who is the person talking to the ACR operator in
+    # the situation that the beam dissapears or has problems
     # FFF: or they want to change the photon energy level
     def __init__(self):
         super().__init__(AgentType.ACR)
-
-    def do_stuff(self):
-        """determine if the output of the instrument is good"""
-        pass

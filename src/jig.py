@@ -1,5 +1,4 @@
 """Jig"""
-import copy
 import os
 import pickle
 from statistics import stdev
@@ -8,56 +7,35 @@ from numpy import mean, sqrt, std, var
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
-from src.enums.jig_enums import SaveType
-from src.library.functions.conf_func import cartesian_product, config_print, runs_to_xyz
+from src.library.enums.jig_enums import SaveType
+from src.library.functions.conf_func import add_time_num, cartesian_product, \
+    collapsed_file_setup, combination_check, dictionary_dump, \
+    runs_to_xyz, sort_combinations, trim_override_dictionary
 from src.model import model
 from src.settings.config import Config
 
 def jig(override_dictionary:dict) -> str:
     """Jig"""
-    combinations = []
-    raw_combinations = list(cartesian_product(**override_dictionary))
-    trimmed_combinations = copy.deepcopy(override_dictionary)
-    if 'reps' in trimmed_combinations:
-        del trimmed_combinations['reps']
-    if 'name_of_experiment' in trimmed_combinations:
-        del trimmed_combinations['name_of_experiment']
-    if 'save_type' in trimmed_combinations:
-        del trimmed_combinations['save_type']
-    temp_list = list(cartesian_product(**trimmed_combinations))
-    number_of_combinations:int = len(temp_list)
-
-    for com in range(number_of_combinations):
-        for rep in override_dictionary['reps']:
-            combinations.append(raw_combinations[com + (rep * number_of_combinations)])
-
-    print(*(config_print(combination) for combination in combinations), sep='\n')
-    print(len(combinations))
-    val = input("run y/n: ")
-    if val != "y":
-        exit()
-
-    start_time = str(time())
-    top_level_config = Config(override_dictionary, start_time, 0)
-    experiment_folder = f"{top_level_config['name_of_experiment'][0]}/{top_level_config['start_time']}"
-    os.makedirs(f"results/{experiment_folder}/dictionaries", exist_ok=True)
-    with open(f'results/{experiment_folder}/dictionaries/config.dictionary', 'wb') as config_dictionary_file:
-        pickle.dump(top_level_config, config_dictionary_file)
+    start_time = time()
+    top_level_config = Config(override_dictionary)
+    experiment_folder = f"{top_level_config['experiment_name'][0]}/{str(start_time)}"
+    override_dictionary = trim_override_dictionary(override_dictionary)
+    combinations = sort_combinations(override_dictionary, top_level_config, list(
+        cartesian_product(**override_dictionary)) if override_dictionary else [
+            {'experiment_name': top_level_config['experiment_name'][0]}])
+    combination_check(combinations)
+    dictionary_dump(top_level_config, 'config', experiment_folder)
     os.makedirs(os.path.dirname(f"results/{experiment_folder}/config.tsv"), exist_ok=True)
     with open(f"results/{experiment_folder}/config.tsv", "w", encoding="utf-8") as file:
         file.write(str(top_level_config))
-
+        if isinstance(top_level_config['save_type'], list):
+            top_level_config.default_dictionary.update(
+                {'save_type':top_level_config['save_type'][0]})
     if top_level_config['save_type'] == SaveType.COLLAPSED:
-        os.makedirs(os.path.dirname(f"results/{experiment_folder}/collapsed.tsv"), exist_ok=True)
-    with open(f"results/{experiment_folder}/collapsed.tsv", "w", encoding="utf-8") as file:
-        for key in override_dictionary.keys():
-            file.write(f"{key}\t")
-        file.write("N\twall_hits\trun\tmean\tstdev\terr\tvar\tpq")
-        file.write("\n")
-        # file.write("N\tnoticing_delay\twall_hits\trun\tmean\tstdev\terr\tvarr\tpq\n")
-    runs = [model(Config(combination, start_time, run_number)) for run_number, combination in enumerate(combinations)]
-    with open(f'results/{experiment_folder}/dictionaries/runs.dictionary', 'wb') as runs_dictionary_file:
-        pickle.dump(runs, runs_dictionary_file)
+        collapsed_file_setup(override_dictionary, experiment_folder)
+    runs = [model(Config(add_time_num(combination, start_time, run_number))
+        ) for run_number, combination in enumerate(combinations)]
+    dictionary_dump(runs, 'runs', experiment_folder)
     return experiment_folder
 
 def stats(folder:str) -> bool:

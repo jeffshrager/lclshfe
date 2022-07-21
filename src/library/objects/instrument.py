@@ -2,8 +2,8 @@
 import random
 from datetime import timedelta
 from termcolor import colored
-from src.enums.jig_enums import SaveType
-from src.enums.model_enums import InstrumentType
+from src.library.enums.jig_enums import SaveType
+from src.library.enums.model_enums import InstrumentType
 from src.library.functions.func import clamp, get_current_datapoints, aquire_data
 from src.library.objects.objs import Beam, Context, DataPoint, \
     InstrumentStatus, SampleData, Stream
@@ -146,7 +146,7 @@ class Instrument:
                 distance = abs(self.stream_status.stream_pos - self.beam_status.beam_pos)
                 for _ in range(int(delta.total_seconds()) * self.data_per_second):
                     datapoint:DataPoint = DataPoint(clamp(aquire_data(distance,
-                            current_sample.preformance_quality) \
+                            current_sample.preformance_quality, context) \
                             # QQQ: Do we need this, line below?
                             # * current_sample.preformance_quality \
                             # Additional pipeline noise not dependent on the sample or anything else
