@@ -1,39 +1,37 @@
 """Run File"""
-from datetime import timedelta
+import numpy as np
 from src.jig import depriciated_display, jig, stats
 from src.library.enums.jig_enums import SaveType
+from src.library.enums.model_enums import SampleImportance, SampleType
 from src.library.objects.objs import SampleData
 
 override_dictionary = {
-    'experiment_name': ['to_delete'],
-    'save_type': [SaveType.COLLAPSED],
-    'reps': [x for x in range(1)],
-    'op_noticing_delay': [1.0],
-    # 'cycle_sleep_time': [0.1],
+    'settings': {
+        'name': ['to_delete'],
+        'save_type': [SaveType.COLLAPSED],
+    },
+    'reps': [x for x in range(3)],
+    'operator': {'noticing_delay': [1.0, 5.0, 10.0]},
     # 'experimental_time': [timedelta(seconds=2500)],
-    'samples': [
-        # [SampleData(0.90, 0.80, timedelta(minutes=0)) for _ in range(25)],
-        [SampleData(0.75, 0.80, timedelta(minutes=1)) for _ in range(2)],
-        # [SampleData(0.80, 0.80, timedelta(minutes=1)) for _ in range(5)],
-        # [SampleData(0.85, 0.80, timedelta(minutes=1)) for _ in range(5)],
-        # [SampleData(0.90, 0.80, timedelta(minutes=1)) for _ in range(5)],
-        # [SampleData(0.95, 0.80, timedelta(minutes=1)) for _ in range(5)],
-    ],
+    'samples': {
+        'samples': [
+            [SampleData(round(0.95 - i, 2), SampleImportance.IMPORTANT, SampleType.TAPE) for i in np.arange(0.0, 0.125, 0.025)],
+            # [SampleData(round(0.95 - i, 2), SampleImportance.UNIMPORTANT, SampleType.TAPE) for i in np.arange(0.0, 0.125, 0.025)],
+        ],
+    }
 }
 
 # jig({})
 jig(override_dictionary)
-
 # display(jig(override_dictionary))
-# stats("Big_Set_1657959904.283649")
+# stats("to_delete/1658518293.767295")
 # depriciated_display("op_delay1-7/1658207804.691573")
 
-# TODO: Create that file -
 
 
 # Jig generalization,
 # Every 50 added mean and stddev for the whole thing
-# PQ ond, 
+# PQ ond,
 # Create a dictionary whos index is a tag array and has all the results of the run in it
 
 # Y is measure of overall run efficency
@@ -54,7 +52,8 @@ jig(override_dictionary)
 # Command to cut off and switch samples
 
 
-# EM this is taking so long not able to take all bump error threshold, peak chasing end of experiment
+# EM this is taking so long not able to take all bump error threshold,
+#   peak chasing end of experiment
 # EM has decision to change it, DA changes it
 # EM says to change it to 0.002
 
@@ -67,8 +66,6 @@ jig(override_dictionary)
 # - Up Side
 # - What I have now and scheduling
 # - Sorting the samples by pq as a proxy for importance
-# - 3 catagorys of samples
-# Most Important, Less Important, Everything else, experimental
 # Scheduling, most data on most important things
 # Quality assurance error to 0.001
 # Very low quality data not important, you would abort that and do high importance
@@ -126,7 +123,6 @@ jig(override_dictionary)
 # TODO: all overrides go in file
 
 
-
 # Print Number
 # FFF: folders for each type
 
@@ -134,12 +130,6 @@ jig(override_dictionary)
 
 # TODO: Compress every run into single number, Mean, Stdev, Var
 # TODO: Label means as noticing delay [number of reps]
-
-# 'samples' : [[
-#     SampleData(clamp(random.gauss(0.80, 0.2), 0.01, 0.99),
-#     random.gauss(0.80, 0.20),
-#     timedelta(minutes=random.gauss(1, 0.5))) for _ in range(5)]
-# ]],
 
 # FFF: accessor function and mutate to change to new value
 # # With accessors and mutators, the dictionary key would actually be an accessor function
@@ -166,3 +156,9 @@ jig(override_dictionary)
 # TODO: Mean of results over the set of number of runs
 # Repeat the simulation with the same samples
 # TODO: array of samples replace number of samples
+
+# 'samples' : [[
+#     SampleData(clamp(random.gauss(0.80, 0.2), 0.01, 0.99),
+#     random.gauss(0.80, 0.20),
+#     timedelta(minutes=random.gauss(1, 0.5))) for _ in range(5)]
+# ]],

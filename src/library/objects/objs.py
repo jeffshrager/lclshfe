@@ -7,7 +7,8 @@ import random
 from datetime import datetime, timedelta
 import numpy as np
 from src.library.enums.jig_enums import SaveType
-from src.library.enums.model_enums import ExperimentState, InstrumentRunState
+from src.library.enums.model_enums import ExperimentState, \
+    InstrumentRunState, SampleImportance, SampleType
 from src.library.functions.func import clamp
 if TYPE_CHECKING:
     from src.settings.config import Config
@@ -76,10 +77,10 @@ class Stream:
     cycle:int = 1
 
     def __init__(self, config:Config):
-        self.stream_shift_amount = config['cxi_stream_shift_amount']
-        self.p_stream_shift = config['cxi_p_stream_shift']
-        self.p_crazy_ivan = config['cxi_p_crazy_ivan']
-        # self.crazy_ivan_shift_amount = config['cxi_crazy_ivan_shift_amount']
+        self.stream_shift_amount = config['cxi']['stream_shift_amount']
+        self.p_stream_shift = config['cxi']['p_stream_shift']
+        self.p_crazy_ivan = config['cxi']['p_crazy_ivan']
+        self.crazy_ivan_shift_amount = config['cxi']['crazy_ivan_shift_amount']
 
 class Beam:
     """And the beam, which is under the control of the operator (or automation),
@@ -96,8 +97,8 @@ class Beam:
     beam_pos = 0.0
 
     def __init__(self, config:Config):
-        self.beam_shift_amount = config['cxi_beam_shift_amount']
-        self.physical_acuity = config['cxi_physical_acuity']
+        self.beam_shift_amount = config['cxi']['beam_shift_amount']
+        self.physical_acuity = config['cxi']['physical_acuity']
 
 class DataPoint:
     """Object to store all the data for each beam point"""
@@ -127,12 +128,12 @@ class SampleData:
     # TODO: make weights affect rescheduling
     # QQQ: What was this N shaped dynamics
     def __init__(self, preformance_quality:float,
-            weight:float, setup_time:timedelta):
+            importance:SampleImportance, setup_time:SampleType):
         self.compleated:bool = False
         self.timeout:bool = False
         self.preformance_quality:float = preformance_quality
-        self.weight:float = weight
-        self.setup_time:timedelta = setup_time
+        self.importance:SampleImportance = importance
+        self.setup_time:timedelta = setup_time.value['setup_time']
         self.data:List[DataPoint] = []
         self.count:float = 0.0
         self.mean:float = 0.0
@@ -178,7 +179,7 @@ class SampleData:
 
     def file_string(self) -> str:
         """Return a string that can be written to a file"""
-        return (f'{self.preformance_quality}\t{self.weight}\t{self.mean:.15f}\t'+
+        return (f'{self.preformance_quality}\t{self.importance}\t{self.mean:.15f}\t'+
         f'{self.m_2:.15f}\t{self.variance:.15f}\t{self.sdev:.15f}\t{self.err:.15f}')
     
     def __str__(self):
@@ -203,12 +204,12 @@ class AMI:
 
     def __init__(self, config:Config):
         self.samples:List[SampleData] = []
-        self.random_samples = config['random_samples']
-        if not config['random_samples']:
+        self.random_samples = config['samples']['random_samples']
+        if not config['samples']['random_samples']:
             sample:SampleData
-            for sample in config['samples']:
+            for sample in config['samples']['samples']:
                 sample.reset()
-            self.samples = config['samples']
+            self.samples = config['samples']['samples']
 
     def load_samples(self, number_of_samples:int):
         """Load the samples using a random distribution"""
@@ -264,14 +265,21 @@ class AMI:
                 sample_list.append(data.quality)
             variance_list.append(np.var(sample_list))
         return variance_list
-    
+
     def get_n(self) -> List[float]:
         """Return the number of samples"""
         n_list = []
         for sample in self.samples:
             n_list.append(len(sample.data))
         return n_list
-    
+
+    def get_pq(self) -> List[float]:
+        """Return the number of samples"""
+        pq_list = []
+        for sample in self.samples:
+            pq_list.append(sample.preformance_quality)
+        return pq_list
+
     def get_wall_hits(self) -> List[float]:
         """Return the number of samples"""
         wall_hit_list = []
@@ -299,7 +307,7 @@ class Agenda:
         self.event_timeline:List[Event] = []
         self.experiment_status:ExperimentState = ExperimentState.STOPED
         self.status = None
-        self.number_of_samples = config['number_of_samples']
+        self.number_of_samples = config['samples']['number_of_samples']
 
     def start_experiment(self):
         """Start the experiment if it has not been started"""
@@ -382,8 +390,11 @@ class Context:
     def printer(self, console:str, file:str):
         """Print message to console"""
         self.messages.concat(f"{console}\n")
-        if self.config['save_type'] == SaveType.DETAILED:
+        if self.config['settings']['save_type'] == SaveType.DETAILED:
             self.file_write(file)
+
+    def __getitem__(self, key):
+        return self.config[key]
 
     def update(self):
         """Make sure all objects are updated"""

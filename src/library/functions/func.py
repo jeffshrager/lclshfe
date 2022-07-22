@@ -1,5 +1,6 @@
 """Collection of functions"""
 from __future__ import annotations
+import collections.abc
 from math import tanh
 from typing import TYPE_CHECKING
 from numpy import random
@@ -13,6 +14,14 @@ def calculate_roi(ami:AMI) -> str:
     """Determine the retun of investment data / time"""
     return (sum(sample.compleated for sample in ami.samples) / len(ami.samples
     ) if len(ami.samples) > 0 else 0)
+
+def update_dict(d, u):
+    for k, v in u.items():
+        if isinstance(v, collections.abc.Mapping):
+            d[k] = update_dict(d.get(k, {}), v)
+        else:
+            d[k] = v
+    return d
 
 def get_line() -> str:
     """return string line"""

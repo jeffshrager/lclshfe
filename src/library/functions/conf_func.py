@@ -1,11 +1,14 @@
 """Configuration Functions"""
 import itertools
+from math import sqrt
 import os
 import pickle
+from statistics import stdev
+from typing import List
+from numpy import mean
+from src.library.objects.objs import AMI, SampleData
 
-from src.library.objects.objs import AMI
-
-def cartesian_product(**kwargs):
+def cartesian_product(kwargs):
     """This returns a list of dictionaries with single value keys
     as a result of the cartesian product of the values
 
@@ -16,17 +19,41 @@ def cartesian_product(**kwargs):
     result = [{'a': 1, 'b': 4},
               {'a': 1, 'b': 5},
               {'a': 1, 'b': 6},"""
-    keys = kwargs.keys()
-    vals = kwargs.values()
-    for instance in itertools.product(*vals):
-        yield dict(zip(keys, instance))
+    keys, values = kwargs.keys(), kwargs.values()
+    values_choices = (cartesian_product(v) if isinstance(v, dict) else v for v in values)
+    for comb in itertools.product(*values_choices):
+        yield dict(zip(keys, comb))
+
+def write_summary_file(override:dict, folder:str, runs:List[dict]):
+    """Write Summary File"""
+    os.makedirs(os.path.dirname(f"results/{folder}/summary.tsv"), exist_ok=True)
+    with open(f"results/{folder}/summary.tsv", "w", encoding="utf-8") as file:
+        file.write("average\tstdev\tn\terr\tpq\tond\n")
+        n_list = []
+        pq_list = []
+        sample:SampleData
+        for sample in override['samples']['samples'][0]:
+            pq_list.append(sample.preformance_quality)
+        for pq in pq_list:
+            for ond in override['operator']['noticing_delay']:
+                ond_list = []
+                for run in runs:
+                    if run['noticing_delay'] == ond:
+                        for count in run['N']:
+                            ond_list.append(count)
+                        break
+                n_list.append([mean(ond_list), stdev(ond_list), len(ond_list), stdev(ond_list)/sqrt(len(ond_list)), pq, ond])
+        for list in n_list:
+            for item in list:
+                file.write(f"{item}\t")
+            file.write("\n")
 
 def sort_combinations(override_dictionary:dict, dictionary:dict, raw_combinations:list):
     """sort combinations"""
     combinations = []
-    temp_list = list(cartesian_product(**override_dictionary)) if override_dictionary else {
-    'experiment_name': dictionary['experiment_name'][0]}
-    number_of_combinations:int = len(temp_list)
+    temp_list = list(cartesian_product(override_dictionary)) if override_dictionary else {
+    'settings':{'name': dictionary['settings']['name'][0]}}
+    number_of_combinations:int = len(temp_list) // len(dictionary['reps'])
     for com in range(number_of_combinations):
         for rep in dictionary['reps']:
             combinations.append(raw_combinations[com+(rep*number_of_combinations)])
@@ -36,9 +63,15 @@ def collapsed_file_setup(dictionary:dict, folder:str) -> bool:
     """If savetype is collapsed setup file"""
     os.makedirs(os.path.dirname(f"results/{folder}/collapsed.tsv"), exist_ok=True)
     with open(f"results/{folder}/collapsed.tsv", "w", encoding="utf-8") as file:
-        for key in dictionary.keys():
-            file.write(f"{key}\t")
-        file.write("N\twall_hits\trun\tmean\tstdev\terr\tvar\tpq")
+        for key, value in dictionary.items():
+            if key != 'samples':
+                if isinstance(value, dict):
+                    for k, v in value.items():
+                        if k != 'name' and k != 'save_type':
+                            file.write(f"{k}\t")
+                else:
+                    file.write(f"{key}\t")
+        file.write("run\tN\twall_hits\tmean\tstdev\terr\tvar\tpq")
         file.write("\n")
 
 def add_time_num(dictionary:dict, time:float, run_number:int) -> dict:
@@ -55,18 +88,23 @@ def dictionary_dump(dictionary:dict, name:str, folder:str) -> bool:
 
 def combination_check(combinations:list):
     """Show user the combinations to run and ask if correct"""
+    for com in combinations:
+        if 'settings' in com:
+            if 'name' in com['settings']:
+                del com['settings']['name']
+            if 'save_type' in com['settings']:
+                del com['settings']['save_type']
+
     print(*(config_print(combination) for combination in combinations), sep='\n')
-    print(len(combinations))
+    # print(len(combinations))
     val = input("run y/n: ")
     if val != "y":
         exit()
 
-def trim_override_dictionary(dictionary:dict) -> dict:
+def trim_override(dictionary:dict) -> dict:
     """Removing non repetitive items from dictionary"""
-    if 'reps' in dictionary:
-        del dictionary['reps']
-    if 'save_type' in dictionary:
-        del dictionary['save_type']
+    if 'settings' in dictionary:
+        del dictionary['settings']
     if 'start_time' in dictionary:
         del dictionary['start_time']
     if 'run_number' in dictionary:
@@ -78,7 +116,7 @@ def config_print(dictionary:dict) -> str:
     return_string = ""
     for k, v in dictionary.items():
         if isinstance(v, dict):
-            config_print(v)
+            return_string += config_print(v)
         else:
             if isinstance(v, list):
                 list_string = ""

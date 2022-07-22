@@ -3,40 +3,44 @@ import os
 import pickle
 from statistics import stdev
 from time import time
-from numpy import mean, sqrt, std, var
+from numpy import mean, sqrt, std
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 from src.library.enums.jig_enums import SaveType
 from src.library.functions.conf_func import add_time_num, cartesian_product, \
     collapsed_file_setup, combination_check, dictionary_dump, \
-    runs_to_xyz, sort_combinations, trim_override_dictionary
+    runs_to_xyz, sort_combinations, trim_override, write_summary_file
 from src.model import model
 from src.settings.config import Config
 
-def jig(override_dictionary:dict) -> str:
+def jig(override:dict) -> str:
     """Jig"""
     start_time = time()
-    top_level_config = Config(override_dictionary)
-    experiment_folder = f"{top_level_config['experiment_name'][0]}/{str(start_time)}"
-    override_dictionary = trim_override_dictionary(override_dictionary)
-    combinations = sort_combinations(override_dictionary, top_level_config, list(
-        cartesian_product(**override_dictionary)) if override_dictionary else [
-            {'experiment_name': top_level_config['experiment_name'][0]}])
+    config = Config(override)
+    folder = f"{config['settings']['name'][0]}/{str(start_time)}"
+    settings_config = override['settings']
+    override = trim_override(override)
+    combinations = sort_combinations(override, config, list(
+        cartesian_product(override)) if override else [
+            {'settings':{'name': config['settings']['name'][0]}}])
     combination_check(combinations)
-    dictionary_dump(top_level_config, 'config', experiment_folder)
-    os.makedirs(os.path.dirname(f"results/{experiment_folder}/config.tsv"), exist_ok=True)
-    with open(f"results/{experiment_folder}/config.tsv", "w", encoding="utf-8") as file:
-        file.write(str(top_level_config))
-        if isinstance(top_level_config['save_type'], list):
-            top_level_config.default_dictionary.update(
-                {'save_type':top_level_config['save_type'][0]})
-    if top_level_config['save_type'] == SaveType.COLLAPSED:
-        collapsed_file_setup(override_dictionary, experiment_folder)
+    for combination in combinations:
+        combination.update({'settings': settings_config})
+    dictionary_dump(config, 'config', folder)
+    os.makedirs(os.path.dirname(f"results/{folder}/config.tsv"), exist_ok=True)
+    with open(f"results/{folder}/config.tsv", "w", encoding="utf-8") as file:
+        file.write(str(config))
+        if isinstance(config['settings']['save_type'], list):
+            config.default_dictionary.update({
+                'settings':{'save_type':config['settings']['save_type'][0]}})
+    if config['settings']['save_type'] == SaveType.COLLAPSED:
+        collapsed_file_setup(override, folder)
     runs = [model(Config(add_time_num(combination, start_time, run_number))
         ) for run_number, combination in enumerate(combinations)]
-    dictionary_dump(runs, 'runs', experiment_folder)
-    return experiment_folder
+    dictionary_dump(runs, 'runs', folder)
+    write_summary_file(override, folder, runs)
+    return folder
 
 def stats(folder:str) -> bool:
     """Standard Deviation"""
@@ -48,24 +52,27 @@ def stats(folder:str) -> bool:
         config = pickle.load(config_dictionary_file)
     with open(f"results/{folder}/dictionaries/runs.dictionary", 'rb') as runs_dictionary_file:
         runs = pickle.load(runs_dictionary_file)
-    
-    for s in range(len(config['reps'])):
-        total_data = []
-        for run in runs:
-            for data in run.samples[s].data:
-                total_data.append(data.quality)
-        ns = [len(run.samples[s].data) for run in runs]
-        print(f"{ns}:\nmean - {mean(ns)}, stdev - {stdev(ns)}, var - {var(ns)}\nmean - {mean(total_data)}, stdev - {stdev(total_data)}, var - {var(total_data)}\n")
+    write_summary_file(config, folder, runs)
+    # for rep_count in range(len(config['reps'])):
+    #     total_data = []
+    #     for run in runs:
+    #         for data in run.samples[rep_count].data:
+    #             total_data.append(data.quality)
+    #     number_samples = [len(run.samples[rep_count].data) for run in runs]
+    #     print(f"{number_samples}:\nmean - {mean(number_samples)}, stdev - {stdev(number_samples)},"+
+    #     f" var - {var(number_samples)}\nmean - {mean(total_data)}, stdev - {stdev(total_data)},"+
+    #     f"var - {var(total_data)}\n")
 
 def display(folder:str) -> bool:
-    pass
-    # """Pivot Table Display"""
-    # config = None
-    # runs = None
-    # with open(f"results/{folder}/dictionaries/config.dictionary", 'rb') as config_dictionary_file:
-    #     config = pickle.load(config_dictionary_file)
-    # with open(f"results/{folder}/dictionaries/runs.dictionary", 'rb') as runs_dictionary_file:
-    #     runs = pickle.load(runs_dictionary_file)
+    """Pivot Table Display"""
+    config = None
+    runs = None
+    with open(f"results/{folder}/dictionaries/config.dictionary", 'rb') as config_dictionary_file:
+        config = pickle.load(config_dictionary_file)
+    with open(f"results/{folder}/dictionaries/runs.dictionary", 'rb') as runs_dictionary_file:
+        runs = pickle.load(runs_dictionary_file)
+    print(config)
+    print(runs)
 
 def depriciated_display(folder:str) -> bool:
     """Display"""
@@ -75,13 +82,13 @@ def depriciated_display(folder:str) -> bool:
         config = pickle.load(config_dictionary_file)
     with open(f"results/{folder}/dictionaries/runs.dictionary", 'rb') as runs_dictionary_file:
         runs = pickle.load(runs_dictionary_file)
-    
-    if config['save_type'][0] == SaveType.DETAILED:
-        (x, y, z) = runs_to_xyz(config, runs)
+
+    if config['settings']['save_type'][0] == SaveType.DETAILED:
+        (x_axis, y_axis, z_axis) = runs_to_xyz(config, runs)
         fig = go.Figure(go.Surface(
-            x=x,
-            y=y,
-            z=z,
+            x=x_axis,
+            y=y_axis,
+            z=z_axis,
         ))
         fig.update_layout(title=folder, autosize=True, margin=dict(l=65, r=50, b=65, t=90),
             scene = {
@@ -92,8 +99,8 @@ def depriciated_display(folder:str) -> bool:
                 "aspectratio": {"x": 3, "y": 1, "z": 0.6}
             })
         fig.show()
-    elif config['save_type'][0] == SaveType.COLLAPSED:
-        if len(config['samples'][0]) > 1:
+    elif config['settings']['save_type'][0] == SaveType.COLLAPSED:
+        if len(config['samples']['samples'][0]) > 1:
 
             computed_run = {
                 'noticing_delay': [],
@@ -110,19 +117,20 @@ def depriciated_display(folder:str) -> bool:
                     computed_run['err'].append(run['err'][value])
                     computed_run['pq'].append(run['pq'])
 
-            df = pd.DataFrame(data=computed_run)
-            print(df)
-            fig = px.line(df, x='noticing_delay', y='N', color='noticing_delay',error_y='err',
-                        color_discrete_sequence=px.colors.qualitative.G10)
-            # fig = px.line_3d(df, x='pq', y='noticing_delay', z='mean', color='noticing_delay',error_z='err',
-            #             color_discrete_sequence=px.colors.qualitative.G10)
+            data_frame = pd.DataFrame(data=computed_run)
+            print(data_frame)
+            fig = px.line(data_frame, x='noticing_delay', y='N', color='noticing_delay',
+                error_y='err', color_discrete_sequence=px.colors.qualitative.G10)
+            # fig = px.line_3d(data_frame, x='pq', y='noticing_delay', z='mean',
+            # color='noticing_delay',error_z='err',
+            # color_discrete_sequence=px.colors.qualitative.G10)
             colors = px.colors.qualitative.G10
             fig.update_traces(showlegend=False, error_y_color='red', marker=dict(color=colors))
             fig.update_layout(title=folder, autosize=True, margin=dict(l=65, r=50, b=65, t=90),
                 scene = {
-                    "xaxis": {"title": 'preformance quality', "nticks": len(config['samples'])},
+                    "xaxis": {"title": 'preformance quality', "nticks": len(config['samples']['samples'])},
                     "zaxis": {"title": 'N', "nticks": 10},
-                    "yaxis": {"title": 'noticing delay', "nticks": len(config['op_noticing_delay'])},
+                    "yaxis": {"title": 'noticing delay', "nticks":len(config['op_noticing_delay'])},
                     'camera_eye': {"x": 2.2, "y": 2.2, "z": 0.5},
                     "aspectratio": {"x": 2, "y": 0.5, "z": 0.6}
                 })

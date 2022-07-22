@@ -73,7 +73,7 @@ class DataAnalyst(Person):
     def __init__(self, config:Config):
         super().__init__(AgentType.DA)
         self.last_sample_with_enough_data = None
-        self.target_error = config['da_target_error']
+        self.target_error = config['data_analysis']['target_error']
 
     def check_if_enough_data_to_analyse(self, context:Context) -> bool:
         """Check if there is enough data to start analysing, right now this is a constant"""
@@ -133,12 +133,12 @@ class Operator(Person):
 
     def __init__(self, config:Config):
         super().__init__(AgentType.OP)
-        self.switch_button_delay_per_cm = config['op_switch_button_delay_per_cm']
-        self.button_press_delay = config['op_button_press_delay']
-        self.button_distance = config['op_button_distance']
-        self.functional_acuity = config['op_functional_acuity']
-        self.noticing_delay = config['op_noticing_delay']
-        self.decision_delay = config['op_decision_delay']
+        self.switch_button_delay_per_cm = config['operator']['switch_button_delay_per_cm']
+        self.button_press_delay = config['operator']['button_press_delay']
+        self.button_distance = config['operator']['button_distance']
+        self.functional_acuity = config['operator']['functional_acuity']
+        self.noticing_delay = config['operator']['noticing_delay']
+        self.decision_delay = config['operator']['decision_delay']
 
     def stop_collecting_data(self, context:Context):
         """Stop Collecting Data"""
@@ -251,7 +251,7 @@ class ExperimentManager(Person):
         if self.previous_sample is not None:
             if self.current_transition_time is None:
                 self.current_transition_time = timedelta(minutes=random.uniform(0.2, 2.0))
-                if context.config['save_type'] == SaveType.DETAILED:
+                if context['settings']['save_type'] == SaveType.DETAILED:
                     context.file_write(f"Instrument transition: {self.current_transition_time}")
             if self.current_transition_time > timedelta(0):
                 if self.previous_transition_check is None:

@@ -158,7 +158,7 @@ class Instrument:
                             # Tik Tak Toe Board Data
                             [[1.0, 0.0, 1.0], [0.0, None, 0.0], [1.0, 0.0, 1.0]]
                             )
-                    if context.config['save_type'] == SaveType.DETAILED:
+                    if context['settings']['save_type'] == SaveType.DETAILED:
                         context.data_file.write(f"{self.current_sample}\t{current_sample.count}\t{datapoint.quality:.15f}\t{current_sample.file_string()}\n")
                     current_sample.append(datapoint)
                 self.last_data_update = context.current_time
@@ -171,11 +171,11 @@ class CXI(Instrument):
 
     def __init__(self, config:Config):
         super().__init__(InstrumentType.CXI)
-        self.data_per_second = config['cxi_data_per_second']
+        self.data_per_second = config['cxi']['data_per_second']
         self.instrument_status = InstrumentStatus()
         self.stream_status = Stream(config)
         self.beam_status = Beam(config)
-        self.time_out_value = config['cxi_time_out_value']
+        self.time_out_value = config['cxi']['time_out_value']
 
     def run_peak_chasing(self, context:Context) -> bool:
         """True: peak chasing started, False: not started"""
@@ -193,7 +193,7 @@ class CXI(Instrument):
             if not sample_goal.compleated and not sample_goal.timeout:
                 self.current_sample = index
                 break
-        if context.config['save_type'] == SaveType.DETAILED:
+        if context['settings']['save_type'] == SaveType.DETAILED:
             context.data_file.write("sample #\tcount\tdata\tpreformance quality\tweight\tmean\tm2\tvariance\tsdev\terr\n")
         self.previous_sample = context.ami.samples[self.current_sample]
         return True
