@@ -63,7 +63,7 @@ def aquire_data(distance:float, preformance_quality:float, context:Context) -> f
     # print(context.current_time.total_seconds()/1000)
     # TODO: Add instument instability to config
     # Have this reset for every shift change
-    instrument_instability = 1 - tanh(context.current_time.total_seconds()/10000)
+    instrument_instability = (1 - tanh(context.current_time.total_seconds()/10000)) if context['cxi']['tanh_curve'] else 0
     cumulative_deviation = preformance_disquality + distance + instrument_instability
     # Gaussian distribution
     # https://towardsdatascience.com/gaussian-mixture-models-with-python-36dabed6212a

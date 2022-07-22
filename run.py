@@ -6,19 +6,16 @@ from src.library.enums.model_enums import SampleImportance, SampleType
 from src.library.objects.objs import SampleData
 
 override_dictionary = {
-    'settings': {
-        'name': ['to_delete'],
-        'save_type': [SaveType.COLLAPSED],
-    },
+    'settings': {'name': ['test'],'save_type': [SaveType.COLLAPSED],},
     'reps': [x for x in range(3)],
     'operator': {'noticing_delay': [1.0, 5.0, 10.0]},
     # 'experimental_time': [timedelta(seconds=2500)],
-    'samples': {
-        'samples': [
-            [SampleData(round(0.95 - i, 2), SampleImportance.IMPORTANT, SampleType.TAPE) for i in np.arange(0.0, 0.125, 0.025)],
-            # [SampleData(round(0.95 - i, 2), SampleImportance.UNIMPORTANT, SampleType.TAPE) for i in np.arange(0.0, 0.125, 0.025)],
-        ],
-    }
+    'samples': {'samples': [
+        [SampleData(round(0.95 - i, 2), SampleImportance.IMPORTANT, SampleType.TAPE) for i in np.arange(0.0, 0.125, 0.025)],
+        # [SampleData(round(0.95 - i, 2), SampleImportance.UNIMPORTANT, SampleType.TAPE) for i in np.arange(0.0, 0.125, 0.025)],
+    ],},
+    'cognative_degredation': [False],
+    'cxi': {'tanh_curve': [True]}
 }
 
 # jig({})

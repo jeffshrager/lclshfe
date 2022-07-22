@@ -1,7 +1,6 @@
 """Config File"""
 from datetime import timedelta
 import os
-from time import time
 from typing import List
 from src.library.enums.jig_enums import SaveType
 from src.library.enums.model_enums import SampleImportance, SampleType
@@ -14,8 +13,6 @@ class Config:
     default_dictionary = None
 
     def __init__(self, override_dictionary):
-        # TODO: Add tangent default off
-        # TODO: Tired
         self.default_dictionary = {
         'settings': {
             'name': ['default_run'],
@@ -24,16 +21,14 @@ class Config:
             'cycle_sleep_time': 0.0,
         },
         'reps': [0],
-        # 'save_type': SaveType.COLLAPSED,
         'experimental_time': timedelta(hours=5),
         'step_through_time': timedelta(seconds=1),
-        # 'cycle_sleep_time': 0.0,
-        # 'display': True,
         'samples': {
             'number_of_samples': 5,
             'samples': [SampleData(0.90, SampleImportance.IMPORTANT, SampleType.TAPE)],
             'random_samples': False,
         },
+        'cognative_degredation': True,
         'data_analysis': {
             'target_error': 0.001,
         },
@@ -46,6 +41,7 @@ class Config:
             'decision_delay': 1.0,
         },
         'cxi': {
+            'tanh_curve': True,
             'data_per_second': 100,
             'time_out_value': 600000,
             'stream_shift_amount': 0.05,
@@ -58,7 +54,6 @@ class Config:
         }
         self.override_dictionary = override_dictionary
         self.default_dictionary = update_dict(self.default_dictionary, self.override_dictionary)
-        # self.default_dictionary.update(self.override_dictionary)
 
     def __getitem__(self, key):
         return self.default_dictionary[key]

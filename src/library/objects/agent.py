@@ -5,6 +5,7 @@ from termcolor import colored
 from scipy.stats import linregress
 from src.library.enums.jig_enums import SaveType
 from src.library.enums.model_enums import AgentType
+from src.library.functions.func import clamp, cognative_temperature_curve
 from src.library.objects.objs import Context, SampleData
 from src.settings.config import Config
 
@@ -26,11 +27,8 @@ class Person:
     cognative_temperature:float = None
     cogtemp_curve:float = None
     # 1.0 / 0.002 = 8.3, total level of energy / minutes = 8.3 total hours of energy
-    energy_degradation:float = 0.000
-
+    energy_degradation:float = 0.002
     attention_meter:float = None
-
-
     previous_check:timedelta = None
     noticing_delay:float = 1.0  # 100 ms
     decision_delay:float = 1.0  # 100 ms -- FFF incorporate differential switch time
@@ -55,14 +53,14 @@ class Person:
         """Update attention and focus"""
         # TODO _: energy degredation on a curve
         # TODO: coupled also on a curve
-        pass
-        # delta:timedelta = context.current_time - self.previous_check
-        # if delta >= timedelta(minutes=1):
-        #     self.cogtemp_curve = clamp(self.cogtemp_curve + self.energy_degradation, 0.0, 1.0)
-        #     self.cognative_temperature = clamp(cognative_temperature_curve(self.cogtemp_curve), 0.01, 1.0)
-        #     self.previous_check = context.current_time
-        # self.noticing_delay = 1 + (1 - self.cognative_temperature)
-        # self.decision_delay = 1 + (1 - self.cognative_temperature)
+        if context['cognative_degredation']:
+            delta:timedelta = context.current_time - self.previous_check
+            if delta >= timedelta(minutes=1):
+                self.cogtemp_curve = clamp(self.cogtemp_curve + self.energy_degradation, 0.0, 1.0)
+                self.cognative_temperature = clamp(cognative_temperature_curve(self.cogtemp_curve), 0.01, 1.0)
+                self.previous_check = context.current_time
+            self.noticing_delay = 1 + (1 - self.cognative_temperature)
+            self.decision_delay = 1 + (1 - self.cognative_temperature)
 
 class DataAnalyst(Person):
     """Retrives data from the instrument"""
