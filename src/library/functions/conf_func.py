@@ -6,6 +6,7 @@ import pickle
 from statistics import stdev
 from typing import List
 from numpy import mean
+from termcolor import colored
 from src.library.objects.objs import AMI, SampleData
 
 def cartesian_product(kwargs):
@@ -24,27 +25,40 @@ def cartesian_product(kwargs):
     for comb in itertools.product(*values_choices):
         yield dict(zip(keys, comb))
 
-def write_summary_file(override:dict, folder:str, runs:List[dict]):
+def write_summary_file(config:dict, folder:str, runs:List[dict]):
     """Write Summary File"""
     os.makedirs(os.path.dirname(f"results/{folder}/summary.tsv"), exist_ok=True)
     with open(f"results/{folder}/summary.tsv", "w", encoding="utf-8") as file:
-        file.write("average\tstdev\tn\terr\tpq\tond\n")
+        file.write("average\tstdev\tn\terr\tpq\functional_acuity\n")
         n_list = []
         pq_list = []
         sample:SampleData
-        for sample in override['samples']['samples'][0]:
-            pq_list.append(sample.preformance_quality)
+        if isinstance(config['settings']['save_type'], list):
+            config['settings']['save_type'] = config['settings']['save_type'][0]
+        for samples in config['samples']['samples']:
+            if isinstance(samples, list):
+                for sample in samples:
+                    pq_list.append(sample.preformance_quality)
+            else:
+                pq_list.append(samples.preformance_quality)
         for pq in pq_list:
-            for ond in override['operator']['noticing_delay']:
+            if isinstance(config['operator']['functional_acuity'], list):
+                for ond in config['operator']['functional_acuity']:
+                    ond_list = []
+                    for run in runs:
+                        if run['functional_acuity'] == ond:
+                            for index, sample_pq in enumerate(run['pq']):
+                                if sample_pq == pq:
+                                    ond_list.append(run['N'][index])
+                    n_list.append([round(mean(ond_list)), round(stdev(ond_list)), len(ond_list), stdev(ond_list)/sqrt(len(ond_list)), pq, ond])
+            else:
                 ond_list = []
                 for run in runs:
-                    if run['noticing_delay'] == ond:
-                        for count in run['N']:
-                            ond_list.append(count)
-                        break
-                n_list.append([mean(ond_list), stdev(ond_list), len(ond_list), stdev(ond_list)/sqrt(len(ond_list)), pq, ond])
-        for list in n_list:
-            for item in list:
+                    for count in run['N']:
+                        ond_list.append(count)
+                n_list.append([ond_list[0], ond_list[0], len(ond_list), '-', pq, config['operator']['functional_acuity']])
+        for l in n_list:
+            for item in l:
                 file.write(f"{item}\t")
             file.write("\n")
 
@@ -64,11 +78,10 @@ def collapsed_file_setup(dictionary:dict, folder:str) -> bool:
     os.makedirs(os.path.dirname(f"results/{folder}/collapsed.tsv"), exist_ok=True)
     with open(f"results/{folder}/collapsed.tsv", "w", encoding="utf-8") as file:
         for key, value in dictionary.items():
-            if key != 'samples':
+            if key != 'samples' and key != 'settings':
                 if isinstance(value, dict):
                     for k, v in value.items():
-                        if k != 'name' and k != 'save_type':
-                            file.write(f"{k}\t")
+                        file.write(f"{k}\t")
                 else:
                     file.write(f"{key}\t")
         file.write("run\tN\twall_hits\tmean\tstdev\terr\tvar\tpq")
@@ -86,7 +99,28 @@ def dictionary_dump(dictionary:dict, name:str, folder:str) -> bool:
     with open(f'results/{folder}/dictionaries/{name}.dictionary', 'wb') as file:
         pickle.dump(dictionary, file)
 
-def combination_check(combinations:list):
+def name_check(override:dict) -> bool:
+    """Check if name is new"""
+    if 'settings' in override:
+        if 'name' in override['settings']:
+            if override['settings']['name'][0] in os.listdir('results'):
+                print(f"{override['settings']['name'][0]} {colored('has been used before.', 'red')}")
+                val = input(f"{colored('Want to change it?', 'red')} y/n: ")
+                if val == "y":
+                    change_confirm = False
+                    while change_confirm is False:
+                        override['settings']['name'][0] = input("Enter new name: ")
+                        if override['settings']['name'][0] in os.listdir('results'):
+                            print(f"{override['settings']['name'][0]} {colored('has been used before.', 'red')}")
+                            val = input(f"{colored('Want to change it?', 'red')} y/n: ")
+                            if val == "y":
+                                change_confirm = False
+                            else:
+                                change_confirm = True
+                        else:
+                            change_confirm = True
+
+def combination_check(combinations:list) -> bool:
     """Show user the combinations to run and ask if correct"""
     for com in combinations:
         if 'settings' in com:
@@ -96,7 +130,7 @@ def combination_check(combinations:list):
                 del com['settings']['save_type']
 
     print(*(config_print(combination) for combination in combinations), sep='\n')
-    # print(len(combinations))
+    print(colored(f'number of combinations: {len(combinations)}', 'green'))
     val = input("run y/n: ")
     if val != "y":
         exit()
@@ -130,8 +164,8 @@ def config_print(dictionary:dict) -> str:
 def runs_to_xyz(config, runs):
     """Runs to xyz"""
 
-    # y_axis = [y for y in range(len(config['reps']))]
-    y_axis = [0, 1, 2, 3]
+    y_axis = [y for y in range(len(config['reps']))]
+    # y_axis = [0, 1, 2, 3]
 
     max_count = 0
     run:AMI

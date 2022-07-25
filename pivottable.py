@@ -7,7 +7,7 @@ import dash_pivottable
 app = dash.Dash(__name__)
 server = app.server
 
-FOLDER = "op_delay1-7/1658207804.691573 copy"
+FOLDER = "fnc_ond_tanh_false_cog_false/1658732176.595285"
 
 with open(f"results/{FOLDER}/dictionaries/runs.dictionary", 'rb') as runs_dictionary_file:
     runs = pickle.load(runs_dictionary_file)

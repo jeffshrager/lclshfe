@@ -199,11 +199,11 @@ class Operator(Person):
         wait before the input arrives."""
         way = self.which_way_do_we_need_to_shift(context)
         if way == self.which_button_were_on:
-            context.messages.concat(f"[{str(self.button_press_delay + self.decision_delay + self.noticing_delay)}]")
+            # context.messages.concat(f"button_press_delay + decision_delay + noticing_delay: [{str(self.button_press_delay + self.decision_delay + self.noticing_delay)}]\n")
             return self.button_press_delay + self.decision_delay + self.noticing_delay
         else:
             self.which_button_were_on = way
-            context.messages.concat(f"[{str((self.button_distance * self.switch_button_delay_per_cm) + self.button_press_delay + self.decision_delay + self.noticing_delay)}]")
+            # context.messages.concat(f"button_press_delay + decision_delay + noticing_delay: [{str((self.button_distance * self.switch_button_delay_per_cm) + self.button_press_delay + self.decision_delay + self.noticing_delay)}]\n")
             return (self.button_distance * self.switch_button_delay_per_cm) + self.button_press_delay + self.decision_delay + self.noticing_delay
 
 class ExperimentManager(Person):

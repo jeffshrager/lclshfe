@@ -226,6 +226,14 @@ class AMI:
         """Get current Sample"""
         return self.samples[context.instrument.current_sample]
 
+    def get_headers(self) -> List[str]:
+        """Return the headers for the file"""
+        return ['mean', 'stdev', 'err', 'var', 'pq']
+    
+    def get_values(self) -> List[any]:
+        """Return the values for the file"""
+        return [self.get_mean(), self.get_stdev(), self.get_err(), self.get_var(), self.get_pq()]
+
     def get_mean(self) -> List[float]:
         """Return the mean of the samples"""
         mean_list = []

@@ -1,32 +1,38 @@
 """Run File"""
-import numpy as np
 from src.jig import depriciated_display, jig, stats
 from src.library.enums.jig_enums import SaveType
 from src.library.enums.model_enums import SampleImportance, SampleType
 from src.library.objects.objs import SampleData
 
 override_dictionary = {
-    'settings': {'name': ['test'],'save_type': [SaveType.COLLAPSED],},
+    'settings': {'name':['fnc_ond_tanh_true_cog_true'],'save_type':[SaveType.COLLAPSED]},
     'reps': [x for x in range(3)],
-    'operator': {'noticing_delay': [1.0, 5.0, 10.0]},
+    'operator': {
+        'functional_acuity': [0.1, 0.3, 0.5, 0.7, 0.9, 1.0],
+        'noticing_delay': [1.0, 5.0, 10.0, 15.0, 20.0, 25.0]},
+    # 'operator': {'noticing_delay': [1.0, 5.0, 10.0]},
     # 'experimental_time': [timedelta(seconds=2500)],
     'samples': {'samples': [
-        [SampleData(round(0.95 - i, 2), SampleImportance.IMPORTANT, SampleType.TAPE) for i in np.arange(0.0, 0.125, 0.025)],
+        [SampleData(0.90, SampleImportance.IMPORTANT, SampleType.TAPE),
+         SampleData(0.85, SampleImportance.IMPORTANT, SampleType.TAPE),
+         SampleData(0.80, SampleImportance.IMPORTANT, SampleType.TAPE),
+         SampleData(0.75, SampleImportance.IMPORTANT, SampleType.TAPE),
+         SampleData(0.70, SampleImportance.IMPORTANT, SampleType.TAPE)]
+        # [SampleData(round(0.95 - i, 2), SampleImportance.IMPORTANT, SampleType.TAPE) for i in np.arange(0.0, 0.050, 0.025)],
         # [SampleData(round(0.95 - i, 2), SampleImportance.UNIMPORTANT, SampleType.TAPE) for i in np.arange(0.0, 0.125, 0.025)],
     ],},
-    'cognative_degredation': [False],
+    'cognative_degredation': [True],
     'cxi': {'tanh_curve': [True]}
 }
 
 # jig({})
-jig(override_dictionary)
+# jig(override_dictionary)
 # display(jig(override_dictionary))
-# stats("to_delete/1658518293.767295")
+# stats("fnc_ond_tanh_false_cog_false/1658732176.595285")
 # depriciated_display("op_delay1-7/1658207804.691573")
 
 
 
-# Jig generalization,
 # Every 50 added mean and stddev for the whole thing
 # PQ ond,
 # Create a dictionary whos index is a tag array and has all the results of the run in it
@@ -152,10 +158,3 @@ jig(override_dictionary)
 # TODO: Add all data parameters in object
 # TODO: Mean of results over the set of number of runs
 # Repeat the simulation with the same samples
-# TODO: array of samples replace number of samples
-
-# 'samples' : [[
-#     SampleData(clamp(random.gauss(0.80, 0.2), 0.01, 0.99),
-#     random.gauss(0.80, 0.20),
-#     timedelta(minutes=random.gauss(1, 0.5))) for _ in range(5)]
-# ]],

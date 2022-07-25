@@ -16,6 +16,7 @@ def calculate_roi(ami:AMI) -> str:
     ) if len(ami.samples) > 0 else 0)
 
 def update_dict(d, u):
+    """Update a dictionary with another dictionary"""
     for k, v in u.items():
         if isinstance(v, collections.abc.Mapping):
             d[k] = update_dict(d.get(k, {}), v)
@@ -27,9 +28,25 @@ def get_line() -> str:
     """return string line"""
     return "---------------------------------------------------------------------------------------"
 
+def config_print(dictionary:dict) -> str:
+    """Config print"""
+    return_string = ""
+    for k, v in dictionary.items():
+        if isinstance(v, dict):
+            return_string += config_print(v)
+        else:
+            if isinstance(v, list):
+                list_string = ""
+                for item in v:
+                    list_string += f"{item}, "
+                return_string += f"{k}: {list_string}"
+            else:
+                return_string += (f"{k} : {v}, ")
+    return return_string
+
 def goal_agenda_plan(context:Context) -> str:
     "Return out GAP: Goal Agenda Plan"
-    return (f"{context.config.override_dictionary}\n{context.ami}\n"+
+    return (f"{config_print(context.config.override_dictionary)}\n{get_line()}\n{context.ami}\n"+
     f"Current Time: {context.current_time} {context.agenda}\n{get_line()}")
 
 def experiment_stats(context:Context) -> str:

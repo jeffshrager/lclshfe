@@ -9,7 +9,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 from src.library.enums.jig_enums import SaveType
 from src.library.functions.conf_func import add_time_num, cartesian_product, \
-    collapsed_file_setup, combination_check, dictionary_dump, \
+    collapsed_file_setup, combination_check, dictionary_dump, name_check, \
     runs_to_xyz, sort_combinations, trim_override, write_summary_file
 from src.model import model
 from src.settings.config import Config
@@ -19,14 +19,18 @@ def jig(override:dict) -> str:
     start_time = time()
     config = Config(override)
     folder = f"{config['settings']['name'][0]}/{str(start_time)}"
-    settings_config = override['settings']
+    settings_config = None
+    name_check(override)
+    if 'settings' in override:
+        settings_config = override['settings']
     override = trim_override(override)
     combinations = sort_combinations(override, config, list(
         cartesian_product(override)) if override else [
             {'settings':{'name': config['settings']['name'][0]}}])
     combination_check(combinations)
-    for combination in combinations:
-        combination.update({'settings': settings_config})
+    if settings_config:
+        for combination in combinations:
+            combination.update({'settings': settings_config})
     dictionary_dump(config, 'config', folder)
     os.makedirs(os.path.dirname(f"results/{folder}/config.tsv"), exist_ok=True)
     with open(f"results/{folder}/config.tsv", "w", encoding="utf-8") as file:
@@ -39,7 +43,7 @@ def jig(override:dict) -> str:
     runs = [model(Config(add_time_num(combination, start_time, run_number))
         ) for run_number, combination in enumerate(combinations)]
     dictionary_dump(runs, 'runs', folder)
-    write_summary_file(override, folder, runs)
+    write_summary_file(config, folder, runs)
     return folder
 
 def stats(folder:str) -> bool:
