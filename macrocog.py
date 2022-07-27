@@ -67,7 +67,7 @@ def run():
     cummulative_time_used = 0
     global samples
     runs = []
-    seconds_saved_per_error_threshold_001_delta = False
+    seconds_saved_from_error_threshold_001_delta = False
     n_samples_left=len(samples)
     for nth_sample in range(n_samples_left):
         sample=samples[nth_sample]
@@ -80,11 +80,11 @@ def run():
         uncorrected_run_length = srl + randint(1,int(0.3*srl))-int(0.15*srl) 
         print("uncorrected_run_length (including noise)="+str(uncorrected_run_length))
         # Correct for error threshold delta
-        run_length_correction_per_e_t=0
-        if seconds_saved_per_error_threshold_001_delta: # Will be False if not yet set
-            run_length_correction_per_e_t=round(seconds_saved_per_error_threshold_001_delta*(error_threshold-0.001)*1000)
-        print("run_length_correction_per_e_t="+str(run_length_correction_per_e_t))
-        actual_run_length=uncorrected_run_length-run_length_correction_per_e_t
+        run_length_correction_from_e_t=0
+        if seconds_saved_from_error_threshold_001_delta: # Will be False if not yet set
+            run_length_correction_from_e_t=round(seconds_saved_from_error_threshold_001_delta*(error_threshold-0.001)*1000)
+        print("run_length_correction_from_e_t="+str(run_length_correction_from_e_t))
+        actual_run_length=uncorrected_run_length-run_length_correction_from_e_t
         print("--> actual run length (including error threshold correction)= "+str(actual_run_length))
         cummulative_time_used += actual_run_length
         print("cummulative_time_used="+str(cummulative_time_used))
@@ -123,8 +123,10 @@ def run():
             # This will be NEGATIVE iff there's a shortfall
             projected_seconds_overtime = time_remaining - estimated_total_time_for_remaining_samples
             print(" projected_seconds_overtime="+str(projected_seconds_overtime))
-            seconds_saved_per_error_threshold_001_delta = (last_run_length/2)/((0.01-error_threshold)*1000)
-            print(" seconds_saved_per_error_threshold_001_delta ="+str(seconds_saved_per_error_threshold_001_delta))
+            # This should be calculated, but at the moment, it's just hacked to five minutes
+            seconds_saved_from_error_threshold_001_delta = 300 
+            #seconds_saved_from_error_threshold_001_delta = (last_run_length/2)/((0.01-error_threshold)*1000)
+            print(" seconds_saved_from_error_threshold_001_delta ="+str(seconds_saved_from_error_threshold_001_delta))
             print(">> TIME ANALYSIS <<")
             if projected_seconds_overtime < 0:
                 print("  *** WE'RE GOING TO RUN OUT OF TIME! ***")
