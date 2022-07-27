@@ -74,18 +74,18 @@ def run():
         n_samples_left-=1
         print("\n\nSAMPLE #"+str(nth_sample)+":"+str(sample))
         srl = sample["run_length"]
-        # *** III !!! The error_threshold has to be increated into
+        # *** III !!! The error_threshold has to be increased into
         # this using the same estimate that's used in
         # recalibrate_error_threshold(...)
         uncorrected_run_length = srl + randint(1,int(0.3*srl))-int(0.15*srl) 
-        print("uncorrected_run_length="+str(uncorrected_run_length))
+        print("uncorrected_run_length (including noise)="+str(uncorrected_run_length))
         # Correct for error threshold delta
         run_length_correction_per_e_t=0
         if seconds_saved_per_error_threshold_001_delta: # Will be False if not yet set
             run_length_correction_per_e_t=round(seconds_saved_per_error_threshold_001_delta*(error_threshold-0.001)*1000)
         print("run_length_correction_per_e_t="+str(run_length_correction_per_e_t))
         actual_run_length=uncorrected_run_length-run_length_correction_per_e_t
-        print("For "+str(sample)+":\n  --> actual run length= "+str(actual_run_length))
+        print("--> actual run length (including error threshold correction)= "+str(actual_run_length))
         cummulative_time_used += actual_run_length
         print("cummulative_time_used="+str(cummulative_time_used))
         runs=[[sample,actual_run_length]]+runs
@@ -98,10 +98,12 @@ def run():
             this_run_length = runs[0][1]
             last_run_pq = runs[1][0]["pq"]
             last_run_length = runs[1][1]
-            pq_delta = last_run_pq - this_run_pq
+            pq_delta = round(last_run_pq - this_run_pq,5)
+            print(" pq_delta="+str(pq_delta))
             run_length_delta = abs(last_run_length - this_run_length)
+            print(" run_length_delta="+str(run_length_delta))
             estimated_delta_seconds_per_pq = round(abs(run_length_delta/pq_delta))
-            print("estimated_delta_seconds_per_pq="+str(estimated_delta_seconds_per_pq))
+            print(" estimated_delta_seconds_per_pq="+str(estimated_delta_seconds_per_pq))
             # Okay, so now we think we know how long per pq we have
             # (and nb. we're using only the latest run data because
             # that's the best estimate of the general state of things,
@@ -110,38 +112,39 @@ def run():
             # of experience and of the machine and instrument).  So,
             # anyway, now we use this seconds/pq to estimate how long
             # the whole rest of the run is going to take.
-            remaining_sample_pqs = [sample["pq"] for sample in samples[(1+nth_sample):]]
-            print("remaining_sample_pqs = "+str(remaining_sample_pqs))
-            total_pq_for_rest_of_samples = reduce(lambda a, b: a + b, remaining_sample_pqs)
-            print("Remaning total pq = "+str(total_pq_for_rest_of_samples))
-            total_estimated_time_needed_for_remaining_samples = round(estimated_delta_seconds_per_pq * total_pq_for_rest_of_samples)
+            print(" n_samples_left = "+str(n_samples_left))
+            # This assumes that the delta pq is fixed (@0.025)
+            estimated_run_length_map = [actual_run_length + round(((s*pq_delta) * estimated_delta_seconds_per_pq)) for s in range(n_samples_left)]
+            print(" estimated_run_length_map = "+str(estimated_run_length_map))
+            estimated_total_time_for_remaining_samples = reduce(lambda a, b: a + b, estimated_run_length_map)
+            print(" estimated_total_time_for_remaining_samples = "+str(estimated_total_time_for_remaining_samples))
             time_remaining = total_available_time - cummulative_time_used
-            print("Time remaining = "+str(time_remaining))
-            print("Time needed for remaining samples = "+str(total_estimated_time_needed_for_remaining_samples))
+            print(" time_remaining = "+str(time_remaining))
             # This will be NEGATIVE iff there's a shortfall
-            projected_seconds_overtime = time_remaining - total_estimated_time_needed_for_remaining_samples
-            print("projected_seconds_overtime="+str(projected_seconds_overtime))
+            projected_seconds_overtime = time_remaining - estimated_total_time_for_remaining_samples
+            print(" projected_seconds_overtime="+str(projected_seconds_overtime))
             seconds_saved_per_error_threshold_001_delta = (last_run_length/2)/((0.01-error_threshold)*1000)
-            print("  seconds_saved_per_error_threshold_001_delta ="+str(seconds_saved_per_error_threshold_001_delta))
+            print(" seconds_saved_per_error_threshold_001_delta ="+str(seconds_saved_per_error_threshold_001_delta))
+            print(">> TIME ANALYSIS <<")
             if projected_seconds_overtime < 0:
-                print(">> TIME ANALYSIS: *** WE'RE GOING TO RUN OUT OF TIME! ***")
+                print("  *** WE'RE GOING TO RUN OUT OF TIME! ***")
                 # Simple error threshold recalibration just incfs or
                 # decfs the e_t by 0.001 depending on whether we're
                 # going to be short or long
                 if (error_threshold==0.01):
-                    print("!!!!!! Uh oh! There's no room to increase error_threshold!!!")
+                    print("    !!!!!! Uh oh! There's no room to increase error_threshold!!!")
                 else:
                     error_threshold+=0.001
-                    print("++++++ Resetting error_threshold to "+str(error_threshold))
+                    print("    ++++++ Resetting error_threshold to "+str(error_threshold))
             elif (projected_seconds_overtime > 3600): 
-                print(">> TIME ANALYSIS: We're going to have more than an hour extra time; reducing error threshold by 0.001")
+                print("  We're going to have more than an hour extra time; reducing error threshold by 0.001")
                 if (error_threshold==0.001):
-                    print("...... No room to reduce error_threshold.")
+                    print("    ...... No room to reduce error_threshold.")
                 else:
                     error_threshold-=0.001
-                    print("------ Resetting error_threshold to "+str(error_threshold))
+                    print("    ------ Resetting error_threshold to "+str(error_threshold))
             else:
-                print(">> TIME ANALYSIS: Still Safe, and within 1 hour of the target, so not changing error threshold.")
+                print("Still Safe, and within 1 hour of the target, so not changing error threshold.")
 
 
 # More complex error threshold calibration: delta we need to have
