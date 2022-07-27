@@ -29,7 +29,7 @@ for (sample,pq,run_length) in zip(samples, pqs, run_lengths):
     sample["run_length"]=run_length
 [print(str(sample)) for sample in samples]
 cumulative_estimated_run_length = reduce(lambda a, b: a + b, [s["run_length"] for s in samples])
-print("Cumulative estimated run length = "+str(cumulative_estimated_run_length))
+print("cumulative_estimated_run_length = "+str(cumulative_estimated_run_length))
 
 # The general plan is to run the less important samples first, until
 # we get a sense of how long this is going to take for a given sample
@@ -63,8 +63,8 @@ def run():
     # FFF For the moment we don't consider shift changes FFF
     #total_available_time = shift_length_seconds * n_shifts 
     total_available_time = cumulative_estimated_run_length
-    print("total_available_time="+str(total_available_time))
-    cummulative_time_used = 0
+    print("total_available_time = "+str(total_available_time))
+    cumulative_time_used = 0
     global samples
     runs = []
     seconds_saved_from_error_threshold_001_delta = False
@@ -72,7 +72,8 @@ def run():
     for nth_sample in range(n_samples_left):
         sample=samples[nth_sample]
         n_samples_left-=1
-        print("\n\nSAMPLE #"+str(nth_sample)+":"+str(sample))
+        print("\nSAMPLE #"+str(nth_sample)+":"+str(sample))
+        print("  error_threshold = "+str(error_threshold))
         srl = sample["run_length"]
         # *** III !!! The error_threshold has to be increased into
         # this using the same estimate that's used in
@@ -80,14 +81,14 @@ def run():
         uncorrected_run_length = srl + randint(1,int(0.3*srl))-int(0.15*srl) 
         print("uncorrected_run_length (including noise)="+str(uncorrected_run_length))
         # Correct for error threshold delta
-        run_length_correction_from_e_t=0
+        run_length_correction_from_error_threshold=0
         if seconds_saved_from_error_threshold_001_delta: # Will be False if not yet set
-            run_length_correction_from_e_t=round(seconds_saved_from_error_threshold_001_delta*(error_threshold-0.001)*1000)
-        print("run_length_correction_from_e_t="+str(run_length_correction_from_e_t))
-        actual_run_length=uncorrected_run_length-run_length_correction_from_e_t
+            run_length_correction_from_error_threshold=round(seconds_saved_from_error_threshold_001_delta*(error_threshold-0.001)*1000)
+        print("run_length_correction_from_error_threshold="+str(run_length_correction_from_error_threshold))
+        actual_run_length=uncorrected_run_length-run_length_correction_from_error_threshold
         print("--> actual run length (including error threshold correction)= "+str(actual_run_length))
-        cummulative_time_used += actual_run_length
-        print("cummulative_time_used="+str(cummulative_time_used))
+        cumulative_time_used += actual_run_length
+        print("cumulative_time_used = "+str(cumulative_time_used)+" [projection(cumulative_estimated_run_length):"+str(cumulative_estimated_run_length))
         runs=[[sample,actual_run_length]]+runs
         # Once we have two samples we can start estimating the amount
         # of time each pq delta costs. For the moment we just use the
@@ -118,7 +119,7 @@ def run():
             print(" estimated_run_length_map = "+str(estimated_run_length_map))
             estimated_total_time_for_remaining_samples = reduce(lambda a, b: a + b, estimated_run_length_map)
             print(" estimated_total_time_for_remaining_samples = "+str(estimated_total_time_for_remaining_samples))
-            time_remaining = total_available_time - cummulative_time_used
+            time_remaining = total_available_time - cumulative_time_used
             print(" time_remaining = "+str(time_remaining))
             # This will be NEGATIVE iff there's a shortfall
             projected_seconds_overtime = time_remaining - estimated_total_time_for_remaining_samples
@@ -131,7 +132,7 @@ def run():
             if projected_seconds_overtime < 0:
                 print("  *** WE'RE GOING TO RUN OUT OF TIME! ***")
                 # Simple error threshold recalibration just incfs or
-                # decfs the e_t by 0.001 depending on whether we're
+                # decfs the error_threshold by 0.001 depending on whether we're
                 # going to be short or long
                 if (error_threshold==0.01):
                     print("    !!!!!! Uh oh! There's no room to increase error_threshold!!!")
