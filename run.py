@@ -1,41 +1,33 @@
 """Run File"""
-from src.jig import depriciated_display, jig, stats
-from src.library.enums.jig_enums import SaveType
-from src.library.enums.model_enums import SampleImportance, SampleType
-from src.library.objects.objs import SampleData
+from src.jig import display, display_new, jig, rollup, stats
+import overrides
 
-override_dictionary = {
-    'settings': {'name':['fnc_ond_tanh_true_cog_true'],'save_type':[SaveType.COLLAPSED]},
-    'reps': [x for x in range(3)],
-    'operator': {
-        'functional_acuity': [0.1, 0.3, 0.5, 0.7, 0.9, 1.0],
-        'noticing_delay': [1.0, 5.0, 10.0, 15.0, 20.0, 25.0]},
-    # 'operator': {'noticing_delay': [1.0, 5.0, 10.0]},
-    # 'experimental_time': [timedelta(seconds=2500)],
-    'samples': {'samples': [
-        [SampleData(0.90, SampleImportance.IMPORTANT, SampleType.TAPE),
-         SampleData(0.85, SampleImportance.IMPORTANT, SampleType.TAPE),
-         SampleData(0.80, SampleImportance.IMPORTANT, SampleType.TAPE),
-         SampleData(0.75, SampleImportance.IMPORTANT, SampleType.TAPE),
-         SampleData(0.70, SampleImportance.IMPORTANT, SampleType.TAPE)]
-        # [SampleData(round(0.95 - i, 2), SampleImportance.IMPORTANT, SampleType.TAPE) for i in np.arange(0.0, 0.050, 0.025)],
-        # [SampleData(round(0.95 - i, 2), SampleImportance.UNIMPORTANT, SampleType.TAPE) for i in np.arange(0.0, 0.125, 0.025)],
-    ],},
-    'cognative_degredation': [True],
-    'cxi': {'tanh_curve': [True]}
-}
+# jig(overrides.fnc_ond1_tanh_true_cog_true, True, 'functional_acuity')
+# display_new(jig(overrides.fnc_ond1_tanh_false_cog_false, True, 'functional_acuity'), 'functional_acuity')
 
-# jig({})
-# jig(override_dictionary)
-# display(jig(override_dictionary))
+# rollup("fnc_ond_tanh_false_cog_false/1658732176.595285")
 # stats("fnc_ond_tanh_false_cog_false/1658732176.595285")
-# depriciated_display("op_delay1-7/1658207804.691573")
+# display("fnc_ond1_tanh_false_cog_false/1658810656.175882")
+# display_new("fnc_ond1_tanh_true_cog_true/1658863335.323498")
 
 
 
-# Every 50 added mean and stddev for the whole thing
-# PQ ond,
-# Create a dictionary whos index is a tag array and has all the results of the run in it
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Y is measure of overall run efficency
 # Worse data you can get it faster, total time for run independant variable
@@ -59,10 +51,6 @@ override_dictionary = {
 #   peak chasing end of experiment
 # EM has decision to change it, DA changes it
 # EM says to change it to 0.002
-
-
-# Precision calculation - goes into ROI
-
 
 
 # III
@@ -113,18 +101,11 @@ override_dictionary = {
 # if its more than an hour for all of them, accept more error
 
 
-
 # Data input file, dict keys, reads through and prints them on tabs between them
 
 
 # Say X
 # Y i alwayse samples
-# III: Any var to scan
-# TODO: When it hits the wall it aborts check this
-# TODO: Add hit wall counter
-
-# TODO: all overrides go in file
-
 
 # Print Number
 # FFF: folders for each type

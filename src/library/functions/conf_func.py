@@ -25,11 +25,12 @@ def cartesian_product(kwargs):
     for comb in itertools.product(*values_choices):
         yield dict(zip(keys, comb))
 
-def write_summary_file(config:dict, folder:str, runs:List[dict]):
+def write_summary_file(config:dict, folder:str, runs:List[dict], independent_variable:str):
     """Write Summary File"""
+    # TODO: which 2 things im running against
     os.makedirs(os.path.dirname(f"results/{folder}/summary.tsv"), exist_ok=True)
     with open(f"results/{folder}/summary.tsv", "w", encoding="utf-8") as file:
-        file.write("average\tstdev\tn\terr\tpq\functional_acuity\n")
+        file.write(f"average\tstdev\tn\terr\tpq\t{independent_variable}\n")
         n_list = []
         pq_list = []
         sample:SampleData
@@ -42,11 +43,12 @@ def write_summary_file(config:dict, folder:str, runs:List[dict]):
             else:
                 pq_list.append(samples.preformance_quality)
         for pq in pq_list:
-            if isinstance(config['operator']['functional_acuity'], list):
-                for ond in config['operator']['functional_acuity']:
+            # Decollapse OND's
+            if isinstance(config['operator'][f"{independent_variable}"], list):
+                for ond in config['operator'][f"{independent_variable}"]:
                     ond_list = []
                     for run in runs:
-                        if run['functional_acuity'] == ond:
+                        if run[f"{independent_variable}"] == ond:
                             for index, sample_pq in enumerate(run['pq']):
                                 if sample_pq == pq:
                                     ond_list.append(run['N'][index])
@@ -56,7 +58,7 @@ def write_summary_file(config:dict, folder:str, runs:List[dict]):
                 for run in runs:
                     for count in run['N']:
                         ond_list.append(count)
-                n_list.append([ond_list[0], ond_list[0], len(ond_list), '-', pq, config['operator']['functional_acuity']])
+                n_list.append([ond_list[0], ond_list[0], len(ond_list), '-', pq, config['operator'][f"{independent_variable}"]])
         for l in n_list:
             for item in l:
                 file.write(f"{item}\t")

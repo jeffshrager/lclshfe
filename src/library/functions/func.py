@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 
 def calculate_roi(ami:AMI) -> str:
     """Determine the retun of investment data / time"""
+    # TODO: Precision calculation - goes into ROI
     return (sum(sample.compleated for sample in ami.samples) / len(ami.samples
     ) if len(ami.samples) > 0 else 0)
 
