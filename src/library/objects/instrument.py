@@ -1,4 +1,15 @@
-"""Instrument"""
+"""A one line summary of the module or program, terminated by a period.
+
+Leave one blank line.  The rest of this docstring should contain an
+overall description of the module or program.  Optionally, it may also
+contain a brief description of exported classes and functions and/or usage
+examples.
+
+  Typical usage example:
+
+  foo = ClassFoo()
+  bar = foo.FunctionBar()
+"""
 import random
 from datetime import timedelta
 from termcolor import colored
@@ -10,7 +21,15 @@ from src.library.objects.objs import Beam, Context, DataPoint, \
 from src.settings.config import Config
 
 class Instrument:
-    """Instrument Parent Class"""
+    """Summary of class here.
+
+    Longer class information...
+    Longer class information...
+
+    Attributes:
+        likes_spam: A boolean indicating if we like SPAM or not.
+        eggs: An integer count of the eggs we have laid.
+    """
     instrument_type = ""
     instrument_status:InstrumentStatus = None
     stream_status:Stream = None
@@ -133,7 +152,7 @@ class Instrument:
             current_sample = context.ami.samples[self.current_sample]
             if len(current_sample.data) > self.time_out_value:
                 context.printer(f"{colored('Warning', 'yellow')}: To many data points timeout", "Warning: To many data points timeout")
-                context.agenda.add_event(context.instrument.run_number, context.instrument.run_start_time, context.current_time, True)
+                context.agenda.add_event(context.instrument.run_number, context.instrument.run_start_time, context.current_time, current_sample, True)
                 current_sample.timeout = True
                 self.collecting_data = False
             else:
@@ -143,6 +162,7 @@ class Instrument:
                 # Closest is 0 right on top of each other
                 # FFF: allow this to work with less than 1 second time steps
                 delta:timedelta = context.current_time - self.last_data_update
+                current_sample.duration = current_sample.duration + delta
                 distance = abs(self.stream_status.stream_pos - self.beam_status.beam_pos)
                 for _ in range(int(delta.total_seconds()) * self.data_per_second):
                     datapoint:DataPoint = DataPoint(clamp(aquire_data(distance,
@@ -158,24 +178,32 @@ class Instrument:
                             # Tik Tak Toe Board Data
                             [[1.0, 0.0, 1.0], [0.0, None, 0.0], [1.0, 0.0, 1.0]]
                             )
-                    if context['settings']['save_type'] == SaveType.DETAILED:
-                        context.data_file.write(f"{self.current_sample}\t{current_sample.count}\t{datapoint.quality:.15f}\t{current_sample.file_string()}\n")
+                    if context['settings']['save_type'][0] == SaveType.DETAILED:
+                        open(context.data_file.name, 'a', encoding="utf-8").write(f"{self.current_sample}\t{current_sample.count}\t{datapoint.quality:.15f}\t{current_sample.file_string()}\n")
                     current_sample.append(datapoint)
                 self.last_data_update = context.current_time
 
 class CXI(Instrument):
-    """CXI"""
+    """Summary of class here.
+
+    Longer class information...
+    Longer class information...
+
+    Attributes:
+        likes_spam: A boolean indicating if we like SPAM or not.
+        eggs: An integer count of the eggs we have laid.
+    """
     transition_write:bool = False
     previous_transition_check:timedelta = None 
     previous_sample:SampleData = None
 
     def __init__(self, config:Config):
         super().__init__(InstrumentType.CXI)
-        self.data_per_second = config['cxi']['data_per_second']
+        self.data_per_second = config['instrument']['data_per_second']
         self.instrument_status = InstrumentStatus()
         self.stream_status = Stream(config)
         self.beam_status = Beam(config)
-        self.time_out_value = config['cxi']['time_out_value']
+        self.time_out_value = config['instrument']['time_out_value']
 
     def run_peak_chasing(self, context:Context) -> bool:
         """True: peak chasing started, False: not started"""
@@ -193,7 +221,7 @@ class CXI(Instrument):
             if not sample_goal.compleated and not sample_goal.timeout:
                 self.current_sample = index
                 break
-        if context['settings']['save_type'] == SaveType.DETAILED:
-            context.data_file.write("sample #\tcount\tdata\tpreformance quality\tweight\tmean\tm2\tvariance\tsdev\terr\n")
+        if context['settings']['save_type'][0] == SaveType.DETAILED:
+            open(context.data_file.name, 'a', encoding="utf-8").write("sample #\tcount\tdata\tpreformance quality\tweight\tmean\tm2\tvariance\tsdev\terr\n")
         self.previous_sample = context.ami.samples[self.current_sample]
         return True

@@ -1,10 +1,22 @@
-"""Run File"""
+"""Run File: A one line summary of the module or program, terminated by a period.
+
+Leave one blank line.  The rest of this docstring should contain an
+overall description of the module or program.  Optionally, it may also
+contain a brief description of exported classes and functions and/or usage
+examples.
+
+  Typical usage example:
+
+  foo = ClassFoo()
+  bar = foo.FunctionBar()
+"""
 from src.jig import display, display_new, jig, rollup, stats
-import overrides
+import src.settings.overrides as overrides
 
-# jig(overrides.fnc_ond1_tanh_true_cog_true, True, 'functional_acuity')
-# display_new(jig(overrides.fnc_ond1_tanh_false_cog_false, True, 'functional_acuity'), 'functional_acuity')
+jig(overrides.macro_test, True, 'functional_acuity')
 
+
+# display_new(jig(overrides.over180, True, 'functional_acuity'), 'functional_acuity')
 # rollup("fnc_ond_tanh_false_cog_false/1658732176.595285")
 # stats("fnc_ond_tanh_false_cog_false/1658732176.595285")
 # display("fnc_ond1_tanh_false_cog_false/1658810656.175882")
@@ -12,8 +24,13 @@ import overrides
 
 
 
+# III: Data Analyst: Every cycle just store the error thresholds in an array. Just store them
+# We can actually read off the table from previous run and understand where 0.002 will get us to
+# Pair of cycle time and error threshold
 
 
+# Given previous run how do we save this many seconds, Experiment manager - Data Analyst
+# Just move up and down by 0.001
 
 
 

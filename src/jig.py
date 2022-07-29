@@ -1,4 +1,15 @@
-"""Jig"""
+"""A one line summary of the module or program, terminated by a period.
+
+Leave one blank line.  The rest of this docstring should contain an
+overall description of the module or program.  Optionally, it may also
+contain a brief description of exported classes and functions and/or usage
+examples.
+
+  Typical usage example:
+
+  foo = ClassFoo()
+  bar = foo.FunctionBar()
+"""
 import os
 import pickle
 from statistics import stdev
@@ -6,7 +17,6 @@ from time import time
 # from turtle import color
 from numpy import mean, sqrt, std
 import pandas as pd
-import csv
 import plotly.graph_objects as go
 import plotly.express as px
 from src.library.enums.jig_enums import SaveType
@@ -17,7 +27,21 @@ from src.model import model
 from src.settings.config import Config
 
 def jig(override:dict, supressed:bool, independent_variable:str) -> str:
-    """Jig"""
+    """Jig
+
+    Runs the model using the given configuration and puts all of the
+    data recived into the AMI object. This is the main function of the
+    model. This is where each of the agents are called during a given cycle.
+
+    Args:
+        config: The set of variables used to run the experiment, each of
+        the configs passed to the model only contain one parameter for
+        each setting.
+
+    Returns:
+        A AMI object which contains the configuration of the simulation
+        as well as all of the data generated during the simulation.
+    """
     start_time = time()
     config = Config(override)
     folder = f"{config['settings']['name'][0]}/{str(start_time)}"
@@ -51,8 +75,34 @@ def jig(override:dict, supressed:bool, independent_variable:str) -> str:
     return folder
 
 def stats(folder:str, independent_variable:str) -> bool:
-    """Standard Deviation"""
-    # FFF QQQ: Auto Remove outliers
+    """Fetches rows from a Smalltable.
+
+    Retrieves rows pertaining to the given keys from the Table instance
+    represented by table_handle.  String keys will be UTF-8 encoded.
+
+    Args:
+        table_handle: An open smalltable.Table instance.
+        keys: A sequence of strings representing the key of each table
+          row to fetch.  String keys will be UTF-8 encoded.
+        require_all_keys: If True only rows with values set for all keys will be
+          returned.
+
+    Returns:
+        A dict mapping keys to the corresponding table row data
+        fetched. Each row is represented as a tuple of strings. For
+        example:
+
+        {b'Serak': ('Rigel VII', 'Preparer'),
+         b'Zim': ('Irk', 'Invader'),
+         b'Lrrr': ('Omicron Persei 8', 'Emperor')}
+
+        Returned keys are always bytes.  If a key from the keys argument is
+        missing from the dictionary, then that row was not found in the
+        table (and require_all_keys must have been False).
+
+    Raises:
+        IOError: An error occurred accessing the smalltable.
+    """    # FFF QQQ: Auto Remove outliers
     # TODO: PUll out erros from runs
     config = None
     runs = None
@@ -72,7 +122,34 @@ def stats(folder:str, independent_variable:str) -> bool:
     #     f"var - {var(total_data)}\n")
 
 def rollup(folder:str) -> bool:
-    """Rollup"""
+    """Fetches rows from a Smalltable.
+
+    Retrieves rows pertaining to the given keys from the Table instance
+    represented by table_handle.  String keys will be UTF-8 encoded.
+
+    Args:
+        table_handle: An open smalltable.Table instance.
+        keys: A sequence of strings representing the key of each table
+          row to fetch.  String keys will be UTF-8 encoded.
+        require_all_keys: If True only rows with values set for all keys will be
+          returned.
+
+    Returns:
+        A dict mapping keys to the corresponding table row data
+        fetched. Each row is represented as a tuple of strings. For
+        example:
+
+        {b'Serak': ('Rigel VII', 'Preparer'),
+         b'Zim': ('Irk', 'Invader'),
+         b'Lrrr': ('Omicron Persei 8', 'Emperor')}
+
+        Returned keys are always bytes.  If a key from the keys argument is
+        missing from the dictionary, then that row was not found in the
+        table (and require_all_keys must have been False).
+
+    Raises:
+        IOError: An error occurred accessing the smalltable.
+    """
     config = None
     runs = None
     with open(f"results/{folder}/dictionaries/config.dictionary", 'rb') as config_dictionary_file:
@@ -86,7 +163,34 @@ def rollup(folder:str) -> bool:
     fig.show()
 
 def display(folder:str) -> bool:
-    """Display"""
+    """Fetches rows from a Smalltable.
+
+    Retrieves rows pertaining to the given keys from the Table instance
+    represented by table_handle.  String keys will be UTF-8 encoded.
+
+    Args:
+        table_handle: An open smalltable.Table instance.
+        keys: A sequence of strings representing the key of each table
+          row to fetch.  String keys will be UTF-8 encoded.
+        require_all_keys: If True only rows with values set for all keys will be
+          returned.
+
+    Returns:
+        A dict mapping keys to the corresponding table row data
+        fetched. Each row is represented as a tuple of strings. For
+        example:
+
+        {b'Serak': ('Rigel VII', 'Preparer'),
+         b'Zim': ('Irk', 'Invader'),
+         b'Lrrr': ('Omicron Persei 8', 'Emperor')}
+
+        Returned keys are always bytes.  If a key from the keys argument is
+        missing from the dictionary, then that row was not found in the
+        table (and require_all_keys must have been False).
+
+    Raises:
+        IOError: An error occurred accessing the smalltable.
+    """
     config = None
     runs = None
     with open(f"results/{folder}/dictionaries/config.dictionary", 'rb') as config_dictionary_file:
@@ -223,8 +327,34 @@ def display(folder:str) -> bool:
             fig.show()
 
 def display_new(folder:str, independent_variable:str) -> bool:
-    """Display"""
+    """Fetches rows from a Smalltable.
 
+    Retrieves rows pertaining to the given keys from the Table instance
+    represented by table_handle.  String keys will be UTF-8 encoded.
+
+    Args:
+        table_handle: An open smalltable.Table instance.
+        keys: A sequence of strings representing the key of each table
+          row to fetch.  String keys will be UTF-8 encoded.
+        require_all_keys: If True only rows with values set for all keys will be
+          returned.
+
+    Returns:
+        A dict mapping keys to the corresponding table row data
+        fetched. Each row is represented as a tuple of strings. For
+        example:
+
+        {b'Serak': ('Rigel VII', 'Preparer'),
+         b'Zim': ('Irk', 'Invader'),
+         b'Lrrr': ('Omicron Persei 8', 'Emperor')}
+
+        Returned keys are always bytes.  If a key from the keys argument is
+        missing from the dictionary, then that row was not found in the
+        table (and require_all_keys must have been False).
+
+    Raises:
+        IOError: An error occurred accessing the smalltable.
+    """
     # import_file = {}
     data_frame = pd.read_csv(f"results/{folder}/summary.tsv", sep='\t', index_col=False)
     print(data_frame)

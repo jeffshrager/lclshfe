@@ -1,4 +1,15 @@
-"""Collection of objects"""
+"""A one line summary of the module or program, terminated by a period.
+
+Leave one blank line.  The rest of this docstring should contain an
+overall description of the module or program.  Optionally, it may also
+contain a brief description of exported classes and functions and/or usage
+examples.
+
+  Typical usage example:
+
+  foo = ClassFoo()
+  bar = foo.FunctionBar()
+"""
 from __future__ import annotations
 from math import sqrt
 from typing import TYPE_CHECKING, List
@@ -16,7 +27,15 @@ if TYPE_CHECKING:
     from src.library.objects.instrument import CXI
 
 class CommunicationObject:
-    """Object that stores the communication"""
+    """Summary of class here.
+
+    Longer class information...
+    Longer class information...
+
+    Attributes:
+        likes_spam: A boolean indicating if we like SPAM or not.
+        eggs: An integer count of the eggs we have laid.
+    """
     messages = ""
 
     def __init__(self):
@@ -38,7 +57,16 @@ class CommunicationObject:
         return self.messages
 
 class InstrumentStatus:
-    """Object that stores the current status regarding the instrument"""
+    """Summary of class here.
+
+    Longer class information...
+    Longer class information...
+
+    Attributes:
+        likes_spam: A boolean indicating if we like SPAM or not.
+        eggs: An integer count of the eggs we have laid.
+    """
+    # """Object that stores the current status regarding the instrument"""
     hits = 0
     misses = 0
     msg = ""
@@ -58,12 +86,21 @@ class InstrumentStatus:
         self.is_running = InstrumentRunState.STOPPED
 
 class Stream:
-    """We have a stream (aka. jet) which shifts around in accord with these params.
-    The stream_shift_time_slice is a bit obscure. The idea is that.
+    """Summary of class here.
 
-    Warning: The stream shift amount should be an integer multiple of the beam_shift_amount,
-    otherwisethe likelihood that they overlap (based on acuity) will be reduced.
-    Usually these will be the same."""
+    Longer class information...
+    Longer class information...
+
+    Attributes:
+        likes_spam: A boolean indicating if we like SPAM or not.
+        eggs: An integer count of the eggs we have laid.
+    """
+    # """We have a stream (aka. jet) which shifts around in accord with these params.
+    # The stream_shift_time_slice is a bit obscure. The idea is that.
+
+    # Warning: The stream shift amount should be an integer multiple of the beam_shift_amount,
+    # otherwisethe likelihood that they overlap (based on acuity) will be reduced.
+    # Usually these will be the same."""
 
     stream_shift_amount:float = 0.0  # Minimal unit of stream shift
     p_stream_shift:float = 0.0  # prob. of stream shift per cycle
@@ -77,14 +114,23 @@ class Stream:
     cycle:int = 1
 
     def __init__(self, config:Config):
-        self.stream_shift_amount = config['cxi']['stream_shift_amount']
-        self.p_stream_shift = config['cxi']['p_stream_shift']
-        self.p_crazy_ivan = config['cxi']['p_crazy_ivan']
-        self.crazy_ivan_shift_amount = config['cxi']['crazy_ivan_shift_amount']
+        self.stream_shift_amount = config['instrument']['stream_shift_amount']
+        self.p_stream_shift = config['instrument']['p_stream_shift']
+        self.p_crazy_ivan = config['instrument']['p_crazy_ivan']
+        self.crazy_ivan_shift_amount = config['instrument']['crazy_ivan_shift_amount']
 
 class Beam:
-    """And the beam, which is under the control of the operator (or automation),
-    which can be shifted in accord with these params:"""
+    """Summary of class here.
+
+    Longer class information...
+    Longer class information...
+
+    Attributes:
+        likes_spam: A boolean indicating if we like SPAM or not.
+        eggs: An integer count of the eggs we have laid.
+    """
+    # """And the beam, which is under the control of the operator (or automation),
+    # which can be shifted in accord with these params:"""
      # You may want to have more or less fine control of the beam vs. the stream's shiftiness
     beam_shift_amount = 0.0
 
@@ -97,11 +143,20 @@ class Beam:
     beam_pos = 0.0
 
     def __init__(self, config:Config):
-        self.beam_shift_amount = config['cxi']['beam_shift_amount']
-        self.physical_acuity = config['cxi']['physical_acuity']
+        self.beam_shift_amount = config['instrument']['beam_shift_amount']
+        self.physical_acuity = config['instrument']['physical_acuity']
 
 class DataPoint:
-    """Object to store all the data for each beam point"""
+    """Summary of class here.
+
+    Longer class information...
+    Longer class information...
+
+    Attributes:
+        likes_spam: A boolean indicating if we like SPAM or not.
+        eggs: An integer count of the eggs we have laid.
+    """
+    # """Object to store all the data for each beam point"""
     # TODO: Tik Tak Toe Board
     quality:float = None
     data:List[List[float]] = [[]]
@@ -119,10 +174,19 @@ class DataPoint:
         return str(self.data)
 
 class SampleData:
-    """Store all information about the sample as well as the datapoints
-    Sample attributes are stored in dict sampleTypeMapper
-    Preformance Quality, different natural signal response
-    when data is on peak data * PQ"""
+    """Summary of class here.
+
+    Longer class information...
+    Longer class information...
+
+    Attributes:
+        likes_spam: A boolean indicating if we like SPAM or not.
+        eggs: An integer count of the eggs we have laid.
+    """
+    # """Store all information about the sample as well as the datapoints
+    # Sample attributes are stored in dict sampleTypeMapper
+    # Preformance Quality, different natural signal response
+    # when data is on peak data * PQ"""
     data:List[DataPoint] = []
 
     # TODO: make weights affect rescheduling
@@ -145,6 +209,8 @@ class SampleData:
         self.err_array = []
         self.projected_intercept = 0.0
         self.wall_hits = 0.0
+        self.run_length = timedelta(seconds=0)
+        self.duration = timedelta(seconds=0)
 
     def append(self, data:DataPoint):
         """Append new data point run Welford's algorithm calculations
@@ -187,12 +253,22 @@ class SampleData:
 
     def get_stats(self):
         """Return the stats of the data"""
-        return (f"pq:{self.preformance_quality:.6f}, mean:{self.mean:.6f}, err:{self.err:.6f},"+
-            f" var:{self.variance:.6f}, dev:{self.sdev:.6f} intercept:{self.projected_intercept}"
-            if self.count != 0 else "pq:0.0, mean:0.0, err:0.0, var:0.0, dev:0.0, intercept:0.0")
+        # print(f"{'Left Aligned Text' : <20}")
+        return (f"{str(self.importance.name):<11} pq:{self.preformance_quality:.3f} time: est:{str(self.run_length).split('.', maxsplit=1)[0]:<6} actual {str(self.duration).split('.', maxsplit=1)[0]:<6} | mean:{self.mean:.3f}, err:{self.err:.6f},"+
+            f" var:{self.variance:.3f}, dev:{self.sdev:.3f}, intercept:{self.projected_intercept:.3f}"
+            if self.count != 0 else f"{str(self.importance.name):<11} pq:{self.preformance_quality:.3f} time: est:{str(self.run_length).split('.', maxsplit=1)[0]:<6} actual {str(self.duration).split('.', maxsplit=1)[0]:<6} | mean:0.000, err:0.000000, var:0.000, dev:0.000, intercept:0.000")
 
 class AMI:
-    """Contains the data of the samples"""
+    """Summary of class here.
+
+    Longer class information...
+    Longer class information...
+
+    Attributes:
+        likes_spam: A boolean indicating if we like SPAM or not.
+        eggs: An integer count of the eggs we have laid.
+    """
+    # """Contains the data of the samples"""
     # FFF: AMI only gets a subset of samples
     # AMI is different than data pipeline
 
@@ -211,12 +287,19 @@ class AMI:
                 sample.reset()
             self.samples = config['samples']['samples']
 
-    def load_samples(self, number_of_samples:int):
+    def load_samples(self, context:Context):
         """Load the samples using a random distribution"""
         if self.random_samples:
             self.samples = [SampleData(clamp(random.gauss(0.90, 0.2), 0.00, 0.99),
                 random.gauss(0.80, 0.20), timedelta(minutes=random.gauss(1, 0.5)))
-                for _ in range(number_of_samples)]
+                for _ in range(context.agenda.number_of_samples)]
+        self.calculate_run_length(context)
+
+    def calculate_run_length(self, context:Context):
+        """Calculate the run length of the samples"""
+        for sample in context.ami.samples:
+            # QQQ: Better Prediction
+            sample.run_length = timedelta(seconds=(1 - sample.preformance_quality) * 1400)
 
     def sort_samples(self):
         """Sort the samples by PQ"""
@@ -276,24 +359,15 @@ class AMI:
 
     def get_n(self) -> List[float]:
         """Return the number of samples"""
-        n_list = []
-        for sample in self.samples:
-            n_list.append(len(sample.data))
-        return n_list
+        return [len(sample.data) for sample in self.samples]
 
     def get_pq(self) -> List[float]:
         """Return the number of samples"""
-        pq_list = []
-        for sample in self.samples:
-            pq_list.append(sample.preformance_quality)
-        return pq_list
+        return [sample.preformance_quality for sample in self.samples]
 
     def get_wall_hits(self) -> List[float]:
         """Return the number of samples"""
-        wall_hit_list = []
-        for sample in self.samples:
-            wall_hit_list.append(sample.wall_hits)
-        return wall_hit_list
+        return [sample.wall_hits for sample in self.samples]
 
     def __str__(self):
         return_string = ""
@@ -303,7 +377,16 @@ class AMI:
         return return_string
 
 class Agenda:
-    """High Level Schedule of events for acheiving the goal"""
+    """Summary of class here.
+
+    Longer class information...
+    Longer class information...
+
+    Attributes:
+        likes_spam: A boolean indicating if we like SPAM or not.
+        eggs: An integer count of the eggs we have laid.
+    """
+    # """High Level Schedule of events for acheiving the goal"""
     experimental_time:timedelta = timedelta(0)
     number_of_samples:int = 0
     event_timeline:List[Event] = []
@@ -333,25 +416,38 @@ class Agenda:
     def __str__(self):
         return f"Experimental Time: {self.experimental_time}"
 
-    def add_event(self, run_number:int, start_time:timedelta, end_time:timedelta, time_out:bool):
+    def add_event(self, run_number:int, start_time:timedelta, end_time:timedelta, current_sample:SampleData, time_out:bool):
         """Add event to agenda timeline"""
-        self.event_timeline.append(Event(run_number, start_time, end_time, time_out))
+        self.event_timeline.append(Event(run_number, start_time, end_time, current_sample, time_out))
 
     def get_timeline(self):
         """return final timeline string"""
         return ''.join(map(str, self.event_timeline))
 
 class Event:
-    """Object to specify the information from each event(run)"""
+    """Summary of class here.
+
+    Longer class information...
+    Longer class information...
+
+    Attributes:
+        likes_spam: A boolean indicating if we like SPAM or not.
+        eggs: An integer count of the eggs we have laid.
+    """
+    # """Object to specify the information from each event(run)"""
     run_number:int = None
     start_time:timedelta = None
     end_time:timedelta = None
+    duration:timedelta = None
     time_out:bool = None
+    sample:SampleData = None
 
-    def __init__(self, run_number:int, start_time:timedelta, end_time:timedelta, time_out:bool):
+    def __init__(self, run_number:int, start_time:timedelta, end_time:timedelta, sample:SampleData, time_out:bool):
         self.run_number = run_number
         self.start_time = start_time
         self.end_time = end_time
+        self.duration = end_time - start_time
+        self.sample = sample
         self.time_out = time_out
 
     def __str__(self):
@@ -359,7 +455,16 @@ class Event:
             f"End: {self.end_time}, Duration: {self.end_time - self.start_time}\n")
 
 class Context:
-    """http://www.corej2eepatterns.com/ContextObject.htm"""
+    """Summary of class here.
+
+    Longer class information...
+    Longer class information...
+
+    Attributes:
+        likes_spam: A boolean indicating if we like SPAM or not.
+        eggs: An integer count of the eggs we have laid.
+    """
+    # """http://www.corej2eepatterns.com/ContextObject.htm"""
     current_time:timedelta = None
     ami:AMI = None
     agenda:Agenda = None
@@ -391,14 +496,14 @@ class Context:
 
     def file_write(self, message:str):
         """write file method"""
-        self.file.write(f"{self.current_time} |"+
+        open(self.file.name, 'a', encoding="utf-8").write(f"{self.current_time} |"+
         f" DA_E:{self.agent_da.get_energy():.2f} "+
         f" OP_E:{self.agent_da.get_attention():.2f} | {message}\n")
 
     def printer(self, console:str, file:str):
         """Print message to console"""
         self.messages.concat(f"{console}\n")
-        if self.config['settings']['save_type'] == SaveType.DETAILED:
+        if self.config['settings']['save_type'][0] == SaveType.DETAILED:
             self.file_write(file)
 
     def __getitem__(self, key):

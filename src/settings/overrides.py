@@ -1,4 +1,15 @@
-"""Collection of overrides for the default behavior of the model."""
+"""A one line summary of the module or program, terminated by a period.
+
+Leave one blank line.  The rest of this docstring should contain an
+overall description of the module or program.  Optionally, it may also
+contain a brief description of exported classes and functions and/or usage
+examples.
+
+  Typical usage example:
+
+  foo = ClassFoo()
+  bar = foo.FunctionBar()
+"""
 from datetime import timedelta
 from src.library.enums.jig_enums import SaveType
 from src.library.enums.model_enums import SampleImportance, SampleType
@@ -19,24 +30,33 @@ over180 = {
          SampleData(0.20, SampleImportance.UNIMPORTANT, SampleType.TAPE)]
     ],},
     'cognative_degredation': [False],
-    'cxi': {'tanh_curve': [False]}
+    'instrument': {'tanh_curve': [False]}
 }
 # --------------------------------------------------------------------------------------------------
 macro_test = {
-    'settings': {'name':['macro_test'],'save_type':[SaveType.COLLAPSED], 'cycle_sleep_time': 0.1,},
+    'settings': {
+        'name':['macro_test'],
+        'save_type':[SaveType.DETAILED]},
     'reps': [x for x in range(1)],
     'operator': {
         'noticing_delay': [1.0]},
-    'experimental_time': [timedelta(seconds=19500)],
+    'experimental_time': [timedelta(minutes=49)],
     'samples': {'samples': [
-        [SampleData(0.90, SampleImportance.UNIMPORTANT, SampleType.TAPE),
-         SampleData(0.85, SampleImportance.UNIMPORTANT, SampleType.TAPE),
-         SampleData(0.80, SampleImportance.UNIMPORTANT, SampleType.TAPE),
-         SampleData(0.75, SampleImportance.UNIMPORTANT, SampleType.TAPE),
-         SampleData(0.70, SampleImportance.UNIMPORTANT, SampleType.TAPE)]
+        [SampleData(0.90, SampleImportance.UNIMPORTANT, SampleType.INSTANT),
+         SampleData(0.875, SampleImportance.UNIMPORTANT, SampleType.INSTANT),
+         SampleData(0.85, SampleImportance.UNIMPORTANT, SampleType.INSTANT),
+         SampleData(0.825, SampleImportance.UNIMPORTANT, SampleType.INSTANT),
+         SampleData(0.8, SampleImportance.UNIMPORTANT, SampleType.INSTANT),
+         SampleData(0.775, SampleImportance.IMPORTANT, SampleType.INSTANT),
+         SampleData(0.75, SampleImportance.IMPORTANT, SampleType.INSTANT),
+         SampleData(0.725, SampleImportance.IMPORTANT, SampleType.INSTANT),
+         SampleData(0.7, SampleImportance.IMPORTANT, SampleType.INSTANT),
+         SampleData(0.675, SampleImportance.IMPORTANT, SampleType.INSTANT)]
     ],},
     'cognative_degredation': [False],
-    'cxi': {'tanh_curve': [False]}
+    'instrument': {
+        'tanh_curve': [False],
+        'sample_transition_time': [timedelta(seconds=1)]}
 }
 # --------------------------------------------------------------------------------------------------
 fnc_ond_tanh_true_cog_true = {
@@ -53,7 +73,7 @@ fnc_ond_tanh_true_cog_true = {
          SampleData(0.70, SampleImportance.IMPORTANT, SampleType.TAPE)]
     ],},
     'cognative_degredation': [True],
-    'cxi': {'tanh_curve': [True]}
+    'instrument': {'tanh_curve': [True]}
 }
 fnc_ond_tanh_false_cog_true = {
     'settings': {'name':['fnc_ond_tanh_true_cog_true'],'save_type':[SaveType.COLLAPSED]},
@@ -69,7 +89,7 @@ fnc_ond_tanh_false_cog_true = {
          SampleData(0.70, SampleImportance.IMPORTANT, SampleType.TAPE)]
     ],},
     'cognative_degredation': [True],
-    'cxi': {'tanh_curve': [False]}
+    'instrument': {'tanh_curve': [False]}
 }
 fnc_ond_tanh_true_cog_false = {
     'settings': {'name':['fnc_ond_tanh_true_cog_true'],'save_type':[SaveType.COLLAPSED]},
@@ -85,7 +105,7 @@ fnc_ond_tanh_true_cog_false = {
          SampleData(0.70, SampleImportance.IMPORTANT, SampleType.TAPE)]
     ],},
     'cognative_degredation': [False],
-    'cxi': {'tanh_curve': [True]}
+    'instrument': {'tanh_curve': [True]}
 }
 fnc_ond_tanh_false_cog_false = {
     'settings': {'name':['fnc_ond_tanh_true_cog_true'],'save_type':[SaveType.COLLAPSED]},
@@ -101,7 +121,7 @@ fnc_ond_tanh_false_cog_false = {
          SampleData(0.70, SampleImportance.IMPORTANT, SampleType.TAPE)]
     ],},
     'cognative_degredation': [False],
-    'cxi': {'tanh_curve': [False]}
+    'instrument': {'tanh_curve': [False]}
 }
 # --------------------------------------------------------------------------------------------------
 fnc_ond1_tanh_false_cog_false = {
@@ -118,7 +138,7 @@ fnc_ond1_tanh_false_cog_false = {
          SampleData(0.70, SampleImportance.IMPORTANT, SampleType.TAPE)]
     ],},
     'cognative_degredation': [False],
-    'cxi': {'tanh_curve': [False]}
+    'instrument': {'tanh_curve': [False]}
 }
 fnc_ond10_tanh_false_cog_false = {
     'settings': {'name':['fnc_ond_tanh_true_cog_true'],'save_type':[SaveType.COLLAPSED]},
@@ -134,7 +154,7 @@ fnc_ond10_tanh_false_cog_false = {
          SampleData(0.70, SampleImportance.IMPORTANT, SampleType.TAPE)]
     ],},
     'cognative_degredation': [False],
-    'cxi': {'tanh_curve': [False]}
+    'instrument': {'tanh_curve': [False]}
 }
 fnc_ond20_tanh_false_cog_false = {
     'settings': {'name':['fnc_ond_tanh_true_cog_true'],'save_type':[SaveType.COLLAPSED]},
@@ -150,7 +170,7 @@ fnc_ond20_tanh_false_cog_false = {
          SampleData(0.70, SampleImportance.IMPORTANT, SampleType.TAPE)]
     ],},
     'cognative_degredation': [False],
-    'cxi': {'tanh_curve': [False]}
+    'instrument': {'tanh_curve': [False]}
 }
 # --------------------------------------------------------------------------------------------------
 button_distance = {
@@ -167,7 +187,7 @@ button_distance = {
          SampleData(0.70, SampleImportance.IMPORTANT, SampleType.TAPE)]
     ],},
     'cognative_degredation': [False],
-    'cxi': {'tanh_curve': [False]}
+    'instrument': {'tanh_curve': [False]}
 }
 # --------------------------------------------------------------------------------------------------
 fnc_ond1_tanh_true_cog_true = {
@@ -184,7 +204,7 @@ fnc_ond1_tanh_true_cog_true = {
          SampleData(0.70, SampleImportance.IMPORTANT, SampleType.TAPE)]
     ],},
     'cognative_degredation': [True],
-    'cxi': {'tanh_curve': [True]}
+    'instrument': {'tanh_curve': [True]}
 }
 fnc_ond1_tanh_false_cog_true = {
     'settings': {'name':['fnc_ond1_tanh_false_cog_true'],'save_type':[SaveType.COLLAPSED]},
@@ -200,7 +220,7 @@ fnc_ond1_tanh_false_cog_true = {
          SampleData(0.70, SampleImportance.IMPORTANT, SampleType.TAPE)]
     ],},
     'cognative_degredation': [True],
-    'cxi': {'tanh_curve': [False]}
+    'instrument': {'tanh_curve': [False]}
 }
 fnc_ond1_tanh_true_cog_false = {
     'settings': {'name':['fnc_ond1_tanh_true_cog_false'],'save_type':[SaveType.COLLAPSED]},
@@ -216,7 +236,7 @@ fnc_ond1_tanh_true_cog_false = {
          SampleData(0.70, SampleImportance.IMPORTANT, SampleType.TAPE)]
     ],},
     'cognative_degredation': [False],
-    'cxi': {'tanh_curve': [True]}
+    'instrument': {'tanh_curve': [True]}
 }
 fnc_ond1_tanh_false_cog_false = {
     'settings': {'name':['fnc_ond1_tanh_false_cog_false'],'save_type':[SaveType.COLLAPSED]},
@@ -232,5 +252,5 @@ fnc_ond1_tanh_false_cog_false = {
          SampleData(0.70, SampleImportance.IMPORTANT, SampleType.TAPE)]
     ],},
     'cognative_degredation': [False],
-    'cxi': {'tanh_curve': [False]}
+    'instrument': {'tanh_curve': [False]}
 }

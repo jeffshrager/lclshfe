@@ -82,6 +82,7 @@ def run():
         print("uncorrected_run_length (including noise)="+str(uncorrected_run_length))
         # Correct for error threshold delta
         run_length_correction_from_error_threshold=0
+        # QQQ: what is this: seconds_saved_from_error_threshold_001_delta and run_length_correction_from_error_threshold
         if seconds_saved_from_error_threshold_001_delta: # Will be False if not yet set
             run_length_correction_from_error_threshold=round(seconds_saved_from_error_threshold_001_delta*(error_threshold-0.001)*1000)
         print("run_length_correction_from_error_threshold="+str(run_length_correction_from_error_threshold))
@@ -90,6 +91,15 @@ def run():
         cumulative_time_used += actual_run_length
         print("cumulative_time_used = "+str(cumulative_time_used)+" [projection(cumulative_estimated_run_length):"+str(cumulative_estimated_run_length))
         runs=[[sample,actual_run_length]]+runs
+        
+        
+        
+        
+        
+        
+        
+        
+        
         # Once we have two samples we can start estimating the amount
         # of time each pq delta costs. For the moment we just use the
         # last two to figure this. This isn't actuallty unreasonable

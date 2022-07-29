@@ -1,4 +1,15 @@
-"""High Level Controller: Round Robbin processes of classes, Synchronous simulation"""
+"""A one line summary of the module or program, terminated by a period.
+
+The High Level Logic of the entire simulation is here this is where the
+einstrument is turned on the experiment started and the data collected.
+This runs synchronous cycles until the experiment is over handling
+calling each part of the experiment in a round robbin execution pattern
+
+  Typical usage example:
+
+  foo = ClassFoo()
+  bar = foo.FunctionBar()
+"""
 import copy
 import os
 import random
@@ -12,7 +23,21 @@ from src.library.functions.func import config_print, create_experiment_figure, \
 from src.settings.config import Config
 
 def model(config:Config) -> AMI:
-    """Run CXI Simulation"""
+    """Runs the experiment and returns an AMI object
+
+    Runs the model using the given configuration and puts all of the
+    data recived into the AMI object. This is the main function of the
+    model. This is where each of the agents are called during a given cycle.
+
+    Args:
+        config: The set of variables used to run the experiment, each of
+        the configs passed to the model only contain one parameter for
+        each setting.
+
+    Returns:
+        A AMI object which contains the configuration of the simulation
+        as well as all of the data generated during the simulation.
+    """
     time_var = round(time())
     random.seed(time_var)
     context = context_setup(config)
@@ -38,8 +63,8 @@ def model(config:Config) -> AMI:
         context.current_time += context['step_through_time']
         sleep(context['settings']['cycle_sleep_time'])
     os.system('cls' if os.name == 'nt' else 'clear')
-    if context['settings']['save_type'] == SaveType.DETAILED:
-        context.file.write(f"\n{experiment_stats(context)}\nFinished")
+    if context['settings']['save_type'][0] == SaveType.DETAILED:
+        open(context.data_file.name, 'a', encoding="utf-8").write(f"\n{experiment_stats(context)}\nFinished")
     print(f"{config_print(context.config.override_dictionary)}\n{experiment_stats(context)}\n"+
     f"{colored('Finished','green')}" if context['settings']['display'] else '-')
     create_experiment_figure(context, False)

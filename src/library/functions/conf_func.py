@@ -1,4 +1,15 @@
-"""Configuration Functions"""
+"""A one line summary of the module or program, terminated by a period.
+
+Leave one blank line.  The rest of this docstring should contain an
+overall description of the module or program.  Optionally, it may also
+contain a brief description of exported classes and functions and/or usage
+examples.
+
+  Typical usage example:
+
+  foo = ClassFoo()
+  bar = foo.FunctionBar()
+"""
 import itertools
 from math import sqrt
 import os
@@ -27,42 +38,43 @@ def cartesian_product(kwargs):
 
 def write_summary_file(config:dict, folder:str, runs:List[dict], independent_variable:str):
     """Write Summary File"""
-    # TODO: which 2 things im running against
-    os.makedirs(os.path.dirname(f"results/{folder}/summary.tsv"), exist_ok=True)
-    with open(f"results/{folder}/summary.tsv", "w", encoding="utf-8") as file:
-        file.write(f"average\tstdev\tn\terr\tpq\t{independent_variable}\n")
-        n_list = []
-        pq_list = []
-        sample:SampleData
-        if isinstance(config['settings']['save_type'], list):
-            config['settings']['save_type'] = config['settings']['save_type'][0]
-        for samples in config['samples']['samples']:
-            if isinstance(samples, list):
-                for sample in samples:
-                    pq_list.append(sample.preformance_quality)
-            else:
-                pq_list.append(samples.preformance_quality)
-        for pq in pq_list:
-            # Decollapse OND's
-            if isinstance(config['operator'][f"{independent_variable}"], list):
-                for ond in config['operator'][f"{independent_variable}"]:
+    if config['settings']['save_type'] == 'collapsed':
+        # TODO: which 2 things im running against
+        os.makedirs(os.path.dirname(f"results/{folder}/summary.tsv"), exist_ok=True)
+        with open(f"results/{folder}/summary.tsv", "w", encoding="utf-8") as file:
+            file.write(f"average\tstdev\tn\terr\tpq\t{independent_variable}\n")
+            n_list = []
+            pq_list = []
+            sample:SampleData
+            if isinstance(config['settings']['save_type'], list):
+                config['settings']['save_type'] = config['settings']['save_type'][0]
+            for samples in config['samples']['samples']:
+                if isinstance(samples, list):
+                    for sample in samples:
+                        pq_list.append(sample.preformance_quality)
+                else:
+                    pq_list.append(samples.preformance_quality)
+            for pq in pq_list:
+                # Decollapse OND's
+                if isinstance(config['operator'][f"{independent_variable}"], list):
+                    for ond in config['operator'][f"{independent_variable}"]:
+                        ond_list = []
+                        for run in runs:
+                            if run[f"{independent_variable}"] == ond:
+                                for index, sample_pq in enumerate(run['pq']):
+                                    if sample_pq == pq:
+                                        ond_list.append(run['N'][index])
+                        n_list.append([round(mean(ond_list)), round(stdev(ond_list)), len(ond_list), stdev(ond_list)/sqrt(len(ond_list)), pq, ond])
+                else:
                     ond_list = []
                     for run in runs:
-                        if run[f"{independent_variable}"] == ond:
-                            for index, sample_pq in enumerate(run['pq']):
-                                if sample_pq == pq:
-                                    ond_list.append(run['N'][index])
-                    n_list.append([round(mean(ond_list)), round(stdev(ond_list)), len(ond_list), stdev(ond_list)/sqrt(len(ond_list)), pq, ond])
-            else:
-                ond_list = []
-                for run in runs:
-                    for count in run['N']:
-                        ond_list.append(count)
-                n_list.append([ond_list[0], ond_list[0], len(ond_list), '-', pq, config['operator'][f"{independent_variable}"]])
-        for l in n_list:
-            for item in l:
-                file.write(f"{item}\t")
-            file.write("\n")
+                        for count in run['N']:
+                            ond_list.append(count)
+                    n_list.append([ond_list[0], ond_list[0], len(ond_list), '-', pq, config['operator'][f"{independent_variable}"]])
+            for l in n_list:
+                for item in l:
+                    file.write(f"{item}\t")
+                file.write("\n")
 
 def sort_combinations(override_dictionary:dict, dictionary:dict, raw_combinations:list):
     """sort combinations"""

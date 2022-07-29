@@ -1,6 +1,17 @@
-"""The cognitive agents in the model"""
+"""A one line summary of the module or program, terminated by a period.
+
+Leave one blank line.  The rest of this docstring should contain an
+overall description of the module or program.  Optionally, it may also
+contain a brief description of exported classes and functions and/or usage
+examples.
+
+  Typical usage example:
+
+  foo = ClassFoo()
+  bar = foo.FunctionBar()
+"""
+from functools import reduce
 from datetime import timedelta
-import random
 from termcolor import colored
 from scipy.stats import linregress
 from src.library.enums.jig_enums import SaveType
@@ -10,7 +21,15 @@ from src.library.objects.objs import Context, SampleData
 from src.settings.config import Config
 
 class Person:
-    """Agent Parent Class"""
+    """Summary of class here.
+
+    Longer class information...
+    Longer class information...
+
+    Attributes:
+        likes_spam: A boolean indicating if we like SPAM or not.
+        eggs: An integer count of the eggs we have laid.
+    """
     agent_type = ""
     # TODO: Add system stability affect attention level
     # If the system is unstable attention should increase, if system is stable attention
@@ -50,7 +69,19 @@ class Person:
         return self.cogtemp_curve
 
     def update(self, context:Context):
-        """Update attention and focus"""
+        """Calculate agents attention and focus each cycle
+
+        Goes through each sample and determines if they all were compleated.
+        If they were, the ROI would be 100%, if not the roi percent
+        is calculated.
+
+        Args:
+            ami: an AMI object which contains all the data and the state
+            that the sample is in.
+
+        Returns:
+            A string that is the ROI of the experiment. In percent.
+        """
         # TODO _: energy degredation on a curve
         # TODO: coupled also on a curve
         if context['cognative_degredation']:
@@ -63,7 +94,15 @@ class Person:
             self.decision_delay = 1 + (1 - self.cognative_temperature)
 
 class DataAnalyst(Person):
-    """Retrives data from the instrument"""
+    """The Data Analyst will be able to predict the error of the current sample
+
+    Longer class information...
+    Longer class information...
+
+    Attributes:
+        Person: A boolean indicating if we like SPAM or not.
+    """
+    # """Retrives data from the instrument"""
     projected_intercept:float = None
     target_error:float = None
     predictions:list = []
@@ -97,7 +136,7 @@ class DataAnalyst(Person):
         #  Determine that the mean is settling
         if current_sample.err <= self.target_error:
             context.printer(f"DA: Data from run {context.instrument.run_number} {colored('is good', 'green')}", f"DA: Data from run {context.instrument.run_number} is good")
-            context.agenda.add_event(context.instrument.run_number, context.instrument.run_start_time, context.current_time, False)
+            context.agenda.add_event(context.instrument.run_number, context.instrument.run_start_time, context.current_time, current_sample, False)
             current_sample.compleated = True
             self.projected_intercept = None
             return True
@@ -115,9 +154,18 @@ class DataAnalyst(Person):
             context.agenda.finished()
 
 class Operator(Person):
-    """Operator reponse delay combines noticing, attention shifting to button, decision delay,
-    moving to the button, and pressing it (Possibly also need attention shift into the
-    display, but we're leaving that out bcs it can be arbitrarily large)"""
+    """Summary of class here.
+
+    Longer class information...
+    Longer class information...
+
+    Attributes:
+        likes_spam: A boolean indicating if we like SPAM or not.
+        eggs: An integer count of the eggs we have laid.
+    """
+    # """Operator reponse delay combines noticing, attention shifting to button, decision delay,
+    # moving to the button, and pressing it (Possibly also need attention shift into the
+    # display, but we're leaving that out bcs it can be arbitrarily large)"""
     # attention shifting to button has to be computed from where we are and where the buttons are
     # current_eye_position = 0
     # left_button_position = -2 # we're actually not gonna use these but just use a fixed shift time
@@ -207,10 +255,20 @@ class Operator(Person):
             return (self.button_distance * self.switch_button_delay_per_cm) + self.button_press_delay + self.decision_delay + self.noticing_delay
 
 class ExperimentManager(Person):
-    """High level GAP Goal Agenda Plan"""
+    """Summary of class here.
+
+    Longer class information...
+    Longer class information...
+
+    Attributes:
+        likes_spam: A boolean indicating if we like SPAM or not.
+        eggs: An integer count of the eggs we have laid.
+    """
+    # """High level GAP Goal Agenda Plan"""
     previous_transition_check:timedelta = None
-    transition_time:timedelta = timedelta(minutes=1)
+    transition_time:timedelta = None
     current_transition_time:timedelta = None
+    max_transition_time:timedelta = None
 
     current_sample_switch_time:timedelta = None
     previous_switch_check:timedelta = timedelta(0)
@@ -220,14 +278,16 @@ class ExperimentManager(Person):
     previous_data_check:timedelta = None
     data_check_wait:timedelta = timedelta(minutes=1)
 
-    def __init__(self):
+    def __init__(self, config:Config):
         super().__init__(AgentType.EM)
+        self.max_transition_time = config['instrument']['sample_transition_time']
+
 
     def start_experiment(self, context:Context):
         """Start Experiment and load samples"""
         context.agenda.start_experiment()
         context.printer(f"EM: {colored('Load Samples', 'green')}", 'EM: Load Samples')
-        context.ami.load_samples(context.agenda.number_of_samples)
+        context.ami.load_samples(context)
         context.printer('EM: sort samples by PQ in decending order',
          'EM: sort samples by PQ in decending order')
         context.ami.sort_samples()
@@ -237,19 +297,47 @@ class ExperimentManager(Person):
         context.printer(f"EM: {colored('Start Instrument', 'green')}", 'EM: Start Instrument')
         context.instrument.start()
 
+    def sample_change_logic(self, context:Context):
+        """Sample change logic"""
+        num_samples_done = len(context.agenda.event_timeline)
+        if num_samples_done >= 2:
+            this_run_pq = context.agenda.event_timeline[num_samples_done-1].sample.preformance_quality
+            this_run_length = context.agenda.event_timeline[num_samples_done-1].duration
+            last_run_pq = context.agenda.event_timeline[num_samples_done-2].sample.preformance_quality
+            last_run_length = context.agenda.event_timeline[num_samples_done-2].duration
+            pq_delta:float = round(last_run_pq - this_run_pq,5)
+            run_length_delta:timedelta = timedelta(seconds=abs(last_run_length.total_seconds() - this_run_length.total_seconds()))
+            estimated_delta_seconds_per_pq:float = round(abs(run_length_delta.total_seconds()/pq_delta))
+            estimated_run_length_map = [timedelta(seconds=(sample.duration.total_seconds() + round(((s*pq_delta) * estimated_delta_seconds_per_pq)))) for s, sample in enumerate(context.ami.samples) if sample.compleated is False]
+            estimated_total_time_for_remaining_samples:timedelta = reduce(lambda a, b: a + b, estimated_run_length_map)
+            time_remaining:timedelta = context.agenda.experimental_time - context.current_time
+            projected_seconds_overtime:float = time_remaining.total_seconds() - estimated_total_time_for_remaining_samples.total_seconds()
+            if projected_seconds_overtime < 0:
+                if context.agent_da.target_error == context['data_analysis']['target_error'] * 10:
+                    pass
+                else:
+                    context.agent_da.target_error+=context['data_analysis']['target_error']
+            elif projected_seconds_overtime > 500:
+                if context.agent_da.target_error == context['data_analysis']['target_error']:
+                    pass
+                else:
+                    context.agent_da.target_error-=context['data_analysis']['target_error']
+
     def check_if_next_run_can_be_started(self, context:Context) -> bool:
         """Check to see if the sample needs to be changed if so wait"""
+        next_sample:SampleData
         # TODO: Ask person to change sample
-        if context.instrument.current_sample is None:
-            next_sample:SampleData = context.ami.samples[0]
-        elif context.instrument.current_sample is not None:
+        if context.instrument.current_sample is not None:
             if len(context.ami.samples) == (context.instrument.current_sample + 1):
                 return False
-            next_sample:SampleData = context.ami.samples[context.instrument.current_sample+1]
+            next_sample = context.ami.samples[context.instrument.current_sample+1]
+        else:
+            next_sample = context.ami.samples[0]
         if self.previous_sample is not None:
             if self.current_transition_time is None:
-                self.current_transition_time = timedelta(minutes=random.uniform(0.2, 2.0))
-                if context['settings']['save_type'] == SaveType.DETAILED:
+                self.current_transition_time = self.max_transition_time
+                # self.current_transition_time = timedelta(minutes=random.uniform(0.2, 2.0))
+                if context['settings']['save_type'][0] == SaveType.DETAILED:
                     context.file_write(f"Instrument transition: {self.current_transition_time}")
             if self.current_transition_time > timedelta(0):
                 if self.previous_transition_check is None:
@@ -262,6 +350,7 @@ class ExperimentManager(Person):
             else:
                 self.previous_transition_check = None
                 self.current_transition_time = None
+                self.sample_change_logic(context)
                 return True
             return False
         if self.current_sample_switch_time is None:
@@ -271,6 +360,7 @@ class ExperimentManager(Person):
         if self.current_sample_switch_time <= timedelta(0):
             self.current_sample_switch_time = None
             self.previous_sample = next_sample
+            self.sample_change_logic(context)
             return True
         else:
             context.messages.concat(f"Sample: {0 if context.instrument.current_sample is None else context.instrument.current_sample + 1}, Setting up: {colored(f'{self.current_sample_switch_time}', 'blue')}\n")
@@ -304,13 +394,29 @@ class ExperimentManager(Person):
             # TODO _: Does operator keep going until told to stop or do they need to be told to keep going
 
 class RemoteUser(Person):
-    """A user who is not present on site"""
+    """Summary of class here.
+
+    Longer class information...
+    Longer class information...
+
+    Attributes:
+        likes_spam: A boolean indicating if we like SPAM or not.
+        eggs: An integer count of the eggs we have laid.
+    """
     # FFF: Who is communicating with the remote user from inside the hutch
     def __init__(self):
         super().__init__(AgentType.RU)
 
 class ACROperator(Person):
-    """An operator who is in the Accelerator Controll Room"""
+    """Summary of class here.
+
+    Longer class information...
+    Longer class information...
+
+    Attributes:
+        likes_spam: A boolean indicating if we like SPAM or not.
+        eggs: An integer count of the eggs we have laid.
+    """
     # FFF: who is the person talking to the ACR operator in
     # the situation that the beam dissapears or has problems
     # FFF: or they want to change the photon energy level
