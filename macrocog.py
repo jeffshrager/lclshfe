@@ -1,3 +1,5 @@
+# Correctly estimate error_threshold time savings per pq (currently set at 300)
+
 # This is intended to model end-to-end decision-making for an LCLS
 # experiment.
 
@@ -7,6 +9,10 @@
 from functools import reduce
 from numpy import arange
 from random import randint
+
+
+def showsamples(samples):
+    [print(str(sample)) for sample in samples]
 
 n_samples_at_each_importance = 5
 sample_pq_delta = 0.025
@@ -22,13 +28,13 @@ time_delta=(3600-300)/(len(pqs)-1)
 # the target err by selection from a table that just associates pqs
 # with a range of times (in seconds) from about 5 minutes (300s) for
 # the highest pq to around 3600s (60 minutes) for the worst.
-run_lengths = [round(t) for t in arange(300,len(pqs)*time_delta,time_delta)]
+estimated_run_lengths = [round(t) for t in arange(300,len(pqs)*time_delta,time_delta)]
 # Now spread the pqs across the samples
-for (sample,pq,run_length) in zip(samples, pqs, run_lengths):
+for (sample,pq,estimated_run_length) in zip(samples, pqs, estimated_run_lengths):
     sample["pq"]=pq
-    sample["run_length"]=run_length
-[print(str(sample)) for sample in samples]
-cumulative_estimated_run_length = reduce(lambda a, b: a + b, [s["run_length"] for s in samples])
+    sample["estimated_run_length"]=estimated_run_length
+showsamples(samples)
+cumulative_estimated_run_length = reduce(lambda a, b: a + b, [s["estimated_run_length"] for s in samples])
 print("cumulative_estimated_run_length = "+str(cumulative_estimated_run_length))
 
 # The general plan is to run the less important samples first, until
@@ -74,7 +80,7 @@ def run():
         n_samples_left-=1
         print("\nSAMPLE #"+str(nth_sample)+":"+str(sample))
         print("  error_threshold = "+str(error_threshold))
-        srl = sample["run_length"]
+        srl = sample["estimated_run_length"]
         # *** III !!! The error_threshold has to be increased into
         # this using the same estimate that's used in
         # recalibrate_error_threshold(...)
@@ -88,11 +94,12 @@ def run():
         actual_run_length=uncorrected_run_length-run_length_correction_from_error_threshold
         print("--> actual run length (including error threshold correction)= "+str(actual_run_length))
         cumulative_time_used += actual_run_length
+        sample["actual_run_length"]=actual_run_length
         print("cumulative_time_used = "+str(cumulative_time_used)+" [projection(cumulative_estimated_run_length):"+str(cumulative_estimated_run_length))
         runs=[[sample,actual_run_length]]+runs
         # Once we have two samples we can start estimating the amount
         # of time each pq delta costs. For the moment we just use the
-        # last two to figure this. This isn't actuallty unreasonable
+        # last two to figure this. This isn't actually unreasonable
         # given instrument float.
         if (len(runs)>1 and nth_sample<n_samples-1):
             this_run_pq = runs[0][0]["pq"]
@@ -114,16 +121,22 @@ def run():
             # anyway, now we use this seconds/pq to estimate how long
             # the whole rest of the run is going to take.
             print(" n_samples_left = "+str(n_samples_left))
-            # This assumes that the delta pq is fixed (@0.025)
-            estimated_run_length_map = [actual_run_length + round(((s*pq_delta) * estimated_delta_seconds_per_pq)) for s in range(n_samples_left)]
+            # This assumes that the delta pq is fixed (@0.025) FFF Someday calculate it! FFF
+            estimated_run_length_map = [actual_run_length + round((((1+s)*pq_delta) * estimated_delta_seconds_per_pq)) for s in range(n_samples_left)]
             print(" estimated_run_length_map = "+str(estimated_run_length_map))
+            # We replace the sample estimates with the estmates we just made (FFF Nb. PQs are wrongly assumed = 0.025! FFF)
+            for (sample,estimated_run_length) in zip([samples[1+n+nth_sample] for n in range(n_samples_left)],estimated_run_length_map):
+                sample["estimated_run_length"]=estimated_run_length
+            print("New sample set (revised estimated_run_lengths):")
+            showsamples(samples)
+            # Now figure out if we're going to run out of time
             estimated_total_time_for_remaining_samples = reduce(lambda a, b: a + b, estimated_run_length_map)
             print(" estimated_total_time_for_remaining_samples = "+str(estimated_total_time_for_remaining_samples))
             time_remaining = total_available_time - cumulative_time_used
             print(" time_remaining = "+str(time_remaining))
             # This will be NEGATIVE iff there's a shortfall
             projected_seconds_overtime = time_remaining - estimated_total_time_for_remaining_samples
-            print(" projected_seconds_overtime="+str(projected_seconds_overtime))
+            print(" projected_seconds_overtime="+str(projected_seconds_overtime)+" [+ is short (under-run=good), - is long (over-run=bad)")
             # This should be calculated, but at the moment, it's just hacked to five minutes
             seconds_saved_from_error_threshold_001_delta = 300 
             #seconds_saved_from_error_threshold_001_delta = (last_run_length/2)/((0.01-error_threshold)*1000)
@@ -148,7 +161,7 @@ def run():
                     print("    ------ Resetting error_threshold to "+str(error_threshold))
             else:
                 print("Still Safe, and within 1 hour of the target, so not changing error threshold.")
-
+    showsamples(samples)
 
 # More complex error threshold calibration: delta we need to have
 # either run several samples with different error rates, or more like
