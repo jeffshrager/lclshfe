@@ -16,15 +16,13 @@ from typing import TYPE_CHECKING, List
 from io import TextIOWrapper
 import random
 from datetime import datetime, timedelta
+from rich import print
 import numpy as np
-from src.library.enums.jig_enums import SaveType
-from src.library.enums.model_enums import ExperimentState, \
-    InstrumentRunState, SampleImportance, SampleType
-from src.library.functions.func import clamp
+import src.library.enums as enums
+import src.library.functions as functions
 if TYPE_CHECKING:
-    from src.settings.config import Config
-    from src.library.objects.agent import DataAnalyst, ExperimentManager, Operator
-    from src.library.objects.instrument import CXI
+    import src.settings as settings
+    import src.library.objects as objects
 
 class CommunicationObject:
     """Summary of class here.
@@ -70,7 +68,7 @@ class InstrumentStatus:
     hits = 0
     misses = 0
     msg = ""
-    is_running = InstrumentRunState.STOPPED
+    is_running = enums.InstrumentRunState.STOPPED
     # These are counted over all reps and then the mean is display at the end
     n_crazy_ivans = 0
 
@@ -79,11 +77,11 @@ class InstrumentStatus:
 
     def start(self):
         """Start the Instrumnet"""
-        self.is_running = InstrumentRunState.RUNNING
+        self.is_running = enums.InstrumentRunState.RUNNING
 
     def stop(self):
         """Stop the Instrumnet"""
-        self.is_running = InstrumentRunState.STOPPED
+        self.is_running = enums.InstrumentRunState.STOPPED
 
 class Stream:
     """Summary of class here.
@@ -113,7 +111,7 @@ class Stream:
     allow_response_cycle:int = 99999999999
     cycle:int = 1
 
-    def __init__(self, config:Config):
+    def __init__(self, config:settings.Config):
         self.stream_shift_amount = config['instrument']['stream_shift_amount']
         self.p_stream_shift = config['instrument']['p_stream_shift']
         self.p_crazy_ivan = config['instrument']['p_crazy_ivan']
@@ -142,7 +140,7 @@ class Beam:
     physical_acuity = 0.02
     beam_pos = 0.0
 
-    def __init__(self, config:Config):
+    def __init__(self, config:settings.Config):
         self.beam_shift_amount = config['instrument']['beam_shift_amount']
         self.physical_acuity = config['instrument']['physical_acuity']
 
@@ -192,11 +190,11 @@ class SampleData:
     # TODO: make weights affect rescheduling
     # QQQ: What was this N shaped dynamics
     def __init__(self, preformance_quality:float,
-            importance:SampleImportance, setup_time:SampleType):
+            importance:enums.SampleImportance, setup_time:enums.SampleType):
         self.compleated:bool = False
         self.timeout:bool = False
         self.preformance_quality:float = preformance_quality
-        self.importance:SampleImportance = importance
+        self.importance:enums.SampleImportance = importance
         self.setup_time:timedelta = setup_time.value['setup_time']
         self.data:List[DataPoint] = []
         self.count:float = 0.0
@@ -205,14 +203,16 @@ class SampleData:
         self.variance:float = 0.0
         self.sdev:float = 0.0
         self.err:float = 0.0
-        self.count_array = []
-        self.err_array = []
-        self.projected_intercept = 0.0
-        self.wall_hits = 0.0
-        self.run_length = timedelta(seconds=0)
-        self.duration = timedelta(seconds=0)
+        self.count_array:List = []
+        self.err_array:List = []
+        self.projected_intercept:float = 0.0
+        self.wall_hits:float = 0.0
+        self.estimated_run_length:timedelta = timedelta(seconds=0)
+        self.duration:timedelta = timedelta(seconds=0)
+        self.running:bool = False
+        self.error_time_array:List = []
 
-    def append(self, data:DataPoint):
+    def append(self, data:DataPoint, context:Context):
         """Append new data point run Welford's algorithm calculations
         https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance"""
         self.count += 1
@@ -227,6 +227,8 @@ class SampleData:
         self.err = self.sdev / sqrt(self.count)
         self.count_array.append(self.count)
         self.err_array.append(self.err)
+
+        self.error_time_array.append([self.err, context.current_time])
 
     def reset(self):
         """Reset the data"""
@@ -251,12 +253,19 @@ class SampleData:
     def __str__(self):
         return f"{self.preformance_quality:.2f}"
 
-    def get_stats(self):
+    def get_stats(self) -> list[str]:
         """Return the stats of the data"""
-        # print(f"{'Left Aligned Text' : <20}")
-        return (f"{str(self.importance.name):<11} pq:{self.preformance_quality:.3f} time: est:{str(self.run_length).split('.', maxsplit=1)[0]:<6} actual {str(self.duration).split('.', maxsplit=1)[0]:<6} | mean:{self.mean:.3f}, err:{self.err:.6f},"+
-            f" var:{self.variance:.3f}, dev:{self.sdev:.3f}, intercept:{self.projected_intercept:.3f}"
-            if self.count != 0 else f"{str(self.importance.name):<11} pq:{self.preformance_quality:.3f} time: est:{str(self.run_length).split('.', maxsplit=1)[0]:<6} actual {str(self.duration).split('.', maxsplit=1)[0]:<6} | mean:0.000, err:0.000000, var:0.000, dev:0.000, intercept:0.000")
+        return (
+            f"[{self.importance.value['color']} not dim]{self.importance.name:<11}",
+            f"[default dim]pq:[rgb({functions.rgb(self.preformance_quality)}) not dim]{self.preformance_quality:.3f}",
+            f"[italic yellow dim]est:[not dim]{str(self.estimated_run_length).split('.', maxsplit=1)[0]:<6}",
+            f"[italic green dim]actual:[not dim]{str(self.duration).split('.', maxsplit=1)[0]:<6}",
+            "[default]|",
+            f"[dim]mean:[not dim]{(self.mean if self.count != 0 else 0.000):.3f}",
+            f"[default dim]err:[not dim]{(self.err  if self.count != 0 else 0.000000):.6f}",
+            f"[default dim]var:[not dim]{(self.variance if self.count != 0 else 0.000):.3f}",
+            f"[default dim]dev:[not dim]{(self.sdev if self.count != 0 else 0.000):.3f}",
+            f"[default dim]intercept:[not dim]{(self.projected_intercept if self.count != 0 else 0.000):.3f}")
 
 class AMI:
     """Summary of class here.
@@ -278,7 +287,7 @@ class AMI:
     samples:List[SampleData] = []
     random_samples:bool = None
 
-    def __init__(self, config:Config):
+    def __init__(self, config:settings.Config):
         self.samples:List[SampleData] = []
         self.random_samples = config['samples']['random_samples']
         if not config['samples']['random_samples']:
@@ -290,7 +299,7 @@ class AMI:
     def load_samples(self, context:Context):
         """Load the samples using a random distribution"""
         if self.random_samples:
-            self.samples = [SampleData(clamp(random.gauss(0.90, 0.2), 0.00, 0.99),
+            self.samples = [SampleData(functions.clamp(random.gauss(0.90, 0.2), 0.00, 0.99),
                 random.gauss(0.80, 0.20), timedelta(minutes=random.gauss(1, 0.5)))
                 for _ in range(context.agenda.number_of_samples)]
         self.calculate_run_length(context)
@@ -299,7 +308,7 @@ class AMI:
         """Calculate the run length of the samples"""
         for sample in context.ami.samples:
             # QQQ: Better Prediction
-            sample.run_length = timedelta(seconds=(1 - sample.preformance_quality) * 1400)
+            sample.estimated_run_length = timedelta(seconds=(1 - sample.preformance_quality) * 1400)
 
     def sort_samples(self):
         """Sort the samples by PQ"""
@@ -371,9 +380,10 @@ class AMI:
 
     def __str__(self):
         return_string = ""
-        for sample in self.samples:
+        for index, sample in enumerate(self.samples):
             # pq, mean, err, var, dev
-            return_string += f'N: {len(sample.data): >6} - {sample.get_stats()}\n'
+            return_string += f"{'[green dim]' if sample.compleated else ('[bold green]' if sample.running else '[default dim]')}{str(index): >2} |N: [default not dim]{len(sample.data): >6} [dim]- {sample.get_stats()}\n"
+            # return_string += f"{'[default dim]' if not sample.compleated else ('[green bold not dim]' if sample.running else '[green dim]')}{str(index): >2} |N: [default not dim]{len(sample.data): >6} [dim]- {sample.get_stats()}\n"
         return return_string
 
 class Agenda:
@@ -390,20 +400,20 @@ class Agenda:
     experimental_time:timedelta = timedelta(0)
     number_of_samples:int = 0
     event_timeline:List[Event] = []
-    experiment_status:ExperimentState = ExperimentState.STOPED
+    experiment_status:enums.ExperimentState = enums.ExperimentState.STOPED
     status = None
 
-    def __init__(self, config:Config):
+    def __init__(self, config:settings.Config):
         self.experimental_time:timedelta = config['experimental_time']
         self.event_timeline:List[Event] = []
-        self.experiment_status:ExperimentState = ExperimentState.STOPED
+        self.experiment_status:enums.ExperimentState = enums.ExperimentState.STOPED
         self.status = None
         self.number_of_samples = config['samples']['number_of_samples']
 
     def start_experiment(self):
         """Start the experiment if it has not been started"""
         if not self.experiment_status.value:
-            self.experiment_status = ExperimentState.STARTED
+            self.experiment_status = enums.ExperimentState.STARTED
 
     def is_started(self):
         """check if experiment has been started"""
@@ -468,18 +478,18 @@ class Context:
     current_time:timedelta = None
     ami:AMI = None
     agenda:Agenda = None
-    agent_da:DataAnalyst = None
-    agent_em:ExperimentManager= None
-    agent_op:Operator = None
-    instrument:CXI = None
+    agent_da:objects.DataAnalyst = None
+    agent_em:objects.ExperimentManager= None
+    agent_op:objects.Operator = None
+    instrument:objects.CXI = None
     messages:CommunicationObject = None
-    config:Config = None
+    config:settings.Config = None
     file:TextIOWrapper = None
     data_file:TextIOWrapper = None
     start_time:datetime = None
 
-    def __init__(self, ami:AMI, agenda:Agenda, agent_da:DataAnalyst, agent_em:ExperimentManager,
-            agent_op:Operator, instrument:CXI, messages:CommunicationObject, config:Config,
+    def __init__(self, ami:AMI, agenda:Agenda, agent_da:objects.DataAnalyst, agent_em:objects.ExperimentManager,
+            agent_op:objects.Operator, instrument:objects.CXI, messages:CommunicationObject, config:settings.Config,
             file:TextIOWrapper, data_file:TextIOWrapper):
         self.current_time = timedelta(0)
         self.ami = ami
@@ -503,7 +513,7 @@ class Context:
     def printer(self, console:str, file:str):
         """Print message to console"""
         self.messages.concat(f"{console}\n")
-        if self.config['settings']['save_type'][0] == SaveType.DETAILED:
+        if self.config['settings']['save_type'][0] == enums.SaveType.DETAILED:
             self.file_write(file)
 
     def __getitem__(self, key):

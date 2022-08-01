@@ -10,10 +10,10 @@ examples.
   foo = ClassFoo()
   bar = foo.FunctionBar()
 """
-from src.jig import display, display_new, jig, rollup, stats
-import src.settings.overrides as overrides
+import src
+import src.settings as settings
 
-jig(overrides.macro_test, True, 'functional_acuity')
+src.jig(settings.overrides.macro_test, True, 'functional_acuity')
 
 
 # display_new(jig(overrides.over180, True, 'functional_acuity'), 'functional_acuity')
@@ -21,6 +21,24 @@ jig(overrides.macro_test, True, 'functional_acuity')
 # stats("fnc_ond_tanh_false_cog_false/1658732176.595285")
 # display("fnc_ond1_tanh_false_cog_false/1658810656.175882")
 # display_new("fnc_ond1_tanh_true_cog_true/1658863335.323498")
+
+
+
+
+
+
+# III: Timing Thing
+# III: Comments
+# III: Unit Tests
+
+
+
+
+
+
+
+
+
 
 
 

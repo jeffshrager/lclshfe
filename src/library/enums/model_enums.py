@@ -74,11 +74,14 @@ class SampleImportance(Enum):
 
     Each sample has a different level of importance
 
+    Available colors:
+        red, green, yellow, blue, magenta, cyan, white.
+
     Attributes:
         enum: The enum for the sample importance.
     """
-    IMPORTANT = 2
-    UNIMPORTANT = 1
+    IMPORTANT = {'importance':2, 'color':'cyan'}
+    UNIMPORTANT = {'importance':1, 'color':'magenta'}
     # MOST_IMPORTANT = 5
     # IMPORTANT = 4
     # LESS_IMPORTANT = 3

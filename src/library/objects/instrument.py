@@ -12,13 +12,11 @@ examples.
 """
 import random
 from datetime import timedelta
-from termcolor import colored
-from src.library.enums.jig_enums import SaveType
-from src.library.enums.model_enums import InstrumentType
-from src.library.functions.func import clamp, get_current_datapoints, aquire_data
-from src.library.objects.objs import Beam, Context, DataPoint, \
-    InstrumentStatus, SampleData, Stream
-from src.settings.config import Config
+from rich import print
+import src.library.enums as enums
+import src.library.functions as functions
+import src.library.objects as objects
+import src.settings as settings
 
 class Instrument:
     """Summary of class here.
@@ -31,10 +29,10 @@ class Instrument:
         eggs: An integer count of the eggs we have laid.
     """
     instrument_type = ""
-    instrument_status:InstrumentStatus = None
-    stream_status:Stream = None
+    instrument_status:objects.InstrumentStatus = None
+    stream_status:objects.Stream = None
     time_out_value:int = None
-    beam_status:Beam = None
+    beam_status:objects.Beam = None
     collecting_data = False
     run_start_time:timedelta = None
     run_number:int = None
@@ -111,7 +109,7 @@ class Instrument:
         self.instrument_status.msg = ""
         return return_string
 
-    def stream_frame_update(self, context:Context):
+    def stream_frame_update(self, context:objects.Context):
         """stream"""
         self.instrument_status.hits = 0
         self.instrument_status.misses = 0
@@ -131,7 +129,7 @@ class Instrument:
             self.stream_status.stream_pos = round(self.stream_status.stream_pos + (
                 self.stream_status.stream_shift_amount * random.choice(
                     [i for i in range(-1, 2) if i not in [0]])), 4)
-        context.messages.concatbegining(f"{self.show_pos()}\n{get_current_datapoints(context)}\n")
+        context.messages.concatbegining(f"{self.show_pos()}\n{functions.get_current_datapoints(context)}\n")
         if self.stream_status.cycle >= self.stream_status.allow_response_cycle:
             self.instrument_status.msg = self.instrument_status.msg + "<?>"
             # Warning! WWW This used to truncate, but that interacts badly with computer math
@@ -139,19 +137,18 @@ class Instrument:
             # of 0.7, and it loops out.
         self.stream_status.cycle = self.stream_status.cycle + 1
 
-    def update(self, context:Context):
+    def update(self, context:objects.Context):
         "update vars in relation to time"
         if self.collecting_data:
             self.stream_frame_update(context)
             if self.run_start_frame:
                 self.run_start_frame = False
             else:
-                context.messages.concat(f"Run {self.run_number} "+
-                    f"{colored('Collecting Data', 'green')}\n")
+                context.messages.concat(f"Run {self.run_number} "+"[green]Collecting Data[/green]\n")
             
             current_sample = context.ami.samples[self.current_sample]
             if len(current_sample.data) > self.time_out_value:
-                context.printer(f"{colored('Warning', 'yellow')}: To many data points timeout", "Warning: To many data points timeout")
+                context.printer("[yellow]Warning[/yellow]: To many data points timeout", "Warning: To many data points timeout")
                 context.agenda.add_event(context.instrument.run_number, context.instrument.run_start_time, context.current_time, current_sample, True)
                 current_sample.timeout = True
                 self.collecting_data = False
@@ -165,7 +162,7 @@ class Instrument:
                 current_sample.duration = current_sample.duration + delta
                 distance = abs(self.stream_status.stream_pos - self.beam_status.beam_pos)
                 for _ in range(int(delta.total_seconds()) * self.data_per_second):
-                    datapoint:DataPoint = DataPoint(clamp(aquire_data(distance,
+                    datapoint:objects.DataPoint = objects.DataPoint(functions.clamp(functions.aquire_data(distance,
                             current_sample.preformance_quality, context) \
                             # QQQ: Do we need this, line below?
                             # * current_sample.preformance_quality \
@@ -178,9 +175,9 @@ class Instrument:
                             # Tik Tak Toe Board Data
                             [[1.0, 0.0, 1.0], [0.0, None, 0.0], [1.0, 0.0, 1.0]]
                             )
-                    if context['settings']['save_type'][0] == SaveType.DETAILED:
+                    if context['settings']['save_type'][0] == enums.SaveType.DETAILED:
                         open(context.data_file.name, 'a', encoding="utf-8").write(f"{self.current_sample}\t{current_sample.count}\t{datapoint.quality:.15f}\t{current_sample.file_string()}\n")
-                    current_sample.append(datapoint)
+                    current_sample.append(datapoint, context)
                 self.last_data_update = context.current_time
 
 class CXI(Instrument):
@@ -195,22 +192,24 @@ class CXI(Instrument):
     """
     transition_write:bool = False
     previous_transition_check:timedelta = None 
-    previous_sample:SampleData = None
+    previous_sample:objects.SampleData = None
 
-    def __init__(self, config:Config):
-        super().__init__(InstrumentType.CXI)
+    def __init__(self, config:settings.Config):
+        super().__init__(enums.InstrumentType.CXI)
         self.data_per_second = config['instrument']['data_per_second']
-        self.instrument_status = InstrumentStatus()
-        self.stream_status = Stream(config)
-        self.beam_status = Beam(config)
+        self.instrument_status = objects.InstrumentStatus()
+        self.stream_status = objects.Stream(config)
+        self.beam_status = objects.Beam(config)
         self.time_out_value = config['instrument']['time_out_value']
 
-    def run_peak_chasing(self, context:Context) -> bool:
+    def run_peak_chasing(self, context:objects.Context) -> bool:
         """True: peak chasing started, False: not started"""
         self.transition_write = False
         self.previous_transition_check = None
         self.run_number += 1
-        context.printer(f"{colored('Start', 'green')} Run {self.run_number}",
+        context.ami.samples[self.run_number-2].running = False
+        context.ami.samples[self.run_number-1].running = True
+        context.printer(f"[green]Start[/green] Run {self.run_number}",
             f"Start Run {self.run_number}")
         self.run_start_time = context.current_time
         self.collecting_data = True
@@ -221,7 +220,7 @@ class CXI(Instrument):
             if not sample_goal.compleated and not sample_goal.timeout:
                 self.current_sample = index
                 break
-        if context['settings']['save_type'][0] == SaveType.DETAILED:
+        if context['settings']['save_type'][0] == enums.SaveType.DETAILED:
             open(context.data_file.name, 'a', encoding="utf-8").write("sample #\tcount\tdata\tpreformance quality\tweight\tmean\tm2\tvariance\tsdev\terr\n")
         self.previous_sample = context.ami.samples[self.current_sample]
         return True

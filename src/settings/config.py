@@ -13,10 +13,9 @@ examples.
 from datetime import timedelta
 import os
 from typing import List
-from src.library.enums.jig_enums import SaveType
-from src.library.enums.model_enums import SampleImportance, SampleType
-from src.library.functions.func import update_dict
-from src.library.objects.objs import SampleData
+import src.library.enums as enums
+import src.library.functions as functions
+import src.library.objects as objects
 
 class Config:
     """Summary of class here.
@@ -63,7 +62,7 @@ class Config:
         self.default_dictionary = {
         'settings': {
             'name': ['default_run'],
-            'save_type': SaveType.COLLAPSED,
+            'save_type': enums.SaveType.COLLAPSED,
             'display': True,
             'cycle_sleep_time': 0.0,
         },
@@ -72,7 +71,7 @@ class Config:
         'step_through_time': timedelta(seconds=1),
         'samples': {
             'number_of_samples': 5,
-            'samples': [SampleData(0.90, SampleImportance.IMPORTANT, SampleType.TAPE)],
+            'samples': [objects.SampleData(0.90, enums.SampleImportance.IMPORTANT, enums.SampleType.TAPE)],
             'random_samples': False,
         },
         'cognative_degredation': True,
@@ -107,7 +106,7 @@ class Config:
         },
         }
         self.override_dictionary = override_dictionary
-        self.default_dictionary = update_dict(self.default_dictionary, self.override_dictionary)
+        self.default_dictionary = functions.update_dict(self.default_dictionary, self.override_dictionary)
 
     def __getitem__(self, key):
         """Fetches rows from a Smalltable.

@@ -18,7 +18,7 @@ from statistics import stdev
 from typing import List
 from numpy import mean
 from termcolor import colored
-from src.library.objects.objs import AMI, SampleData
+import src.library.objects as objects
 
 def cartesian_product(kwargs):
     """This returns a list of dictionaries with single value keys
@@ -45,7 +45,7 @@ def write_summary_file(config:dict, folder:str, runs:List[dict], independent_var
             file.write(f"average\tstdev\tn\terr\tpq\t{independent_variable}\n")
             n_list = []
             pq_list = []
-            sample:SampleData
+            sample:objects.SampleData
             if isinstance(config['settings']['save_type'], list):
                 config['settings']['save_type'] = config['settings']['save_type'][0]
             for samples in config['samples']['samples']:
@@ -182,7 +182,7 @@ def runs_to_xyz(config, runs):
     # y_axis = [0, 1, 2, 3]
 
     max_count = 0
-    run:AMI
+    run:objects.AMI
     for sample in y_axis:
         sample_max = 0
         for run in runs:

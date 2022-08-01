@@ -12,13 +12,11 @@ examples.
 """
 from functools import reduce
 from datetime import timedelta
-from termcolor import colored
 from scipy.stats import linregress
-from src.library.enums.jig_enums import SaveType
-from src.library.enums.model_enums import AgentType
-from src.library.functions.func import clamp, cognative_temperature_curve
-from src.library.objects.objs import Context, SampleData
-from src.settings.config import Config
+import src.library.enums as enums
+import src.library.functions as functions
+import src.library.objects as objects
+import src.settings as settings
 
 class Person:
     """Summary of class here.
@@ -68,7 +66,7 @@ class Person:
         """get the level of attention"""
         return self.cogtemp_curve
 
-    def update(self, context:Context):
+    def update(self, context:objects.Context):
         """Calculate agents attention and focus each cycle
 
         Goes through each sample and determines if they all were compleated.
@@ -87,8 +85,8 @@ class Person:
         if context['cognative_degredation']:
             delta:timedelta = context.current_time - self.previous_check
             if delta >= timedelta(minutes=1):
-                self.cogtemp_curve = clamp(self.cogtemp_curve + self.energy_degradation, 0.0, 1.0)
-                self.cognative_temperature = clamp(cognative_temperature_curve(self.cogtemp_curve), 0.01, 1.0)
+                self.cogtemp_curve = functions.clamp(self.cogtemp_curve + self.energy_degradation, 0.0, 1.0)
+                self.cognative_temperature = functions.clamp(functions.cognative_temperature_curve(self.cogtemp_curve), 0.01, 1.0)
                 self.previous_check = context.current_time
             self.noticing_delay = 1 + (1 - self.cognative_temperature)
             self.decision_delay = 1 + (1 - self.cognative_temperature)
@@ -107,12 +105,12 @@ class DataAnalyst(Person):
     target_error:float = None
     predictions:list = []
 
-    def __init__(self, config:Config):
-        super().__init__(AgentType.DA)
+    def __init__(self, config:settings.Config):
+        super().__init__(enums.AgentType.DA)
         self.last_sample_with_enough_data = None
         self.target_error = config['data_analysis']['target_error']
 
-    def check_if_enough_data_to_analyse(self, context:Context) -> bool:
+    def check_if_enough_data_to_analyse(self, context:objects.Context) -> bool:
         """Check if there is enough data to start analysing, right now this is a constant"""
         # III: Reconnect prediction to operation
         current_sample = context.ami.samples[context.instrument.current_sample]
@@ -124,26 +122,26 @@ class DataAnalyst(Person):
                 self.projected_intercept = (self.target_error - regression.intercept) / regression.slope
                 context.ami.samples[context.instrument.current_sample].projected_intercept = self.projected_intercept
                 if self.projected_intercept <= current_sample.count:
-                    context.printer(f"DA: Data from run {context.instrument.run_number} {colored('has enough data to analyse', 'green')}", f"DA: Data from run {context.instrument.run_number} has enough data to analyse")
+                    context.printer(f"[default]DA: Data from run {context.instrument.run_number} [green]has enough data to analyse", f"DA: Data from run {context.instrument.run_number} has enough data to analyse")
             return True
         return False
 
-    def check_if_data_is_sufficient(self, context:Context) -> bool:
+    def check_if_data_is_sufficient(self, context:objects.Context) -> bool:
         """If there is enough data True, else False to ask to keep running"""
         # TODO: Ask Instrument scientist to see what is the real decision logic stopping criteria
         current_sample = context.ami.samples[context.instrument.current_sample]
         # TODO: DA does not have access to preformance quality
         #  Determine that the mean is settling
         if current_sample.err <= self.target_error:
-            context.printer(f"DA: Data from run {context.instrument.run_number} {colored('is good', 'green')}", f"DA: Data from run {context.instrument.run_number} is good")
+            context.printer(f"DA: Data from run {context.instrument.run_number} [green]is good[/green]", f"DA: Data from run {context.instrument.run_number} is good")
             context.agenda.add_event(context.instrument.run_number, context.instrument.run_start_time, context.current_time, current_sample, False)
             current_sample.compleated = True
             self.projected_intercept = None
             return True
-        context.printer(f"DA: {colored('More data needed from run', 'yellow')} {context.instrument.run_number}", f"DA: More data needed from run {context.instrument.run_number}")
+        context.printer(f"DA: [yellow]More data needed from run[/yellow] {context.instrument.run_number}", f"DA: More data needed from run {context.instrument.run_number}")
         return False
 
-    def check_if_experiment_is_compleated(self, context:Context):
+    def check_if_experiment_is_compleated(self, context:objects.Context):
         """Check if experiment is compleated"""
         current_sample = None
         for index, sample_goal in enumerate(context.ami.samples):
@@ -177,8 +175,8 @@ class Operator(Person):
     running_peak_chasing = False
     allow_response_cycle = 99999999999
 
-    def __init__(self, config:Config):
-        super().__init__(AgentType.OP)
+    def __init__(self, config:settings.Config):
+        super().__init__(enums.AgentType.OP)
         self.switch_button_delay_per_cm = config['operator']['switch_button_delay_per_cm']
         self.button_press_delay = config['operator']['button_press_delay']
         self.button_distance = config['operator']['button_distance']
@@ -186,21 +184,21 @@ class Operator(Person):
         self.noticing_delay = config['operator']['noticing_delay']
         self.decision_delay = config['operator']['decision_delay']
 
-    def stop_collecting_data(self, context:Context):
+    def stop_collecting_data(self, context:objects.Context):
         """Stop Collecting Data"""
-        context.printer(f"OP: {colored('Stop Collecting Data', 'blue')}", "OP: Stop Collecting Data")
+        context.printer("OP: [blue]Stop Collecting Data[/blue]", "OP: Stop Collecting Data")
         context.instrument.collecting_data = False
 
-    def start_peak_chasing(self, context:Context) -> bool:
+    def start_peak_chasing(self, context:objects.Context) -> bool:
         """True: communication sucessful and instrument started, False: Instrumnent not started"""
         if context.instrument.run_peak_chasing(context):
-            context.printer(f"OP: {colored('Start Peak Chasing', 'green')}", "OP: Start Peak Chasing")
+            context.printer("OP: [green]Start Peak Chasing[/green]", "OP: Start Peak Chasing")
             return True
         else:
-            context.messages.concat(f"OP: {colored('Instrument transition', 'blue')}\n")
+            context.messages.concat(f"OP: [blue]Instrument transition[/blue]\n")
             return False
 
-    def track_stream_position(self, context:Context):
+    def track_stream_position(self, context:objects.Context):
         "Move beam"
         if self.allow_response_cycle == 99999999999:
             self.allow_response_cycle = context.instrument.stream_status.cycle + self.operator_response_delay(context)
@@ -209,7 +207,7 @@ class Operator(Person):
         if abs(context.instrument.beam_status.beam_pos - context.instrument.stream_status.stream_pos) < self.functional_acuity:
             self.allow_response_cycle = 99999999999
 
-    def tracker_tool(self, context:Context):
+    def tracker_tool(self, context:objects.Context):
         """FFF This should use a model of visual UI-mediated visual acuity,
         rather than just exact operators."""
         which_way = self.which_way_do_we_need_to_shift(context)
@@ -220,15 +218,15 @@ class Operator(Person):
             context.instrument.beam_status.beam_pos = 0.0
             return context.instrument.beam_status.beam_pos
         elif which_way == "<<":
-            context.printer(f"OP: {colored('Move Beam <<', 'blue')}", "OP: Move Beam <<")
+            context.printer("OP: [blue]Move Beam <<[/blue]", "OP: Move Beam <<")
             context.instrument.instrument_status.msg = context.instrument.instrument_status.msg + "<<"
             return context.instrument.beam_status.beam_pos - context.instrument.beam_status.beam_shift_amount
         else:
-            context.printer(f"OP: {colored('Move Beam >>', 'blue')}", "OP: Move Beam >>")
+            context.printer("OP: [blue]Move Beam >>[/blue]", "OP: Move Beam >>")
             context.instrument.instrument_status.msg = context.instrument.instrument_status.msg + ">>"
             return context.instrument.beam_status.beam_pos + context.instrument.beam_status.beam_shift_amount
 
-    def which_way_do_we_need_to_shift(self, context:Context):
+    def which_way_do_we_need_to_shift(self, context:objects.Context):
         """Used in various places, returns '<<', '>>', 'none'"""
         delta = abs(context.instrument.beam_status.beam_pos - context.instrument.stream_status.stream_pos)
         if delta < self.functional_acuity:
@@ -238,7 +236,7 @@ class Operator(Person):
         else:
             return ">>"
 
-    def operator_response_delay(self, context:Context):
+    def operator_response_delay(self, context:objects.Context):
         # FFF Deconvolve this
         """operator_response_delay() uses the current eye position and button distances to decide
         how many cycles it takes to hit the button, which is either short
@@ -272,33 +270,38 @@ class ExperimentManager(Person):
 
     current_sample_switch_time:timedelta = None
     previous_switch_check:timedelta = timedelta(0)
-    previous_sample:SampleData = None
+    previous_sample:objects.SampleData = None
 
     # current_data_check_time:timedelta = None
     previous_data_check:timedelta = None
     data_check_wait:timedelta = timedelta(minutes=1)
 
-    def __init__(self, config:Config):
-        super().__init__(AgentType.EM)
+    amount_of_time_to_save:timedelta = timedelta(seconds=30)
+    new_error_value:float = None
+
+    def __init__(self, config:settings.Config):
+        super().__init__(enums.AgentType.EM)
         self.max_transition_time = config['instrument']['sample_transition_time']
 
 
-    def start_experiment(self, context:Context):
+    def start_experiment(self, context:objects.Context):
         """Start Experiment and load samples"""
         context.agenda.start_experiment()
-        context.printer(f"EM: {colored('Load Samples', 'green')}", 'EM: Load Samples')
+        context.printer("EM: [green]Load Samples[/green]", 'EM: Load Samples')
         context.ami.load_samples(context)
         context.printer('EM: sort samples by PQ in decending order',
          'EM: sort samples by PQ in decending order')
         context.ami.sort_samples()
 
-    def start_instrument(self, context:Context):
+    def start_instrument(self, context:objects.Context):
         """determine if the output of the instrument is good"""
-        context.printer(f"EM: {colored('Start Instrument', 'green')}", 'EM: Start Instrument')
+        context.printer("EM: [green]Start Instrument[/green]", 'EM: Start Instrument')
         context.instrument.start()
 
-    def sample_change_logic(self, context:Context):
+    def sample_change_logic(self, context:objects.Context):
         """Sample change logic"""
+        # TODO: add algorithm to config
+        # TODO: add back time estimation
         num_samples_done = len(context.agenda.event_timeline)
         if num_samples_done >= 2:
             this_run_pq = context.agenda.event_timeline[num_samples_done-1].sample.preformance_quality
@@ -306,26 +309,60 @@ class ExperimentManager(Person):
             last_run_pq = context.agenda.event_timeline[num_samples_done-2].sample.preformance_quality
             last_run_length = context.agenda.event_timeline[num_samples_done-2].duration
             pq_delta:float = round(last_run_pq - this_run_pq,5)
+            context.printer(f"EM: Preformance Quality Delta {'[green]'if (pq_delta > 0) else '[red]'}{pq_delta}", f'EM: Preformance Quality Delta {pq_delta}')
             run_length_delta:timedelta = timedelta(seconds=abs(last_run_length.total_seconds() - this_run_length.total_seconds()))
+            context.printer(f"EM: Run Length Delta [green]{run_length_delta}", f'EM: Run Length Delta {run_length_delta}')
             estimated_delta_seconds_per_pq:float = round(abs(run_length_delta.total_seconds()/pq_delta))
-            estimated_run_length_map = [timedelta(seconds=(sample.duration.total_seconds() + round(((s*pq_delta) * estimated_delta_seconds_per_pq)))) for s, sample in enumerate(context.ami.samples) if sample.compleated is False]
+            context.printer(f"EM: Estimated Delta Seconds Per PQ [green]{estimated_delta_seconds_per_pq}", f'EM: Estimated Delta Seconds Per PQ {estimated_delta_seconds_per_pq}')
+            estimated_run_length_map = [timedelta(seconds=(sample.duration.total_seconds() + round((((1+s)*pq_delta) * estimated_delta_seconds_per_pq)))) for s, sample in enumerate(context.ami.samples) if sample.compleated is False]
+            context.printer(f"EM: Estimated Run Length Map [green]{[str(run_length) for run_length in estimated_run_length_map]}", f'EM: Estimated Run Length Map {estimated_run_length_map}')
             estimated_total_time_for_remaining_samples:timedelta = reduce(lambda a, b: a + b, estimated_run_length_map)
+            context.printer(f"EM: Estimated Total Time for Remaining Samples [green]{estimated_total_time_for_remaining_samples}[/green]", f'EM: Estimated Total Time for Remaining Samples {estimated_total_time_for_remaining_samples}')
             time_remaining:timedelta = context.agenda.experimental_time - context.current_time
+            context.printer(f"EM: Time Remaining [green]{time_remaining}", f'EM: Time Remaining {time_remaining}')
             projected_seconds_overtime:float = time_remaining.total_seconds() - estimated_total_time_for_remaining_samples.total_seconds()
-            if projected_seconds_overtime < 0:
-                if context.agent_da.target_error == context['data_analysis']['target_error'] * 10:
-                    pass
-                else:
-                    context.agent_da.target_error+=context['data_analysis']['target_error']
-            elif projected_seconds_overtime > 500:
-                if context.agent_da.target_error == context['data_analysis']['target_error']:
-                    pass
-                else:
-                    context.agent_da.target_error-=context['data_analysis']['target_error']
+            context.printer(f"EM: Projected Seconds Overtime {'[green]' if (projected_seconds_overtime > 0) else '[red]'}{projected_seconds_overtime}{'[/green]' if (projected_seconds_overtime > 0) else '[/red]'}", f'EM: Projected Seconds Overtime {projected_seconds_overtime}')
+            
+            
+            # Increase error threshold to save time
 
-    def check_if_next_run_can_be_started(self, context:Context) -> bool:
+            
+            if projected_seconds_overtime < 0:
+                context.printer("EM: [red]*** WERE GOING TO RUN OUT OF TIME! ***[/red]", 'EM: *** WERE GOING TO RUN OUT OF TIME! ***')
+                if context.agent_da.target_error == context['data_analysis']['target_error'] * 10:
+                    context.printer("EM: [red]!!!!!! Uh oh! Theres no room to increase error_threshold!!!", 'EM: !!!!!! Uh oh! Theres no room to increase error_threshold!!!')
+                else:
+
+                    #  array_check_point = self.previous_sample.duration.total_seconds() - self.amount_of_time_to_save.total_seconds()
+                    temp_check = abs(projected_seconds_overtime)
+                    while temp_check > self.previous_sample.duration.total_seconds():
+                        temp_check = temp_check / 2
+                    array_check_point = self.previous_sample.duration.total_seconds() - temp_check
+
+                    previous_value = None
+                    for value in self.previous_sample.error_time_array:
+                        previous_value = value[0]
+                        if value[1].total_seconds() > array_check_point:
+                            self.new_error_value = previous_value
+                            break
+
+                    # context.agent_da.target_error+=context['data_analysis']['target_error']
+                    context.agent_da.target_error = self.new_error_value
+                    context.printer(f"EM: [yellow]++++++ Resetting error_threshold to {context.agent_da.target_error}", f'EM: ++++++ Resetting error_threshold to {context.agent_da.target_error}')
+            elif projected_seconds_overtime > 500:
+                error_change = context['data_analysis']['target_error']
+                context.printer(f"EM: [yellow]'Were going to have more than an hour extra time; reducing error threshold by {error_change}", 'EM: Were going to have more than an hour extra time; reducing error threshold by {error_change}')
+                if context.agent_da.target_error == context['data_analysis']['target_error']:
+                    context.printer("EM: [yellow]...... No room to reduce error_threshold", 'EM: ...... No room to reduce error_threshold')
+                else:
+                    context.agent_da.target_error = context['data_analysis']['target_error']
+                    # context.agent_da.target_error-=context['data_analysis']['target_error']
+                    context.printer(f"EM: [yellow]------ Resetting error_threshold to {context.agent_da.target_error}", f'EM: ------ Resetting error_threshold to {context.agent_da.target_error}')
+
+
+    def check_if_next_run_can_be_started(self, context:objects.Context) -> bool:
         """Check to see if the sample needs to be changed if so wait"""
-        next_sample:SampleData
+        next_sample:objects.SampleData
         # TODO: Ask person to change sample
         if context.instrument.current_sample is not None:
             if len(context.ami.samples) == (context.instrument.current_sample + 1):
@@ -337,13 +374,13 @@ class ExperimentManager(Person):
             if self.current_transition_time is None:
                 self.current_transition_time = self.max_transition_time
                 # self.current_transition_time = timedelta(minutes=random.uniform(0.2, 2.0))
-                if context['settings']['save_type'][0] == SaveType.DETAILED:
+                if context['settings']['save_type'][0] == enums.SaveType.DETAILED:
                     context.file_write(f"Instrument transition: {self.current_transition_time}")
             if self.current_transition_time > timedelta(0):
                 if self.previous_transition_check is None:
                     self.previous_transition_check = context.current_time
                 else:
-                    context.messages.concat(f"Instrument transition: {colored(f'{self.current_transition_time}', 'blue')}\n")
+                    context.messages.concat(f"Instrument transition: [blue]{self.current_transition_time}[/blue]\n")
                     self.current_transition_time -= context.current_time - self.previous_transition_check
                     self.previous_transition_check = context.current_time
                     return False
@@ -363,17 +400,17 @@ class ExperimentManager(Person):
             self.sample_change_logic(context)
             return True
         else:
-            context.messages.concat(f"Sample: {0 if context.instrument.current_sample is None else context.instrument.current_sample + 1}, Setting up: {colored(f'{self.current_sample_switch_time}', 'blue')}\n")
+            context.messages.concat(f"Sample: {0 if context.instrument.current_sample is None else context.instrument.current_sample + 1}, Setting up: [blue]{self.current_sample_switch_time}[/blue]\n")
             return False
 
-    def tell_operator_start_data_collection(self, context:Context):
+    def tell_operator_start_data_collection(self, context:objects.Context):
         """Communicate with operator to start collecting data"""
         if context.agent_op.start_peak_chasing(context):
-            context.printer(f"EM: {colored('Communicate with Operator', 'green')}", 'EM: Communicate with Operator')
+            context.printer("EM: [green]Communicate with Operator[/green]", 'EM: Communicate with Operator')
         else:
-            context.messages.concat(f"EM: {colored('Instrument cannot start', 'blue')}")
+            context.messages.concat("EM: [blue]Instrument cannot start[/blue]")
 
-    def check_if_data_is_sufficient(self, context:Context):
+    def check_if_data_is_sufficient(self, context:objects.Context):
         """Communiate with the data analyst to see if the run has enough
         data or if the run needs to continue, if so tell the operator to continue
         the run for longer"""
@@ -387,9 +424,9 @@ class ExperimentManager(Person):
             #     self.previous_data_check = context.current_time
             # else:
             #     return False
-            context.printer(f"EM: {colored('Ask DA if data is sufficient', 'green')}", "EM: Ask DA if data is sufficient")
+            context.printer("EM: [green]Ask DA if data is sufficient[/green]", "EM: Ask DA if data is sufficient")
             if context.agent_da.check_if_data_is_sufficient(context):
-                context.printer(f"EM: {colored('Tell operator to stop collecting data', 'blue')}", "EM: Tell operator to stop collecting data")
+                context.printer("EM: [blue]Tell operator to stop collecting data[/blue]", "EM: Tell operator to stop collecting data")
                 context.agent_op.stop_collecting_data(context)
             # TODO _: Does operator keep going until told to stop or do they need to be told to keep going
 
@@ -405,7 +442,7 @@ class RemoteUser(Person):
     """
     # FFF: Who is communicating with the remote user from inside the hutch
     def __init__(self):
-        super().__init__(AgentType.RU)
+        super().__init__(enums.AgentType.RU)
 
 class ACROperator(Person):
     """Summary of class here.
@@ -421,4 +458,4 @@ class ACROperator(Person):
     # the situation that the beam dissapears or has problems
     # FFF: or they want to change the photon energy level
     def __init__(self):
-        super().__init__(AgentType.ACR)
+        super().__init__(enums.AgentType.ACR)

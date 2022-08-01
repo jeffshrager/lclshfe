@@ -1,20 +1,28 @@
-"""A one line summary of the module or program, terminated by a period.
+"""The primary functions of the model used to configure and run the jig.
 
-Leave one blank line.  The rest of this docstring should contain an
-overall description of the module or program.  Optionally, it may also
-contain a brief description of exported classes and functions and/or usage
-examples.
+The contained methods are used to interact with the model. These are the
+only functions that should be run by the user from a separate script.
+There is the primary jig method as well as other methods for processing
+data as well as creating and displaying graphs.
+
+supressed:
+    Supressing the jig will prevent any input from being asked from the user.
+independent_variable:
+    The variable that is used from the override dictionary to create
+    graphs and data summarys.
 
   Typical usage example:
 
-  foo = ClassFoo()
-  bar = foo.FunctionBar()
+  jig(override, supressed, independent_variable)
+  stats(folder, independent_variable)
+  rollup(folder, independent_variable)
+  display(folder, independent_variable)
+  display_new(folder, independent_variable)
 """
 import os
 import pickle
 from statistics import stdev
 from time import time
-# from turtle import color
 from numpy import mean, sqrt, std
 import pandas as pd
 import plotly.graph_objects as go
@@ -27,11 +35,13 @@ from src.model import model
 from src.settings.config import Config
 
 def jig(override:dict, supressed:bool, independent_variable:str) -> str:
-    """Jig
+    """Runs the model using the override dictionary.
 
-    Runs the model using the given configuration and puts all of the
-    data recived into the AMI object. This is the main function of the
-    model. This is where each of the agents are called during a given cycle.
+    Using the override dictionary, creates all the configurations using
+    the cartisian product and runs the model for each configuration.
+    The models return an AMI object which is the result of the run.
+    This method then handles output file creation as well as dumping
+    the resulting obejcts to files for use later.
 
     Args:
         config: The set of variables used to run the experiment, each of
@@ -75,34 +85,16 @@ def jig(override:dict, supressed:bool, independent_variable:str) -> str:
     return folder
 
 def stats(folder:str, independent_variable:str) -> bool:
-    """Fetches rows from a Smalltable.
+    """Creates a summary file of the data.
 
-    Retrieves rows pertaining to the given keys from the Table instance
-    represented by table_handle.  String keys will be UTF-8 encoded.
+    Goes through the data and averages the data for each combination,
+    resulting in a summary file.
 
     Args:
-        table_handle: An open smalltable.Table instance.
-        keys: A sequence of strings representing the key of each table
-          row to fetch.  String keys will be UTF-8 encoded.
-        require_all_keys: If True only rows with values set for all keys will be
-          returned.
-
-    Returns:
-        A dict mapping keys to the corresponding table row data
-        fetched. Each row is represented as a tuple of strings. For
-        example:
-
-        {b'Serak': ('Rigel VII', 'Preparer'),
-         b'Zim': ('Irk', 'Invader'),
-         b'Lrrr': ('Omicron Persei 8', 'Emperor')}
-
-        Returned keys are always bytes.  If a key from the keys argument is
-        missing from the dictionary, then that row was not found in the
-        table (and require_all_keys must have been False).
-
-    Raises:
-        IOError: An error occurred accessing the smalltable.
-    """    # FFF QQQ: Auto Remove outliers
+        folder: The folder containing the data to be summarized.
+        independent_variable: The variable that is used from the override
+    """
+    # FFF QQQ: Auto Remove outliers
     # TODO: PUll out erros from runs
     config = None
     runs = None
