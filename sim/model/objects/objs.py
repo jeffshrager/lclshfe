@@ -18,11 +18,11 @@ import random
 from datetime import datetime, timedelta
 from rich import print
 import numpy as np
-import src.library.enums as enums
-import src.library.functions as functions
+import sim.model.enums as enums
+import sim.model.functions as functions
 if TYPE_CHECKING:
-    import src.settings as settings
-    import src.library.objects as objects
+    import sim.model.settings as settings
+    import sim.model.objects as objects
 
 class CommunicationObject:
     """Summary of class here.
@@ -244,6 +244,8 @@ class SampleData:
         self.count_array = []
         self.err_array = []
         self.wall_hits = 0.0
+        self.estimated_run_length = timedelta(seconds=0)
+
 
     def file_string(self) -> str:
         """Return a string that can be written to a file"""
@@ -482,6 +484,7 @@ class Context:
     agent_em:objects.ExperimentManager= None
     agent_op:objects.Operator = None
     instrument:objects.CXI = None
+    data_display:CommunicationObject = None
     messages:CommunicationObject = None
     config:settings.Config = None
     file:TextIOWrapper = None
@@ -489,7 +492,7 @@ class Context:
     start_time:datetime = None
 
     def __init__(self, ami:AMI, agenda:Agenda, agent_da:objects.DataAnalyst, agent_em:objects.ExperimentManager,
-            agent_op:objects.Operator, instrument:objects.CXI, messages:CommunicationObject, config:settings.Config,
+            agent_op:objects.Operator, instrument:objects.CXI, data_display:CommunicationObject, messages:CommunicationObject, config:settings.Config,
             file:TextIOWrapper, data_file:TextIOWrapper):
         self.current_time = timedelta(0)
         self.ami = ami
@@ -498,6 +501,7 @@ class Context:
         self.agent_em = agent_em
         self.agent_op = agent_op
         self.instrument = instrument
+        self.data_display = data_display
         self.messages = messages
         self.config = config
         self.file = file

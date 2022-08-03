@@ -24,15 +24,18 @@ import pickle
 from statistics import stdev
 from time import time
 from numpy import mean, sqrt, std
+from rich.live import Live
+from rich.layout import Layout
+from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn
+from rich.panel import Panel
+from rich.table import Table
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
-from src.library.enums.jig_enums import SaveType
-from src.library.functions.conf_func import add_time_num, cartesian_product, \
-    collapsed_file_setup, combination_check, dictionary_dump, name_check, \
-    runs_to_xyz, sort_combinations, trim_override, write_summary_file
-from src.model import model
-from src.settings.config import Config
+import sim.model.enums as enums
+import sim.model.functions as functions
+import sim.model as model
+import sim.model.settings as settings
 
 def jig(override:dict, supressed:bool, independent_variable:str) -> str:
     """Runs the model using the override dictionary.
@@ -53,35 +56,47 @@ def jig(override:dict, supressed:bool, independent_variable:str) -> str:
         as well as all of the data generated during the simulation.
     """
     start_time = time()
-    config = Config(override)
+    config = settings.Config(override)
     folder = f"{config['settings']['name'][0]}/{str(start_time)}"
     settings_config = None
+    job_progress = Progress("{task.description}",SpinnerColumn(),BarColumn(),
+        TextColumn("[progress.percentage]{task.percentage:>3.0f}%"))
     if not supressed:
-        name_check(override)
+        functions.name_check(override)
     if 'settings' in override:
         settings_config = override['settings']
-    override = trim_override(override)
-    combinations = sort_combinations(override, config, list(
-        cartesian_product(override)) if override else [
+    override = functions.trim_override(override)
+    combinations = functions.sort_combinations(config, list(
+        functions.cartesian_product(override)) if override else [
             {'settings':{'name': config['settings']['name'][0]}}])
-    if not supressed:
-        combination_check(combinations)
-    if settings_config:
-        for combination in combinations:
-            combination.update({'settings': settings_config})
-    dictionary_dump(config, 'config', folder)
-    os.makedirs(os.path.dirname(f"results/{folder}/config.tsv"), exist_ok=True)
-    with open(f"results/{folder}/config.tsv", "w", encoding="utf-8") as file:
-        file.write(str(config))
-        if isinstance(config['settings']['save_type'], list):
-            config.default_dictionary.update({
-                'settings':{'save_type':config['settings']['save_type'][0]}})
-    if config['settings']['save_type'] == SaveType.COLLAPSED:
-        collapsed_file_setup(override, folder)
-    runs = [model(Config(add_time_num(combination, start_time, run_number))
-        ) for run_number, combination in enumerate(combinations)]
-    dictionary_dump(runs, 'runs', folder)
-    write_summary_file(config, folder, runs, independent_variable)
+    for run_number, combination in enumerate(combinations):
+        job_progress.add_task(f"[green]{run_number}", total=combination['experimental_time'].total_seconds())
+    total = sum(task.total for task in job_progress.tasks)
+    overall_progress = Progress()
+    overall_task = overall_progress.add_task("All Jobs", total=int(total))
+    progress_table = Table.grid()
+    progress_table.add_row(
+        Panel.fit(overall_progress, title="Overall Progress", border_style="green", padding=(2, 2)),
+        Panel.fit(job_progress, title="[b]Jobs", border_style="red", padding=(1, 2)))
+    with Live(Layout() if config['settings']['display'] else progress_table, refresh_per_second=60, screen=False if config['settings']['display'] else False) as live:
+        if not supressed:
+            functions.combination_check(combinations)
+        if settings_config:
+            for combination in combinations:
+                combination.update({'settings': settings_config})
+        functions.dictionary_dump(config, 'config', folder)
+        os.makedirs(os.path.dirname(f"results/{folder}/config.tsv"), exist_ok=True)
+        with open(f"results/{folder}/config.tsv", "w", encoding="utf-8") as file:
+            file.write(str(config))
+            if isinstance(config['settings']['save_type'], list):
+                config.default_dictionary.update({
+                    'settings':{'save_type':config['settings']['save_type'][0]}})
+        # if config['settings']['save_type'] == enums.SaveType.COLLAPSED:
+        functions.collapsed_file_setup(override, folder)
+        runs = [model.run(settings.Config(functions.add_time_num(combination, start_time, run_number)), live, job_progress, overall_progress, overall_task, len(combinations)
+            ) for run_number, combination in enumerate(combinations)]
+        functions.dictionary_dump(runs, 'runs', folder)
+        functions.write_summary_file(config, folder, runs, independent_variable)
     return folder
 
 def stats(folder:str, independent_variable:str) -> bool:
@@ -102,7 +117,7 @@ def stats(folder:str, independent_variable:str) -> bool:
         config = pickle.load(config_dictionary_file)
     with open(f"results/{folder}/dictionaries/runs.dictionary", 'rb') as runs_dictionary_file:
         runs = pickle.load(runs_dictionary_file)
-    write_summary_file(config, folder, runs, independent_variable)
+    functions.write_summary_file(config, folder, runs, independent_variable)
     # for rep_count in range(len(config['reps'])):
     #     total_data = []
     #     for run in runs:
@@ -190,8 +205,8 @@ def display(folder:str) -> bool:
     with open(f"results/{folder}/dictionaries/runs.dictionary", 'rb') as runs_dictionary_file:
         runs = pickle.load(runs_dictionary_file)
 
-    if config['settings']['save_type'][0] == SaveType.DETAILED:
-        (x_axis, y_axis, z_axis) = runs_to_xyz(config, runs)
+    if config['settings']['save_type'][0] == enums.SaveType.DETAILED:
+        (x_axis, y_axis, z_axis) = functions.runs_to_xyz(config, runs)
         fig = go.Figure(go.Surface(
             x=x_axis,
             y=y_axis,
@@ -206,7 +221,7 @@ def display(folder:str) -> bool:
                 "aspectratio": {"x": 3, "y": 1, "z": 0.6}
             })
         fig.show()
-    elif config['settings']['save_type'][0] == SaveType.COLLAPSED:
+    elif config['settings']['save_type'][0] == enums.SaveType.COLLAPSED:
         if len(config['samples']['samples'][0]) > 1:
 
             computed_run = {

@@ -12,11 +12,12 @@ examples.
 """
 import random
 from datetime import timedelta
+from typing import List
 from rich import print
-import src.library.enums as enums
-import src.library.functions as functions
-import src.library.objects as objects
-import src.settings as settings
+import sim.model.enums as enums
+import sim.model.functions as functions
+import sim.model.objects as objects
+import sim.model.settings as settings
 
 class Instrument:
     """Summary of class here.
@@ -44,6 +45,11 @@ class Instrument:
     # System is unstable then gets to a stable period
     # then it fluctuates
     system_stability = None
+
+
+    data_stream:str = ""
+    position_display:str = ""
+
 
     def __init__(self, instrument):
         self.instrument_type = instrument
@@ -77,9 +83,9 @@ class Instrument:
         # FFF: Where exact beam|jet match is tested with ==, replace with a
         # more "perceptually" accurate model
         return_string = ""
-        show_width = 80
+        show_width = 60
         show_incr = 2.0 / show_width
-        return_string += f"{self.stream_status.cycle: >6}:["
+        return_string += f"{self.stream_status.cycle: >3}:["
         beam_shown_f = False
         stream_shown_f = False
         stream_position = -1.0
@@ -129,7 +135,10 @@ class Instrument:
             self.stream_status.stream_pos = round(self.stream_status.stream_pos + (
                 self.stream_status.stream_shift_amount * random.choice(
                     [i for i in range(-1, 2) if i not in [0]])), 4)
-        context.messages.concatbegining(f"{self.show_pos()}\n{functions.get_current_datapoints(context)}\n")
+        # context.messages.concatbegining(f"{self.show_pos()}\n")
+        self.position_display = self.show_pos()
+        self.data_stream = functions.get_current_datapoints(context)
+        # context.data_display.concat(functions.get_current_datapoints(context))
         if self.stream_status.cycle >= self.stream_status.allow_response_cycle:
             self.instrument_status.msg = self.instrument_status.msg + "<?>"
             # Warning! WWW This used to truncate, but that interacts badly with computer math

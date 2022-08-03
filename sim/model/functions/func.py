@@ -13,9 +13,11 @@ from __future__ import annotations
 import collections.abc
 from datetime import timedelta
 from math import tanh
-from typing import TYPE_CHECKING
+import time
+from typing import TYPE_CHECKING, List
 from rich.table import Table
 from rich import box
+from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn
 from rich.layout import Layout
 from rich.panel import Panel
 from rich.pretty import Pretty
@@ -24,7 +26,7 @@ from numpy import arange, random
 import plotly.express as px
 import pandas as pd
 if TYPE_CHECKING:
-    import src.library.objects as objects
+    import sim.model.objects as objects
 
 def rgb(p):# <-- percentage as parameter
     """Get RGB values from a percentage"""
@@ -94,10 +96,6 @@ def update_dict(d, u):
             d[k] = v
     return d
 
-def get_line() -> str:
-    """return string line"""
-    return "---------------------------------------------------------------------------------------"
-
 def config_print(dictionary:dict) -> str:
     """Config print"""
     return_string = ""
@@ -119,34 +117,66 @@ def cumulative_estimated_run_length(context:objects.Context) -> timedelta:
     """Cumulative estimated run length"""
     return timedelta(seconds=sum([sample.estimated_run_length.total_seconds() for sample in context.ami.samples]))
 
-def generate_layout(context:objects.Context) -> Layout:
+def generate_layout(context:objects.Context, overall_progress, number_of_combinations:int) -> Layout:
     """Generate a layout for the model."""
     layout = Layout()
-    layout.split_column(
-    Layout(name="upper"),
-    Layout(name="lower"))
+    layout.split_row(
+    Layout(name="left", ratio=4),
+    Layout(name="right", ratio=6))
 
-    layout["upper"].split_row(
-    Layout(get_config_string(context), name="upper_left"),
-    Layout(generate_table(context), name="upper_right"))
+    layout["right"].split_column(
+    Layout(goal_agenda_plan(context), name="time", size=4),
+    Layout(generate_table(context), name="table"))
 
-    layout["upper_right"].ratio=2
+    layout["left"].split_row(
+    Layout(get_run_sequence(context, number_of_combinations), name="run number", size=4),
+    Layout(name="info"))
 
-    layout["lower"].split_row(
-    Layout(get_messages(context), name="lower_left"),
-    Layout(get_other(context), name="lower_right"))
+    layout["info"].split_column(
+    Layout(Panel(overall_progress, box=box.SIMPLE), name="position", size=3),
+    Layout(name="information"))
+
+    layout["information"].split_column(
+    Layout(get_position_display(context), name="position", size=3),
+    Layout(name="instrument"))
+
+    layout["instrument"].split_row(
+    Layout(get_config_string(context), name="config", size=38),
+    Layout(name="data_messages"))
+
+    layout["data_messages"].split_row(
+    Layout(get_data_stream_display(context), name="data", size=8),
+    Layout(get_messages(context), name="messages"))
     return layout
+
+def get_run_sequence(context:objects.Context, number_of_combinations:int) -> Panel:
+    """Get the other string"""
+    return_string = ""
+    for run in range (number_of_combinations):
+        return_string += f"{'[green]' if context.config['run_number'] == run else '[default]'}{run}\n"
+    # [return_string f"{run}\n" for run in range(number_of_combinations)]
+    # {['[green]'] if context.config['run_number'] == run else ['default']}
+    return Panel(return_string, box=box.SIMPLE, padding=0)
+    # return Panel("1\n2\n3\n4\n5\n6\n7\n8", box=box.SIMPLE, padding=0)
 
 def get_other(context:objects.Context) -> Panel:
     """Get the other string"""
     return Panel(f"Estimated Time: {str(cumulative_estimated_run_length(context)).split('.', maxsplit=1)[0]} | Error Threshold - Target: {context['data_analysis']['target_error']} Current {context.agent_da.target_error}\n"+
-    f"  Current Time: {context.current_time} | {context.agenda}")
+    f"  Current Time: {context.current_time} | {context.agenda}", padding=0)
 
 def get_messages(context:objects.Context) -> Panel:
     """Get the config string"""
-    # pretty = Pretty(context.config.override_dictionary)
-    # panel = Panel(pretty)
-    panel = Panel(str(context.messages))
+    panel = Panel(str(context.messages), box=box.SIMPLE, padding=0)
+    return panel
+
+def get_position_display(context:objects.Context) -> Panel:
+    """Get the config string"""
+    panel = Panel(str(context.instrument.position_display), box=box.SIMPLE, padding=0)
+    return panel
+
+def get_data_stream_display(context:objects.Context) -> Panel:
+    """Get the config string"""
+    panel = Panel(str(context.instrument.data_stream), box=box.MARKDOWN, padding=0)
     return panel
 
 
@@ -173,9 +203,8 @@ def config_str(d:dict) -> dict:
 
 def get_config_string(context:objects.Context) -> Panel:
     """Get the config string"""
-    stringified = config_str(context.config.override_dictionary)
-    pretty = Pretty(stringified)
-    panel = Panel(pretty)
+    pretty = Pretty(config_str(context.config.override_dictionary))
+    panel = Panel(pretty, box.MINIMAL)
     return panel
 
 def generate_table(context:objects.Context) -> Panel:
@@ -201,44 +230,57 @@ def generate_table(context:objects.Context) -> Panel:
         table.add_row(
             f"{'[green dim]' if sample.compleated else ('[bold green]' if sample.running else '[default dim]')}{str(index): >2} |N:", f" [default not dim]{len(sample.data): >6}", "[dim]-", f"{values[0]}", f"{values[1]}", f"{values[2]}", f"{values[3]}", f"{values[4]}", f"{values[5]}", f"{values[6]}", f"{values[7]}", f"{values[8]}", f"{values[9]}"
         )
-    return Panel(table)
+    return Panel(table, box=box.SIMPLE)
 
 def ami_sample_table(context:objects.Context):
     """Return a table of the AMI samples"""
     return context.ami
 
-def goal_agenda_plan(context:objects.Context) -> str:
+def goal_agenda_plan(context:objects.Context) -> Panel:
     "Return out GAP: Goal Agenda Plan"
-    return (f"{config_print(context.config.override_dictionary)}\n{get_line()}\n"+
-    f"{ami_sample_table(context)}\n"+
-    f"Estimated Time: {str(cumulative_estimated_run_length(context)).split('.', maxsplit=1)[0]} | Error Threshold - Target: {context['data_analysis']['target_error']} Current {context.agent_da.target_error}\n"+
-    f"  Current Time: {context.current_time} | {context.agenda}\n{get_line()}")
+    # return (f"{config_print(context.config.override_dictionary)}\n{get_line()}\n"+
+    # f"{ami_sample_table(context)}\n"+
+    return Panel(f"Estimated Time: {str(cumulative_estimated_run_length(context)).split('.', maxsplit=1)[0]} | Error Threshold - Target: {context['data_analysis']['target_error']} Current {context.agent_da.target_error}\n"+
+    f"  Current Time: {context.current_time} | {context.agenda}", box=box.SIMPLE)
     # return (f"{config_print(context.config.override_dictionary)}\n{get_line()}\n{context.ami}\n"+
     # f"Estimated Time: {str(cumulative_estimated_run_length(context)).split('.', maxsplit=1)[0]} | Error Threshold - Target: {context['data_analysis']['target_error']} Current {context.agent_da.target_error}\n"+
     # f"  Current Time: {context.current_time} | {context.agenda}\n{get_line()}")
 
 def experiment_stats(context:objects.Context) -> str:
     "Write out statistics of the experiment"
-    return (f"{context.ami}\n"+
-    f"Estimated Time: {str(cumulative_estimated_run_length(context)).split('.', maxsplit=1)[0]} | Error Threshold - Target: {context['data_analysis']['target_error']} Current {context.agent_da.target_error}\n"+
-    f"  Current Time: {context.current_time} {context.agenda}\n"+
-    f"{get_line()}\nROI: {calculate_roi(context.ami):.0%}\n{context.agenda.get_timeline()}")
+    return ""
+    # return (f"{context.ami}\n"+
+    # f"Estimated Time: {str(cumulative_estimated_run_length(context)).split('.', maxsplit=1)[0]} | Error Threshold - Target: {context['data_analysis']['target_error']} Current {context.agent_da.target_error}\n"+
+    # f"  Current Time: {context.current_time} {context.agenda}\n"+
+    # f"{get_line()}\nROI: {calculate_roi(context.ami):.0%}\n{context.agenda.get_timeline()}")
 
-def experiment_is_not_over(context:objects.Context) -> bool:
-    """True: Experiment is not over, False: Experiment is over"""
-    # Time does not affect it
-    return (len(context.agenda.event_timeline) != len(context.ami.samples)
-    ) if (len(context.agenda.event_timeline) != 0) else True
-    # return (context.current_time < context.agenda.experimental_time
-    # ) and (len(context.agenda.event_timeline) != len(context.ami.samples)
-    # ) if (len(context.agenda.event_timeline) != 0) else True
+def experiment_is_over(context:objects.Context) -> bool:
+    """Determines if the experiment is over
+
+    If strict time is enabled - when the experiment reaches the
+    end time it will stop regardless if the samples have finished
+    collecting data. If strict time is disabled - The experiment
+    will finish collecting data on all the samples and will stop
+    after the last sample has finished collecting data.
+
+    Args:
+        context: Context object for access to run data
+
+    Returns:
+        False: Experiment is not over
+        True: Experiment is over
+    """
+    return (context.current_time >= context.agenda.experimental_time \
+    if context['settings']['strict_time'] else False or
+    len(context.agenda.event_timeline) == len(context.ami.samples) \
+    if context.agenda.event_timeline else False)
 
 def get_current_datapoints(context:objects.Context) -> str:
     """Gets the datapoints live"""
     current_sample = context.ami.get_current_sample(context)
     return_string = ""
-    for index, data in enumerate(current_sample.data[-60:]):
-        return_string += f"{'[green]' if data.quality >= aquire_data(0.001, current_sample.preformance_quality, context) else '[yellow]' if data.quality >= aquire_data(0.03, current_sample.preformance_quality, context) else '[red]'}{data}{chr(10) if index == 19 or index == 39 else ' '}"
+    for data in current_sample.data[-70:]:
+        return_string += f"{'[green]' if data.quality >= aquire_data(0.001, current_sample.preformance_quality, context) else '[yellow]' if data.quality >= aquire_data(0.03, current_sample.preformance_quality, context) else '[red]'}{data}\n"
     return return_string
 
 def aquire_data(distance:float, preformance_quality:float, context:objects.Context) -> float:

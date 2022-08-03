@@ -56,6 +56,18 @@ class ExperimentState(Enum):
     STOPED = False
     STARTED = True
 
+class ExperimentManagerAlgorithm(Enum):
+    """Summary of class here.
+
+    Longer class information...
+    Longer class information...
+
+    Attributes:
+        enum: The enum for the experiment state.
+    """
+    THIS = 1
+    THAT = 2
+
 class SampleType(Enum):
     """Summary of class here.
 

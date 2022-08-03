@@ -15,12 +15,14 @@ from math import sqrt
 import os
 import pickle
 from statistics import stdev
-from typing import List
+from typing import TYPE_CHECKING, List
 from numpy import mean
 from termcolor import colored
-import src.library.objects as objects
+import sim.model.objects as objects
+if TYPE_CHECKING:
+    import sim.model.settings as settings
 
-def cartesian_product(kwargs):
+def cartesian_product(kwargs) -> list[dict]:
     """This returns a list of dictionaries with single value keys
     as a result of the cartesian product of the values
 
@@ -30,7 +32,7 @@ def cartesian_product(kwargs):
 
     result = [{'a': 1, 'b': 4},
               {'a': 1, 'b': 5},
-              {'a': 1, 'b': 6},"""
+              {'a': 1, 'b': 6}..."""
     keys, values = kwargs.keys(), kwargs.values()
     values_choices = (cartesian_product(v) if isinstance(v, dict) else v for v in values)
     for comb in itertools.product(*values_choices):
@@ -38,52 +40,68 @@ def cartesian_product(kwargs):
 
 def write_summary_file(config:dict, folder:str, runs:List[dict], independent_variable:str):
     """Write Summary File"""
-    if config['settings']['save_type'] == 'collapsed':
-        # TODO: which 2 things im running against
-        os.makedirs(os.path.dirname(f"results/{folder}/summary.tsv"), exist_ok=True)
-        with open(f"results/{folder}/summary.tsv", "w", encoding="utf-8") as file:
-            file.write(f"average\tstdev\tn\terr\tpq\t{independent_variable}\n")
-            n_list = []
-            pq_list = []
-            sample:objects.SampleData
-            if isinstance(config['settings']['save_type'], list):
-                config['settings']['save_type'] = config['settings']['save_type'][0]
-            for samples in config['samples']['samples']:
-                if isinstance(samples, list):
-                    for sample in samples:
-                        pq_list.append(sample.preformance_quality)
-                else:
-                    pq_list.append(samples.preformance_quality)
-            for pq in pq_list:
-                # Decollapse OND's
-                if isinstance(config['operator'][f"{independent_variable}"], list):
-                    for ond in config['operator'][f"{independent_variable}"]:
-                        ond_list = []
-                        for run in runs:
-                            if run[f"{independent_variable}"] == ond:
-                                for index, sample_pq in enumerate(run['pq']):
-                                    if sample_pq == pq:
-                                        ond_list.append(run['N'][index])
-                        n_list.append([round(mean(ond_list)), round(stdev(ond_list)), len(ond_list), stdev(ond_list)/sqrt(len(ond_list)), pq, ond])
-                else:
+    # TODO: which 2 things im running against
+    os.makedirs(os.path.dirname(f"results/{folder}/summary.tsv"), exist_ok=True)
+    with open(f"results/{folder}/summary.tsv", "w", encoding="utf-8") as file:
+        # TODO: \taverage_over\taverage_under
+        file.write(f"average\tstdev\tn\terr\tpq\tlast_error_mean\tlast_error_deviation\t{independent_variable}\n")
+        n_list = []
+        pq_list = []
+        sample:objects.SampleData
+        if isinstance(config['settings']['save_type'], list):
+            config['settings']['save_type'] = config['settings']['save_type'][0]
+        for samples in config['samples']['samples']:
+            if isinstance(samples, list):
+                for sample in samples:
+                    pq_list.append(sample.preformance_quality)
+            else:
+                pq_list.append(samples.preformance_quality)
+        for pq in pq_list:
+            # Decollapse OND's
+            if isinstance(config['operator'][f"{independent_variable}"], list):
+                for ond in config['operator'][f"{independent_variable}"]:
                     ond_list = []
                     for run in runs:
-                        for count in run['N']:
-                            ond_list.append(count)
-                    n_list.append([ond_list[0], ond_list[0], len(ond_list), '-', pq, config['operator'][f"{independent_variable}"]])
-            for l in n_list:
-                for item in l:
-                    file.write(f"{item}\t")
-                file.write("\n")
+                        if run[0][f"{independent_variable}"] == ond:
+                            for index, sample_pq in enumerate(run[0]['pq']):
+                                if sample_pq == pq:
+                                    ond_list.append(run[0]['N'][index])
+                    last_value = []
+                    for sample in run[1].samples:
+                        last_value.append(sample.err_array[-1])
+                    n_list.append([round(mean(ond_list)), round(stdev(ond_list)), len(ond_list), stdev(ond_list)/sqrt(len(ond_list)), pq, ond, mean(last_value), stdev(last_value)])
+            else:
+                ond_list = []
+                for run in runs:
+                    for count in run[0]['N']:
+                        ond_list.append(count)
+                n_list.append([ond_list[0], ond_list[0], len(ond_list), '-', pq, config['operator'][f"{independent_variable}"]])
+        for l in n_list:
+            for item in l:
+                file.write(f"{item}\t")
+            file.write("\n")
 
-def sort_combinations(override_dictionary:dict, dictionary:dict, raw_combinations:list):
-    """sort combinations"""
+def sort_combinations(config, raw_combinations:list):
+    """Runs the experiment and returns an AMI object
+
+    Runs the model using the given configuration and puts all of the
+    data recived into the AMI object. This is the main function of the
+    model. This is where each of the agents are called during a given cycle.
+
+    Args:
+        config:the configs passed to the model only contain one parameter for
+        raw_combinations:
+
+    Returns:
+        A AMI object which contains the configuration of the simulation
+        as well as all of the data generated during the simulation.
+    """
     combinations = []
-    temp_list = list(cartesian_product(override_dictionary)) if override_dictionary else {
-    'settings':{'name': dictionary['settings']['name'][0]}}
-    number_of_combinations:int = len(temp_list) // len(dictionary['reps'])
+    temp_list = list(cartesian_product(config.override_dictionary)) if config.override_dictionary else {
+    'settings':{'name': config['settings']['name'][0]}}
+    number_of_combinations:int = len(temp_list) // len(config['reps'])
     for com in range(number_of_combinations):
-        for rep in dictionary['reps']:
+        for rep in config['reps']:
             combinations.append(raw_combinations[com+(rep*number_of_combinations)])
     return combinations
 

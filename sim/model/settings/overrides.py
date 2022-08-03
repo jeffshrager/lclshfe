@@ -11,8 +11,8 @@ examples.
   bar = foo.FunctionBar()
 """
 from datetime import timedelta
-import src.library.enums as enum
-import src.library.objects as objects
+import sim.model.enums as enum
+import sim.model.objects as objects
 
 over180 = {
     'settings': {'name':['over180'],'save_type':[enum.SaveType.COLLAPSED], 'cycle_sleep_time': 0.0,},
@@ -123,12 +123,13 @@ fnc_ond_tanh_false_cog_false = {
     'instrument': {'tanh_curve': [False]}
 }
 # --------------------------------------------------------------------------------------------------
-fnc_ond1_tanh_false_cog_false = {
-    'settings': {'name':['fnc_ond_tanh_true_cog_true'],'save_type':[enum.SaveType.COLLAPSED]},
+fnc_ond1_tanh_false_cog_false_30mins = {
+    'settings': {'name':['fnc_ond1_tanh_false_cog_false_30mins'],'save_type':[enum.SaveType.COLLAPSED]},
     'reps': [x for x in range(9)],
     'operator': {
         'functional_acuity': [0.1, 0.3, 0.5, 0.7, 0.9, 1.0],
         'noticing_delay': [1.0]},
+    'experimental_time': [timedelta(minutes=22)],
     'samples': {'samples': [
         [objects.SampleData(0.90, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
          objects.SampleData(0.85, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
@@ -252,4 +253,45 @@ fnc_ond1_tanh_false_cog_false = {
     ],},
     'cognative_degredation': [False],
     'instrument': {'tanh_curve': [False]}
+}
+# --------------------------------------------------------------------------------------------------
+tiny_test = {
+    'settings': {'name':['tiny_test'],'save_type':[enum.SaveType.DETAILED]},
+    'reps': [x for x in range(1)],
+    'operator': {
+        'functional_acuity': [0.1],
+        'noticing_delay': [1.0, 2.0]},
+    'experimental_time': [timedelta(minutes=22)],
+    'samples': {'samples': [
+        [objects.SampleData(0.90, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+        objects.SampleData(0.90, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE)]
+    ],},
+    'cognative_degredation': [False],
+    'instrument': {'tanh_curve': [False]}
+}
+# --------------------------------------------------------------------------------------------------
+ErrorChangeTest = {
+    'settings': {
+        'name':['ErrorChangeTest'],
+        'save_type':[enum.SaveType.DETAILED],
+        'display': True,
+        'ask_to_continue': {
+            'sample': False,
+        }},
+    'reps': [x for x in range(1)],
+    'operator': {
+        'noticing_delay': [1.0]},
+    'experimental_time': [timedelta(minutes=20)],
+    'samples': {'samples': [
+        [objects.SampleData(0.9, enum.SampleImportance.UNIMPORTANT, enum.SampleType.INSTANT),
+         objects.SampleData(0.85, enum.SampleImportance.UNIMPORTANT, enum.SampleType.INSTANT),
+         objects.SampleData(0.8, enum.SampleImportance.IMPORTANT, enum.SampleType.INSTANT),
+         objects.SampleData(0.75, enum.SampleImportance.IMPORTANT, enum.SampleType.INSTANT),
+         objects.SampleData(0.7, enum.SampleImportance.IMPORTANT, enum.SampleType.INSTANT),
+         objects.SampleData(0.65, enum.SampleImportance.IMPORTANT, enum.SampleType.INSTANT)]
+    ],},
+    'cognative_degredation': [False],
+    'instrument': {
+        'tanh_curve': [False],
+        'sample_transition_time': [timedelta(seconds=1)]}
 }

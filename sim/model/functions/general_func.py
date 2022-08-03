@@ -10,10 +10,11 @@ examples.
   foo = ClassFoo()
   bar = foo.FunctionBar()
 """
-import src.library.enums as enums
-import src.library.functions as functions
-import src.library.objects as objects
-import src.settings as settings
+import sim.model.enums as enums
+import sim.model.functions as functions
+import sim.model.objects as objects
+import sim.model.settings as settings
+import sim.model.objects.agents as agents
 
 def context_setup(config:settings.Config) -> objects.Context:
     """Setup the context"""
@@ -27,9 +28,9 @@ def context_setup(config:settings.Config) -> objects.Context:
             c_file = file
         with open(f"{experiment_folder}/data/r{config['start_time']}.tsv", "w", encoding="utf-8") as data_file:
             c_data_file = data_file
-    context = objects.Context(objects.AMI(config), objects.Agenda(config), objects.DataAnalyst(config),
-        objects.ExperimentManager(config), objects.Operator(config), objects.CXI(config), objects.CommunicationObject(),
-        config, c_file, c_data_file)
+    context = objects.Context(objects.AMI(config), objects.Agenda(config), agents.DataAnalyst(config),
+        agents.ExperimentManager(config), agents.Operator(config), objects.CXI(config), objects.CommunicationObject(), 
+        objects.CommunicationObject(), config, c_file, c_data_file)
     if context['settings']['save_type'][0] == enums.SaveType.DETAILED:
         open(context.file.name, 'a', encoding="utf-8").write(f"{functions.goal_agenda_plan(context)}\n")
     return context
