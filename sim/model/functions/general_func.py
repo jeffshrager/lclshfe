@@ -29,8 +29,8 @@ def context_setup(config:settings.Config) -> objects.Context:
         with open(f"{experiment_folder}/data/r{config['start_time']}.tsv", "w", encoding="utf-8") as data_file:
             c_data_file = data_file
     context = objects.Context(objects.AMI(config), objects.Agenda(config), agents.DataAnalyst(config),
-        agents.ExperimentManager(config), agents.Operator(config), objects.CXI(config), objects.CommunicationObject(), 
-        objects.CommunicationObject(), config, c_file, c_data_file)
+        agents.ExperimentManager(config), agents.Operator(config), objects.CXI(config), objects.CommunicationObject(),
+        config, c_file, c_data_file)
     if context['settings']['save_type'][0] == enums.SaveType.DETAILED:
         open(context.file.name, 'a', encoding="utf-8").write(f"{functions.goal_agenda_plan(context)}\n")
     return context

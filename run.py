@@ -14,8 +14,13 @@ import sim
 def main() -> int:
     """Run the Jig"""
     # TODO: Fix Suppressed
-    sim.jig(sim.overrides.fnc_ond1_tanh_false_cog_false_30mins, True, 'functional_acuity')
-    # sim.stats('tiny_test/1659509527.23861', 'functional_acuity')
+    # sim.display_new(sim.jig(sim.overrides.fnc1_ond_tanh_false_cog_false, True, 'noticing_delay'), 'noticing_delay')
+    # sim.stats('Poster1/1659637732.51549', 'noticing_delay')
+    # sim.stats('Poster2/1659638382.7977269', 'noticing_delay')
+    # sim.stats('Poster3/1659726202.022182', 'noticing_delay')
+    sim.display_new('fnc_ond1_tanh_false_cog_false/1658879734.700448', 'functional_acuity')
+
+    # sim.display_new('Poster3/1659726202.022182', 'noticing_delay')
     # sim.stats('fnc_ond1_tanh_false_cog_false_30mins_for_tomorow/1659508987.5486', 'functional_acuity')
     return 0
 

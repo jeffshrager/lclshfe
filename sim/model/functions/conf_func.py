@@ -67,9 +67,15 @@ def write_summary_file(config:dict, folder:str, runs:List[dict], independent_var
                                 if sample_pq == pq:
                                     ond_list.append(run[0]['N'][index])
                     last_value = []
-                    for sample in run[1].samples:
-                        last_value.append(sample.err_array[-1])
-                    n_list.append([round(mean(ond_list)), round(stdev(ond_list)), len(ond_list), stdev(ond_list)/sqrt(len(ond_list)), pq, ond, mean(last_value), stdev(last_value)])
+                    for run_index in runs:
+                        if run_index[0][f"{independent_variable}"] == ond:
+                            for sample_index in run_index[1].samples:
+                                if sample_index.preformance_quality == pq:
+                                    if sample_index.err_array:
+                                        last_value.append(sample_index.err_array[-1])
+                                    else:
+                                        last_value.append(0)
+                    n_list.append([round(mean(ond_list)), round(stdev(ond_list)), len(ond_list), stdev(ond_list)/sqrt(len(ond_list)), pq, mean(last_value), stdev(last_value), ond])
             else:
                 ond_list = []
                 for run in runs:

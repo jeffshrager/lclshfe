@@ -138,7 +138,6 @@ class Instrument:
         # context.messages.concatbegining(f"{self.show_pos()}\n")
         self.position_display = self.show_pos()
         self.data_stream = functions.get_current_datapoints(context)
-        # context.data_display.concat(functions.get_current_datapoints(context))
         if self.stream_status.cycle >= self.stream_status.allow_response_cycle:
             self.instrument_status.msg = self.instrument_status.msg + "<?>"
             # Warning! WWW This used to truncate, but that interacts badly with computer math

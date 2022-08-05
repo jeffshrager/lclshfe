@@ -124,8 +124,8 @@ fnc_ond_tanh_false_cog_false = {
 }
 # --------------------------------------------------------------------------------------------------
 fnc_ond1_tanh_false_cog_false_30mins = {
-    'settings': {'name':['fnc_ond1_tanh_false_cog_false_30mins'],'save_type':[enum.SaveType.COLLAPSED]},
-    'reps': [x for x in range(9)],
+    'settings': {'name':['fnc_ond1_tanh_false_cog_false_30mins'],'save_type':[enum.SaveType.COLLAPSED], 'display': True,},
+    'reps': [x for x in range(1)],
     'operator': {
         'functional_acuity': [0.1, 0.3, 0.5, 0.7, 0.9, 1.0],
         'noticing_delay': [1.0]},
@@ -294,4 +294,114 @@ ErrorChangeTest = {
     'instrument': {
         'tanh_curve': [False],
         'sample_transition_time': [timedelta(seconds=1)]}
+}
+# --------------------------------------------------------------------------------------------------
+Poster1 = {
+    'settings': {
+        'name':['Poster1'],
+        'save_type':[enum.SaveType.DETAILED],
+        'display': False,
+        'strict_time': False,
+        'ask_to_continue': {
+            'sample': False,
+        }},
+    'reps': [x for x in range(9)],
+    'experiment_manager': {
+        'adjust_error': [True],
+    },
+    'operator': {
+        'functional_acuity': [0.1],
+        'noticing_delay': [1.0, 5.0, 10.0]},
+    'experimental_time': [timedelta(minutes=20)],
+    'samples': {'samples': [
+        [objects.SampleData(0.90, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.85, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.80, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.75, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.70, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE)]
+    ],},
+    'cognative_degredation': [False],
+    'instrument': {
+        'tanh_curve': [False],
+        'sample_transition_time': [timedelta(seconds=1)]}
+}
+Poster2 = {
+    'settings': {
+        'name':['Poster2'],
+        'save_type':[enum.SaveType.DETAILED],
+        'display': False,
+        'strict_time': False,
+        'ask_to_continue': {
+            'sample': False,
+        }},
+    'reps': [x for x in range(9)],
+    'experiment_manager': {
+        'adjust_error': [False],
+    },
+    'operator': {
+        'functional_acuity': [0.1],
+        'noticing_delay': [1.0, 5.0, 10.0]},
+    'experimental_time': [timedelta(minutes=20)],
+    'samples': {'samples': [
+        [objects.SampleData(0.90, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.85, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.80, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.75, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.70, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE)]
+    ],},
+    'cognative_degredation': [False],
+    'instrument': {
+        'tanh_curve': [False],
+        'sample_transition_time': [timedelta(seconds=1)]}
+}
+Poster3 = {
+    'settings': {
+        'name':['Poster3'],
+        'save_type':[enum.SaveType.DETAILED],
+        'display': False,
+        'strict_time': True,
+        'ask_to_continue': {
+            'sample': False,
+        }},
+    'reps': [x for x in range(9)],
+    'experiment_manager': {
+        'adjust_error': [False],
+    },
+    'operator': {
+        'functional_acuity': [0.1],
+        'noticing_delay': [1.0, 5.0, 10.0]},
+    'experimental_time': [timedelta(minutes=20)],
+    'samples': {'samples': [
+        [objects.SampleData(0.90, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.85, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.80, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.75, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.70, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE)]
+    ],},
+    'cognative_degredation': [False],
+    'instrument': {
+        'tanh_curve': [False],
+        'sample_transition_time': [timedelta(seconds=1)]}
+}
+# --------------------------------------------------------------------------------------------------
+fnc1_ond_tanh_false_cog_false = {
+    'settings': {
+        'name':['fnc1_ond_tanh_false_cog_false'],
+        'save_type':[enum.SaveType.COLLAPSED],
+        'display': False,
+    },
+    'reps': [x for x in range(10)],
+    'operator': {
+        'functional_acuity': [0.1],
+        'noticing_delay': [1.0, 5.0, 10.0]},
+    'experimental_time': [timedelta(minutes=20)],
+    'samples': {'samples': [
+        [objects.SampleData(0.90, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.85, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.80, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.75, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.70, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE)]
+    ],},
+    'cognative_degredation': [False],
+    'instrument': {'tanh_curve': [False]}
 }

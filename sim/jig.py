@@ -19,6 +19,7 @@ independent_variable:
   display(folder, independent_variable)
   display_new(folder, independent_variable)
 """
+from itertools import product
 import os
 import pickle
 from statistics import stdev
@@ -29,6 +30,7 @@ from rich.layout import Layout
 from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn
 from rich.panel import Panel
 from rich.table import Table
+from multiprocessing import Pool
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
@@ -93,8 +95,18 @@ def jig(override:dict, supressed:bool, independent_variable:str) -> str:
                     'settings':{'save_type':config['settings']['save_type'][0]}})
         # if config['settings']['save_type'] == enums.SaveType.COLLAPSED:
         functions.collapsed_file_setup(override, folder)
-        runs = [model.run(settings.Config(functions.add_time_num(combination, start_time, run_number)), live, job_progress, overall_progress, overall_task, len(combinations)
-            ) for run_number, combination in enumerate(combinations)]
+
+    # runs = [product(settings.Config(functions.add_time_num(combination, start_time, run_number)), job_progress, overall_progress, overall_task) for run_number, combination in enumerate(combinations)]
+    # queries = [settings.Config(functions.add_time_num(combination, start_time, run_number)) for run_number, combination in enumerate(combinations)]
+    # with Pool() as pool:
+    #     args = ((args, 1) for args in product(queries))
+    #     results = pool.map(model.run, args)
+    # with Pool() as p:
+    #     p.map(model.run, [product(settings.Config(functions.add_time_num(combination, start_time, run_number)) for run_number, combination in enumerate(combinations)])
+        # print(p.map(f, [1, 2, 3]))
+        runs = [model.run(settings.Config(functions.add_time_num(combination, start_time, run_number)), live, job_progress, overall_progress, overall_task, len(combinations)) for run_number, combination in enumerate(combinations)]
+        
+        
         functions.dictionary_dump(runs, 'runs', folder)
         functions.write_summary_file(config, folder, runs, independent_variable)
     return folder

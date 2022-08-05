@@ -145,7 +145,7 @@ def generate_layout(context:objects.Context, overall_progress, number_of_combina
     Layout(name="data_messages"))
 
     layout["data_messages"].split_row(
-    Layout(get_data_stream_display(context), name="data", size=8),
+    Layout(get_data_stream_display(context), name="data", size=6),
     Layout(get_messages(context), name="messages"))
     return layout
 
@@ -166,40 +166,19 @@ def get_other(context:objects.Context) -> Panel:
 
 def get_messages(context:objects.Context) -> Panel:
     """Get the config string"""
-    panel = Panel(str(context.messages), box=box.SIMPLE, padding=0)
-    return panel
+    return Panel(str(context.messages), box=box.SIMPLE, padding=0)
 
 def get_position_display(context:objects.Context) -> Panel:
     """Get the config string"""
-    panel = Panel(str(context.instrument.position_display), box=box.SIMPLE, padding=0)
-    return panel
+    return Panel(str(context.instrument.position_display), box=box.SIMPLE, padding=0)
 
 def get_data_stream_display(context:objects.Context) -> Panel:
     """Get the config string"""
-    panel = Panel(str(context.instrument.data_stream), box=box.MARKDOWN, padding=0)
-    return panel
-
+    return Panel(str(context.instrument.data_stream), box=box.MARKDOWN, padding=0)
 
 def config_str(d:dict) -> dict:
     """Config string"""
-    return (f := lambda d: {k: f(v) for k, v in d.items()} if type(d) == dict else [str(i) for i in d] if isinstance(d, list) else d)(d)
-
-# def config_str(dictionary:dict) -> dict:
-#     """Config print"""
-#     return_dict = ""
-#     for k, v in dictionary.items():
-#         # if k != 'samples' and k != 'start_time' and k != 'experimental_time':
-#         if isinstance(v, dict):
-#             return_dict += config_print(v)
-#         else:
-#             if isinstance(v, list):
-#                 list_string = ""
-#                 for item in v:
-#                     list_string += f"{item}, "
-#                 return_dict += f"{k}: {list_string}"
-#             else:
-#                 return_dict += (f"{k}:{v}, ")
-#     return return_dict
+    return (f := lambda d: {k: f(v) for k, v in d.items()} if isinstance(d, dict) else [str(i) for i in d] if isinstance(d, list) else d)(d)
 
 def get_config_string(context:objects.Context) -> Panel:
     """Get the config string"""
@@ -238,21 +217,15 @@ def ami_sample_table(context:objects.Context):
 
 def goal_agenda_plan(context:objects.Context) -> Panel:
     "Return out GAP: Goal Agenda Plan"
-    # return (f"{config_print(context.config.override_dictionary)}\n{get_line()}\n"+
-    # f"{ami_sample_table(context)}\n"+
     return Panel(f"Estimated Time: {str(cumulative_estimated_run_length(context)).split('.', maxsplit=1)[0]} | Error Threshold - Target: {context['data_analysis']['target_error']} Current {context.agent_da.target_error}\n"+
     f"  Current Time: {context.current_time} | {context.agenda}", box=box.SIMPLE)
-    # return (f"{config_print(context.config.override_dictionary)}\n{get_line()}\n{context.ami}\n"+
-    # f"Estimated Time: {str(cumulative_estimated_run_length(context)).split('.', maxsplit=1)[0]} | Error Threshold - Target: {context['data_analysis']['target_error']} Current {context.agent_da.target_error}\n"+
-    # f"  Current Time: {context.current_time} | {context.agenda}\n{get_line()}")
 
 def experiment_stats(context:objects.Context) -> str:
     "Write out statistics of the experiment"
-    return ""
-    # return (f"{context.ami}\n"+
-    # f"Estimated Time: {str(cumulative_estimated_run_length(context)).split('.', maxsplit=1)[0]} | Error Threshold - Target: {context['data_analysis']['target_error']} Current {context.agent_da.target_error}\n"+
-    # f"  Current Time: {context.current_time} {context.agenda}\n"+
-    # f"{get_line()}\nROI: {calculate_roi(context.ami):.0%}\n{context.agenda.get_timeline()}")
+    return (f"{context.ami}\n"+
+    f"Estimated Time: {str(cumulative_estimated_run_length(context)).split('.', maxsplit=1)[0]} | Error Threshold - Target: {context['data_analysis']['target_error']} Current {context.agent_da.target_error}\n"+
+    f"  Current Time: {context.current_time} {context.agenda}\n"+
+    f"---\nROI: {calculate_roi(context.ami):.0%}\n{context.agenda.get_timeline()}")
 
 def experiment_is_over(context:objects.Context) -> bool:
     """Determines if the experiment is over
@@ -275,8 +248,27 @@ def experiment_is_over(context:objects.Context) -> bool:
     len(context.agenda.event_timeline) == len(context.ami.samples) \
     if context.agenda.event_timeline else False)
 
-def get_current_datapoints(context:objects.Context) -> str:
-    """Gets the datapoints live"""
+def get_current_datapoints(context:objects.Context) -> List[str]:
+    """Calculate the quality of the data given the distance and preformance quality
+
+    Used this gaussian curve: https://www.desmos.com/calculator/1dc980vuj1
+    using distance and preformance quality to determine where the quality
+    for this given data point is on the curve.
+
+    Args:
+        distance: an AMI object which contains all the data and the state
+        preformance_quality: the quality of the preformance of the agent
+        context: the context of the agent
+
+    Returns:
+        A string that is the ROI of the experiment. In percent.
+    """
+    # list(map(lambda v: v ** 2, l1))
+    # return ''.join(list(map(lambda data: f"{'[green]' if data.quality >= aquire_data(0.001, current_sample.preformance_quality, context) else '[yellow]' if data.quality >= aquire_data(0.03, current_sample.preformance_quality, context) else '[red]'}{data}\n", current_sample.data[-70:])))
+    # return reduce(lambda data: a + b, context.ami.get_current_sample(context).data[-70:])
+    # return lambda (context.ami.get_current_sample(context).data[-70:]): "{x}"
+    # current_sample = context.ami.get_current_sample(context)
+    # return '\n'.join(map(str, current_sample.data[-70:]))
     current_sample = context.ami.get_current_sample(context)
     return_string = ""
     for data in current_sample.data[-70:]:
@@ -298,19 +290,19 @@ def aquire_data(distance:float, preformance_quality:float, context:objects.Conte
     Returns:
         A string that is the ROI of the experiment. In percent.
     """
-    preformance_disquality = 1 - preformance_quality
     # cumulative_deviation = (0.125 / (0.05 * sqrt(2 * pi))) * pow(e, -0.5 * pow(distance/ 0.05, 2))
     # FFF: Figure out what this should really be
     # print(context.current_time.total_seconds()/1000)
     # TODO: Add instument instability to config
     # Have this reset for every shift change
-    instrument_instability = (1 - tanh(context.current_time.total_seconds()/10000)) if context['instrument']['tanh_curve'] else 0
-    cumulative_deviation = preformance_disquality + distance + instrument_instability
     # Gaussian distribution
     # https://towardsdatascience.com/gaussian-mixture-models-with-python-36dabed6212a
     # Add system stability, hyperbolic tangent
-    data = random.normal(loc=1.0, scale=cumulative_deviation)
-    return data
+    preformance_disquality = 1 - preformance_quality
+    instrument_instability = (1 - tanh(context.current_time.total_seconds()/10000)) if context['instrument']['tanh_curve'] else 0
+    cumulative_deviation = preformance_disquality + distance + instrument_instability
+
+    return random.normal(loc=1.0, scale=cumulative_deviation)
 
 def cognative_temperature_curve(x_pos:float) -> float:
     """Agent cognitive temperature decrease
@@ -332,29 +324,15 @@ def cognative_temperature_curve(x_pos:float) -> float:
 def clamp(num:float, min_value:float, max_value:float):
     """Clamp a number to a minimum and maximum value
 
-    Update nested dicts with the values from the second nested dict.
+    Clamp a number to a minimum and maximum value
 
     Args:
-        d: Dictionary to update
-        {
-            'a': {'c': 1, 'd': 3},
-            'b': 2,
-        }
-        u: Dictionary to update with
-        {
-            'a': {'c': 2, 'd': 3, e': 4},
-            'b': 1,
-        }
+        num: The number to clamp
+        min_value: The minimum value
+        max_value: The maximum value
 
     Returns:
-        A new dictionary with the updated values.
-        A dict mapping keys to the corresponding table row data
-        fetched. Each row is represented as a tuple of strings. For
-        example:
-        {
-            'a': {'c': 2,'d': 3, 'e': 4},
-            'b': 1,
-        }
+        The clamped number
     """
     return max(min(num, max_value), min_value)
 

@@ -55,6 +55,6 @@ class TestConfigFunctions:
                   {'a': 3, 'b': 6}]
         assert list(functions.cartesian_product(test)) == result
     
-    def test_sort_combinations(self):
-        """Sort Combinations"""
-        assert functions.sort_combinations()
+    # def test_sort_combinations(self):
+    #     """Sort Combinations"""
+    #     assert functions.sort_combinations()

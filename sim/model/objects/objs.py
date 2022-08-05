@@ -16,7 +16,6 @@ from typing import TYPE_CHECKING, List
 from io import TextIOWrapper
 import random
 from datetime import datetime, timedelta
-from rich import print
 import numpy as np
 import sim.model.enums as enums
 import sim.model.functions as functions
@@ -65,15 +64,14 @@ class InstrumentStatus:
         eggs: An integer count of the eggs we have laid.
     """
     # """Object that stores the current status regarding the instrument"""
-    hits = 0
-    misses = 0
-    msg = ""
-    is_running = enums.InstrumentRunState.STOPPED
-    # These are counted over all reps and then the mean is display at the end
-    n_crazy_ivans = 0
 
     def __init__(self):
-        pass
+        self.hits = 0
+        self.misses = 0
+        self.msg = ""
+        self.is_running = enums.InstrumentRunState.STOPPED
+        # These are counted over all reps and then the mean is display at the end
+        self.n_crazy_ivans = 0
 
     def start(self):
         """Start the Instrumnet"""
@@ -100,22 +98,17 @@ class Stream:
     # otherwisethe likelihood that they overlap (based on acuity) will be reduced.
     # Usually these will be the same."""
 
-    stream_shift_amount:float = 0.0  # Minimal unit of stream shift
-    p_stream_shift:float = 0.0  # prob. of stream shift per cycle
     # A crazy ivan is when the stream goes haywire; It should happen very rarely.
-    p_crazy_ivan:float = 0.0  # About 0.0001 gives you one/10k
-    crazy_ivan_shift_amount:float = round(random.uniform(0.1, 0.2), 2)  # 0.2
-    # If the beam doesn't hit a wall before this, we cut the run off here.
-    default_max_cycles:int = 10000
-    stream_pos:float = 0.0
-    allow_response_cycle:int = 99999999999
-    cycle:int = 1
-
     def __init__(self, config:settings.Config):
         self.stream_shift_amount = config['instrument']['stream_shift_amount']
         self.p_stream_shift = config['instrument']['p_stream_shift']
         self.p_crazy_ivan = config['instrument']['p_crazy_ivan']
         self.crazy_ivan_shift_amount = config['instrument']['crazy_ivan_shift_amount']
+        # If the beam doesn't hit a wall before this, we cut the run off here.
+        self.default_max_cycles:int = 10000
+        self.stream_pos:float = 0.0
+        self.allow_response_cycle:int = 99999999999
+        self.cycle:int = 1
 
 class Beam:
     """Summary of class here.
@@ -156,13 +149,11 @@ class DataPoint:
     """
     # """Object to store all the data for each beam point"""
     # TODO: Tik Tak Toe Board
-    quality:float = None
-    data:List[List[float]] = [[]]
     # t = [ [0]*3 for i in range(3)]
 
     def __init__(self, quality, data):
-        self.quality = quality
-        self.data = data
+        self.quality:float = quality
+        self.data:List[List[float]] = data
 
     def __str__(self):
         return f'{self.quality:.2f}'
@@ -185,8 +176,6 @@ class SampleData:
     # Sample attributes are stored in dict sampleTypeMapper
     # Preformance Quality, different natural signal response
     # when data is on peak data * PQ"""
-    data:List[DataPoint] = []
-
     # TODO: make weights affect rescheduling
     # QQQ: What was this N shaped dynamics
     def __init__(self, preformance_quality:float,
@@ -244,6 +233,7 @@ class SampleData:
         self.count_array = []
         self.err_array = []
         self.wall_hits = 0.0
+        self.duration:timedelta = timedelta(seconds=0)
         self.estimated_run_length = timedelta(seconds=0)
 
 
@@ -330,43 +320,20 @@ class AMI:
 
     def get_mean(self) -> List[float]:
         """Return the mean of the samples"""
-        mean_list = []
-        for sample in self.samples:
-            sample_list = []
-            for data in sample.data:
-                sample_list.append(data.quality)
-            mean_list.append(np.mean(sample_list))
-        return mean_list
-    
+        return [np.mean([data.quality for data in sample.data]) for sample in self.samples]
+
     def get_stdev(self) -> List[float]:
         """Return the standard deviation of the samples"""
-        stdev_list = []
-        for sample in self.samples:
-            sample_list = []
-            for data in sample.data:
-                sample_list.append(data.quality)
-            stdev_list.append(np.std(sample_list))
-        return stdev_list
-    
+        return [np.std([data.quality for data in sample.data]) for sample in self.samples]
+
     def get_err(self) -> List[float]:
         """Return the error of the samples"""
-        err_list = []
-        for sample in self.samples:
-            sample_list = []
-            for data in sample.data:
-                sample_list.append(data.quality)
-            err_list.append(np.std(sample_list) / sqrt(len(sample_list)))
-        return err_list
-    
+        return [(np.std([data.quality for data in sample.data]
+        ) / sqrt(len(sample.data))) for sample in self.samples]
+
     def get_var(self) -> List[float]:
         """Return the variance of the samples"""
-        variance_list = []
-        for sample in self.samples:
-            sample_list = []
-            for data in sample.data:
-                sample_list.append(data.quality)
-            variance_list.append(np.var(sample_list))
-        return variance_list
+        return [np.var([data.quality for data in sample.data]) for sample in self.samples]
 
     def get_n(self) -> List[float]:
         """Return the number of samples"""
@@ -392,18 +359,15 @@ class Agenda:
     """Summary of class here.
 
     Longer class information...
+    High Level Schedule of events for acheiving the goal
     Longer class information...
 
     Attributes:
         likes_spam: A boolean indicating if we like SPAM or not.
         eggs: An integer count of the eggs we have laid.
     """
-    # """High Level Schedule of events for acheiving the goal"""
     experimental_time:timedelta = timedelta(0)
     number_of_samples:int = 0
-    event_timeline:List[Event] = []
-    experiment_status:enums.ExperimentState = enums.ExperimentState.STOPED
-    status = None
 
     def __init__(self, config:settings.Config):
         self.experimental_time:timedelta = config['experimental_time']
@@ -441,90 +405,121 @@ class Event:
 
     Longer class information...
     Longer class information...
+    Object to specify the information from each event(run)
 
     Attributes:
         likes_spam: A boolean indicating if we like SPAM or not.
         eggs: An integer count of the eggs we have laid.
     """
-    # """Object to specify the information from each event(run)"""
-    run_number:int = None
-    start_time:timedelta = None
-    end_time:timedelta = None
-    duration:timedelta = None
-    time_out:bool = None
-    sample:SampleData = None
-
     def __init__(self, run_number:int, start_time:timedelta, end_time:timedelta, sample:SampleData, time_out:bool):
-        self.run_number = run_number
-        self.start_time = start_time
-        self.end_time = end_time
-        self.duration = end_time - start_time
-        self.sample = sample
-        self.time_out = time_out
+        self.run_number:int = run_number
+        self.start_time:timedelta = start_time
+        self.end_time:timedelta = end_time
+        self.duration:timedelta = end_time - start_time
+        self.sample:SampleData = sample
+        self.time_out:bool = time_out
 
     def __str__(self):
         return (f"Run: {self.run_number: >2}, Timeout: {self.time_out}, Start: {self.start_time}, "+
             f"End: {self.end_time}, Duration: {self.end_time - self.start_time}\n")
 
 class Context:
-    """Summary of class here.
+    """Simulation State Container
 
-    Longer class information...
-    Longer class information...
+    Using the Context Pattern (http://www.corej2eepatterns.com/ContextObject.htm)
+    to store the state of the simulation on a protocal independant way.
+    A context is instantiated with each run of the simulation and is used
+    to access each of the modifyable objects.
 
     Attributes:
-        likes_spam: A boolean indicating if we like SPAM or not.
-        eggs: An integer count of the eggs we have laid.
+        start_time: System time at start of simulation
+        current_time: The timedelta that the simulation is on, indipendent of the system time.
+        ami: The object with the samples and data
+        agenda: To store events and information about the experiment
+        agent_da: Data Analyst Agent
+        agent_em: Experiment Manager Agent
+        agent_op: Operator Agent
+        instrument: The instrument used in the experiment
+        messages: The comunication between the agents
+        config: The configuration of the experiment
+        file: Stores the messages and experiment information
+        data_file: Stores the actual data from the instrument
     """
-    # """http://www.corej2eepatterns.com/ContextObject.htm"""
-    current_time:timedelta = None
-    ami:AMI = None
-    agenda:Agenda = None
-    agent_da:objects.DataAnalyst = None
-    agent_em:objects.ExperimentManager= None
-    agent_op:objects.Operator = None
-    instrument:objects.CXI = None
-    data_display:CommunicationObject = None
-    messages:CommunicationObject = None
-    config:settings.Config = None
-    file:TextIOWrapper = None
-    data_file:TextIOWrapper = None
-    start_time:datetime = None
 
     def __init__(self, ami:AMI, agenda:Agenda, agent_da:objects.DataAnalyst, agent_em:objects.ExperimentManager,
-            agent_op:objects.Operator, instrument:objects.CXI, data_display:CommunicationObject, messages:CommunicationObject, config:settings.Config,
+            agent_op:objects.Operator, instrument:objects.CXI, messages:CommunicationObject, config:settings.Config,
             file:TextIOWrapper, data_file:TextIOWrapper):
-        self.current_time = timedelta(0)
-        self.ami = ami
-        self.agenda = agenda
-        self.agent_da = agent_da
-        self.agent_em = agent_em
-        self.agent_op = agent_op
-        self.instrument = instrument
-        self.data_display = data_display
-        self.messages = messages
-        self.config = config
-        self.file = file
-        self.data_file = data_file
-        self.start_time = datetime.now()
+        self.start_time:datetime = datetime.now()
+        self.current_time:timedelta = timedelta(0)
+        self.ami:AMI = ami
+        self.agenda:Agenda = agenda
+        self.agent_da:objects.DataAnalyst = agent_da
+        self.agent_em:objects.ExperimentManager = agent_em
+        self.agent_op:objects.Operator = agent_op
+        self.instrument:objects.CXI = instrument
+        self.messages:CommunicationObject = messages
+        self.config:settings.Config = config
+        self.file:TextIOWrapper = file
+        self.data_file:TextIOWrapper = data_file
 
     def file_write(self, message:str):
-        """write file method"""
+        """Fetches rows from a Smalltable.
+
+        Retrieves rows pertaining to the given keys from the Table instance
+        represented by table_handle.  String keys will be UTF-8 encoded.
+
+        Args:
+            table_handle: An open smalltable.Table instance.
+
+        Returns:
+            A dict mapping keys to the corresponding table row data
+        """
         open(self.file.name, 'a', encoding="utf-8").write(f"{self.current_time} |"+
         f" DA_E:{self.agent_da.get_energy():.2f} "+
         f" OP_E:{self.agent_da.get_attention():.2f} | {message}\n")
 
     def printer(self, console:str, file:str):
-        """Print message to console"""
+        """Fetches rows from a Smalltable.
+
+        Retrieves rows pertaining to the given keys from the Table instance
+        represented by table_handle.  String keys will be UTF-8 encoded.
+
+        Args:
+            table_handle: An open smalltable.Table instance.
+
+        Returns:
+            A dict mapping keys to the corresponding table row data
+        """
         self.messages.concat(f"{console}\n")
         if self.config['settings']['save_type'][0] == enums.SaveType.DETAILED:
             self.file_write(file)
 
     def __getitem__(self, key):
+        """Fetches rows from a Smalltable.
+
+        Retrieves rows pertaining to the given keys from the Table instance
+        represented by table_handle.  String keys will be UTF-8 encoded.
+
+        Args:
+            table_handle: An open smalltable.Table instance.
+
+        Returns:
+            A dict mapping keys to the corresponding table row data
+        """
         return self.config[key]
 
     def update(self):
-        """Make sure all objects are updated"""
+        """Fetches rows from a Smalltable.
+
+        Retrieves rows pertaining to the given keys from the Table instance
+        represented by table_handle.  String keys will be UTF-8 encoded.
+
+        Args:
+            table_handle: An open smalltable.Table instance.
+
+        Returns:
+            A dict mapping keys to the corresponding table row data
+        """
         self.instrument.update(self)
         self.agent_da.update(self)
         self.agent_op.update(self)
