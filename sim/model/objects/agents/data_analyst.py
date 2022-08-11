@@ -13,9 +13,9 @@ from scipy.stats import linregress
 import sim.model.enums as enums
 import sim.model.objects as objects
 import sim.model.settings as settings
-import sim.model.objects.agents.Base as Base
+import sim.model.objects.agents.base as base
 
-class DataAnalyst(Base.Person):
+class DataAnalyst(base.Person):
     """The Data Analyst will be able to predict the error of the current sample
 
     The Data Analyst agents is responsible for monitoring the AMI and determining the quality

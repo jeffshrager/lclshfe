@@ -301,7 +301,7 @@ ADJ_True_Stop_True = {
     'settings': {
         'name':['ADJ_True_Stop_True_10'],
         'save_type':[enum.SaveType.COLLAPSED],
-        'display': False,
+        'display': True,
         'strict_time': True,
         'ask_to_continue': {
             'sample': False,

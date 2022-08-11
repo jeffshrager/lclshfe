@@ -18,9 +18,9 @@ from datetime import timedelta
 import sim.model.enums as enums
 import sim.model.objects as objects
 import sim.model.settings as settings
-import sim.model.objects.agents.Base as Base
+import sim.model.objects.agents.base as base
 
-class ExperimentManager(Base.Person):
+class ExperimentManager(base.Person):
     """Experiment Manager Logic
 
     The experiment manager agent is responsible for managing the experiment.
