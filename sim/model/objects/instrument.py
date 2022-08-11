@@ -1,33 +1,36 @@
-"""A one line summary of the module or program, terminated by a period.
+"""The instruments represented in the model
 
-Leave one blank line.  The rest of this docstring should contain an
-overall description of the module or program.  Optionally, it may also
-contain a brief description of exported classes and functions and/or usage
-examples.
+This contains the parent and child objects of the instrument. Right now there
+is just CXI but this can be extended to include other instruments in the future
+that have different properties.
 
   Typical usage example:
 
-  foo = ClassFoo()
-  bar = foo.FunctionBar()
+  CXI = CXI()
 """
 import random
 from datetime import timedelta
-from typing import List
-from rich import print
 import sim.model.enums as enums
 import sim.model.functions as functions
 import sim.model.objects as objects
 import sim.model.settings as settings
 
 class Instrument:
-    """Summary of class here.
+    """The parent object for the insturments
 
-    Longer class information...
-    Longer class information...
+    The parent object for the insturments
 
     Attributes:
-        likes_spam: A boolean indicating if we like SPAM or not.
-        eggs: An integer count of the eggs we have laid.
+        instrument_type (str): The type of instrument
+        run_number (int): The run number of the instrument
+        instrument_status (InstrumentStatus): The status of the instrument
+        stream_status (Stream): The status of the stream
+        beam_status (Beam): The status of the beam
+        time_out_value (int): The time out value for the instrument
+        current_sample (int): The current sample
+        position_display (str): The position display for the instrument
+        data_stream (list): The data stream for the instrument
+        collecting_data (bool): Whether the instrument is collecting data
     """
     instrument_type = ""
     instrument_status:objects.InstrumentStatus = None
@@ -45,8 +48,6 @@ class Instrument:
     # System is unstable then gets to a stable period
     # then it fluctuates
     system_stability = None
-
-
     data_stream:str = ""
     position_display:str = ""
 
@@ -189,14 +190,13 @@ class Instrument:
                 self.last_data_update = context.current_time
 
 class CXI(Instrument):
-    """Summary of class here.
+    """CXI Instrument
 
-    Longer class information...
-    Longer class information...
+    The object for the CXI instrument.
 
     Attributes:
-        likes_spam: A boolean indicating if we like SPAM or not.
-        eggs: An integer count of the eggs we have laid.
+        data_per_second (int): The number of data points to be collected per second.
+        instrument_status (InstrumentStatus): The status of the instrument.
     """
     transition_write:bool = False
     previous_transition_check:timedelta = None 

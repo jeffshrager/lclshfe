@@ -7,6 +7,7 @@ simulation. This should be the only file that is run.
 
   sim.jig(sim.overrides.macro_test, True, 'functional_acuity')
   sim.stats('fnc_ond1_tanh_false_cog_false_30mins/1659488027.688672', 'functional_acuity')
+  sim.display(sim.jig(sim.overrides.fnc1_ond_tanh_false_cog_false, True, 'noticing_delay'), 'noticing_delay')
 """
 import sys
 import sim
@@ -14,13 +15,21 @@ import sim
 def main() -> int:
     """Run the Jig"""
     # TODO: Fix Suppressed
-    # sim.display_new(sim.jig(sim.overrides.fnc1_ond_tanh_false_cog_false, True, 'noticing_delay'), 'noticing_delay')
+    sim.jig(sim.overrides.ADJ_True_Stop_True, True, 'noticing_delay')
+    sim.jig(sim.overrides.ADJ_False_Stop_True, True, 'noticing_delay')
+    sim.jig(sim.overrides.ADJ_True_Stop_False, True, 'noticing_delay')
+    sim.jig(sim.overrides.ADJ_False_Stop_False, True, 'noticing_delay')
+    # sim.jig(sim.overrides.TF, True, 'noticing_delay')
+    # sim.jig(sim.overrides.FT, True, 'noticing_delay')
+    # sim.jig(sim.overrides.FF, True, 'noticing_delay')
+
+    # sim.display(sim.jig(sim.overrides.fnc1_ond_tanh_false_cog_false, True, 'noticing_delay'), 'noticing_delay')
     # sim.stats('Poster1/1659637732.51549', 'noticing_delay')
     # sim.stats('Poster2/1659638382.7977269', 'noticing_delay')
     # sim.stats('Poster3/1659726202.022182', 'noticing_delay')
-    sim.display_new('fnc_ond1_tanh_false_cog_false/1658879734.700448', 'functional_acuity')
+    # sim.display('fnc_ond1_tanh_false_cog_false/1658879734.700448', 'functional_acuity')
 
-    # sim.display_new('Poster3/1659726202.022182', 'noticing_delay')
+    # sim.display('Poster3/1659726202.022182', 'noticing_delay')
     # sim.stats('fnc_ond1_tanh_false_cog_false_30mins_for_tomorow/1659508987.5486', 'functional_acuity')
     return 0
 

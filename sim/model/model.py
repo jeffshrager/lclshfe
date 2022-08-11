@@ -19,7 +19,6 @@ from rich.progress import Progress
 import sim.model.enums as enums
 import sim.model.functions as functions
 import sim.model.objects as objects
-from sim.model.objects.objs import AMI
 import sim.model.settings as settings
 
 def run(config:settings.Config, live:Live, job_progress:Progress, overall_progress:Progress, overall_task, number_of_combinations:int) -> objects.AMI:
@@ -77,11 +76,6 @@ def run(config:settings.Config, live:Live, job_progress:Progress, overall_progre
     functions.create_experiment_figure(context, False)
     if isinstance(context['settings']['save_type'], list):
         context['settings']['save_type'] = context['settings']['save_type'][0]
-    # if context['settings']['save_type'] == enums.SaveType.DETAILED:
-    #     # object = copy.deepcopy(context.ami)
-    #     object = copy.deepcopy(context.ami)
-    #     return object
-    # elif context['settings']['save_type'] == enums.SaveType.COLLAPSED:
     header_list = []
     value_list = []
     for key, value in config.override_dictionary.items():

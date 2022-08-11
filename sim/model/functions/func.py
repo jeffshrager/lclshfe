@@ -13,16 +13,13 @@ from __future__ import annotations
 import collections.abc
 from datetime import timedelta
 from math import tanh
-import time
 from typing import TYPE_CHECKING, List
 from rich.table import Table
 from rich import box
-from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn
 from rich.layout import Layout
 from rich.panel import Panel
 from rich.pretty import Pretty
-from functools import reduce
-from numpy import arange, random
+from numpy import random
 import plotly.express as px
 import pandas as pd
 if TYPE_CHECKING:

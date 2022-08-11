@@ -7,10 +7,9 @@ from datetime import timedelta
 from enum import Enum
 
 class AgentType(Enum):
-    """Summary of class here.
+    """The type of the agents
 
-    Longer class information...
-    Enum to mark the different agent roles
+    Determine what the agent is.
 
     Attributes:
         enum: The enum for the agent type.
@@ -22,59 +21,57 @@ class AgentType(Enum):
     ACR = "ACR Operator"
 
 class InstrumentType(Enum):
-    """Summary of class here.
+    """The type of the insturment
 
-    Longer class information...
-    Enum to mark the different hutches
+    Future right now this is just for CXI but
+    when instruments are added this will be used.
 
     Attributes:
-        enum: The enum for the instrument type.
+        enum: The enum for the agent type.
     """
     CXI = "CXI"
 
 class InstrumentRunState(Enum):
-    """Summary of class here.
+    """The state of the instrument
 
-    Longer class information...
-    Different States of the Instrument
+    Determine if the instrument is running or not.
 
     Attributes:
-       enum: The enum for the instrument run state.
+        enum: The enum for the agent type.
     """
     STOPPED = False
     RUNNING = True
 
 class ExperimentState(Enum):
-    """Summary of class here.
+    """The state of the experiment
 
-    Longer class information...
-    Longer class information...
+    If the experiment is running or not.
 
     Attributes:
-        enum: The enum for the experiment state.
+        enum: The enum for the agent type.
     """
     STOPED = False
     STARTED = True
 
 class ExperimentManagerAlgorithm(Enum):
-    """Summary of class here.
+    """Future, the algorithm to use for the experiment manager
 
-    Longer class information...
-    Longer class information...
+    Future, the algorithm to use for the experiment manager
 
     Attributes:
-        enum: The enum for the experiment state.
+        enum: The enum for the agent type.
     """
     THIS = 1
     THAT = 2
 
 class SampleType(Enum):
-    """Summary of class here.
+    """The type of the sample
 
-    Different States of the Instrument
+    This determines how long it takes to setup
+    the sample as well as other sample paramters.
 
     Attributes:
-        enum: The enum for the sample type.
+        enum: The enum for the agent type.
     """
     INSTANT = {'setup_time':timedelta(seconds=10)}
     WATER_JET = {'setup_time':timedelta(seconds=30)}
@@ -82,19 +79,19 @@ class SampleType(Enum):
     OTHER = {'setup_time':timedelta(seconds=60)}
 
 class SampleImportance(Enum):
-    """Summary of class here.
+    """The importance of the sample
 
-    Each sample has a different level of importance
-
-    Available colors:
-        red, green, yellow, blue, magenta, cyan, white.
+    Used to determine the importance of the sample.
+    This will interact with the other parameters to
+    maximize data for the samples. This also includes
+    the color to display the sample in the output.
 
     Attributes:
-        enum: The enum for the sample importance.
+        enum: The enum for the agent type.
     """
     IMPORTANT = {'importance':2, 'color':'cyan'}
     UNIMPORTANT = {'importance':1, 'color':'magenta'}
-    # MOST_IMPORTANT = 5
+    # MOST_IMPORTANT = 5s
     # IMPORTANT = 4
     # LESS_IMPORTANT = 3
     # EXPERIMENTAL = 2

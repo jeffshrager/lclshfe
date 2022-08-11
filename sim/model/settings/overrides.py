@@ -1,14 +1,14 @@
-"""A one line summary of the module or program, terminated by a period.
+"""The overrides to run the simulation with.
 
-Leave one blank line.  The rest of this docstring should contain an
-overall description of the module or program.  Optionally, it may also
-contain a brief description of exported classes and functions and/or usage
-examples.
+This file contains variables that you can override the simulation with to
+run different experiments with. These were settings that have been used previously.
 
   Typical usage example:
 
-  foo = ClassFoo()
-  bar = foo.FunctionBar()
+    sim.jig(sim.overrides.ADJ_True_Stop_True, True, 'noticing_delay')
+    sim.jig(sim.overrides.ADJ_False_Stop_True, True, 'noticing_delay')
+    sim.jig(sim.overrides.ADJ_True_Stop_False, True, 'noticing_delay')
+    sim.jig(sim.overrides.ADJ_False_Stop_False, True, 'noticing_delay')
 """
 from datetime import timedelta
 import sim.model.enums as enum
@@ -276,9 +276,10 @@ ErrorChangeTest = {
         'save_type':[enum.SaveType.DETAILED],
         'display': True,
         'ask_to_continue': {
-            'sample': False,
+            'sample':True,
+            'run': True,
         }},
-    'reps': [x for x in range(1)],
+    'reps': [x for x in range(10)],
     'operator': {
         'noticing_delay': [1.0]},
     'experimental_time': [timedelta(minutes=20)],
@@ -296,12 +297,12 @@ ErrorChangeTest = {
         'sample_transition_time': [timedelta(seconds=1)]}
 }
 # --------------------------------------------------------------------------------------------------
-Poster1 = {
+ADJ_True_Stop_True = {
     'settings': {
-        'name':['Poster1'],
-        'save_type':[enum.SaveType.DETAILED],
+        'name':['ADJ_True_Stop_True_10'],
+        'save_type':[enum.SaveType.COLLAPSED],
         'display': False,
-        'strict_time': False,
+        'strict_time': True,
         'ask_to_continue': {
             'sample': False,
         }},
@@ -311,8 +312,8 @@ Poster1 = {
     },
     'operator': {
         'functional_acuity': [0.1],
-        'noticing_delay': [1.0, 5.0, 10.0]},
-    'experimental_time': [timedelta(minutes=20)],
+        'noticing_delay': [1.0]},
+    'experimental_time': [timedelta(minutes=10)],
     'samples': {'samples': [
         [objects.SampleData(0.90, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
          objects.SampleData(0.85, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
@@ -325,39 +326,10 @@ Poster1 = {
         'tanh_curve': [False],
         'sample_transition_time': [timedelta(seconds=1)]}
 }
-Poster2 = {
+ADJ_False_Stop_True = {
     'settings': {
-        'name':['Poster2'],
-        'save_type':[enum.SaveType.DETAILED],
-        'display': False,
-        'strict_time': False,
-        'ask_to_continue': {
-            'sample': False,
-        }},
-    'reps': [x for x in range(9)],
-    'experiment_manager': {
-        'adjust_error': [False],
-    },
-    'operator': {
-        'functional_acuity': [0.1],
-        'noticing_delay': [1.0, 5.0, 10.0]},
-    'experimental_time': [timedelta(minutes=20)],
-    'samples': {'samples': [
-        [objects.SampleData(0.90, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
-         objects.SampleData(0.85, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
-         objects.SampleData(0.80, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
-         objects.SampleData(0.75, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
-         objects.SampleData(0.70, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE)]
-    ],},
-    'cognative_degredation': [False],
-    'instrument': {
-        'tanh_curve': [False],
-        'sample_transition_time': [timedelta(seconds=1)]}
-}
-Poster3 = {
-    'settings': {
-        'name':['Poster3'],
-        'save_type':[enum.SaveType.DETAILED],
+        'name':['ADJ_False_Stop_True_10'],
+        'save_type':[enum.SaveType.COLLAPSED],
         'display': False,
         'strict_time': True,
         'ask_to_continue': {
@@ -369,8 +341,66 @@ Poster3 = {
     },
     'operator': {
         'functional_acuity': [0.1],
-        'noticing_delay': [1.0, 5.0, 10.0]},
-    'experimental_time': [timedelta(minutes=20)],
+        'noticing_delay': [1.0]},
+    'experimental_time': [timedelta(minutes=10)],
+    'samples': {'samples': [
+        [objects.SampleData(0.90, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.85, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.80, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.75, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.70, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE)]
+    ],},
+    'cognative_degredation': [False],
+    'instrument': {
+        'tanh_curve': [False],
+        'sample_transition_time': [timedelta(seconds=1)]}
+}
+ADJ_True_Stop_False = {
+    'settings': {
+        'name':['ADJ_True_Stop_False_10'],
+        'save_type':[enum.SaveType.COLLAPSED],
+        'display': False,
+        'strict_time': False,
+        'ask_to_continue': {
+            'sample': False,
+        }},
+    'reps': [x for x in range(9)],
+    'experiment_manager': {
+        'adjust_error': [True],
+    },
+    'operator': {
+        'functional_acuity': [0.1],
+        'noticing_delay': [1.0]},
+    'experimental_time': [timedelta(minutes=10)],
+    'samples': {'samples': [
+        [objects.SampleData(0.90, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.85, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.80, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.75, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.70, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE)]
+    ],},
+    'cognative_degredation': [False],
+    'instrument': {
+        'tanh_curve': [False],
+        'sample_transition_time': [timedelta(seconds=1)]}
+}
+ADJ_False_Stop_False = {
+    'settings': {
+        'name':['ADJ_False_Stop_False_10'],
+        'save_type':[enum.SaveType.COLLAPSED],
+        'display': False,
+        'strict_time': False,
+        'ask_to_continue': {
+            'sample': False,
+        }},
+    'reps': [x for x in range(9)],
+    'experiment_manager': {
+        'adjust_error': [False],
+    },
+    'operator': {
+        'functional_acuity': [0.1],
+        'noticing_delay': [1.0]},
+    'experimental_time': [timedelta(minutes=10)],
     'samples': {'samples': [
         [objects.SampleData(0.90, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
          objects.SampleData(0.85, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),

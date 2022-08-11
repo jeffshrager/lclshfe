@@ -1,20 +1,13 @@
-"""The agents represented in the model
+"""The Data Analyst agent
 
-In the model, there are three primary agents responsible for the operation of the
-instrument. The Operator is directly in controll of the beamline of the instrument.
-The Data Analyst observes the AMI and determines when the data is good enough to
-stop the run as well as gives updates to the Experiment Manager when there is a problem.
-The Experiment Manager is responsible for the overall control of the experiment and
-communicates with both the Operator and the Data Analyst to understand the state of 
-the Experiment as well as make changes at a high level to improve the quality and
-efficiency of the experiment.
+The Data Analyst agents is responsible for monitoring the AMI and determining the quality
+of the data being produced. This is used to inform the Experiment Manager and using this
+information the error thrreshold can be changed.
 
   Typical usage example:
 
   DA = DataAnalyst()
   DA.check_if_enough_data_to_analyse(context)
-
-  bar = foo.FunctionBar()
 """
 from scipy.stats import linregress
 import sim.model.enums as enums
@@ -25,8 +18,9 @@ import sim.model.objects.agents.Base as Base
 class DataAnalyst(Base.Person):
     """The Data Analyst will be able to predict the error of the current sample
 
-    Longer class information...
-    Longer class information...
+    The Data Analyst agents is responsible for monitoring the AMI and determining the quality
+    of the data being produced. This is used to inform the Experiment Manager and using this
+    information the error thrreshold can be changed.
 
     Attributes:
         Person: A boolean indicating if we like SPAM or not.

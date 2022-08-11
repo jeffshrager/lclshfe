@@ -19,7 +19,6 @@ independent_variable:
   display(folder, independent_variable)
   display_new(folder, independent_variable)
 """
-from itertools import product
 import os
 import pickle
 from statistics import stdev
@@ -30,7 +29,6 @@ from rich.layout import Layout
 from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn
 from rich.panel import Panel
 from rich.table import Table
-from multiprocessing import Pool
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
@@ -95,7 +93,7 @@ def jig(override:dict, supressed:bool, independent_variable:str) -> str:
                     'settings':{'save_type':config['settings']['save_type'][0]}})
         # if config['settings']['save_type'] == enums.SaveType.COLLAPSED:
         functions.collapsed_file_setup(override, folder)
-
+    # TODO: add multiprocessing
     # runs = [product(settings.Config(functions.add_time_num(combination, start_time, run_number)), job_progress, overall_progress, overall_task) for run_number, combination in enumerate(combinations)]
     # queries = [settings.Config(functions.add_time_num(combination, start_time, run_number)) for run_number, combination in enumerate(combinations)]
     # with Pool() as pool:
@@ -105,8 +103,6 @@ def jig(override:dict, supressed:bool, independent_variable:str) -> str:
     #     p.map(model.run, [product(settings.Config(functions.add_time_num(combination, start_time, run_number)) for run_number, combination in enumerate(combinations)])
         # print(p.map(f, [1, 2, 3]))
         runs = [model.run(settings.Config(functions.add_time_num(combination, start_time, run_number)), live, job_progress, overall_progress, overall_task, len(combinations)) for run_number, combination in enumerate(combinations)]
-        
-        
         functions.dictionary_dump(runs, 'runs', folder)
         functions.write_summary_file(config, folder, runs, independent_variable)
     return folder
@@ -140,75 +136,17 @@ def stats(folder:str, independent_variable:str) -> bool:
     #     f" var - {var(number_samples)}\nmean - {mean(total_data)}, stdev - {stdev(total_data)},"+
     #     f"var - {var(total_data)}\n")
 
-def rollup(folder:str) -> bool:
-    """Fetches rows from a Smalltable.
+def old_display(folder:str) -> bool:
+    """Old_Display the data in a graph
 
-    Retrieves rows pertaining to the given keys from the Table instance
-    represented by table_handle.  String keys will be UTF-8 encoded.
-
-    Args:
-        table_handle: An open smalltable.Table instance.
-        keys: A sequence of strings representing the key of each table
-          row to fetch.  String keys will be UTF-8 encoded.
-        require_all_keys: If True only rows with values set for all keys will be
-          returned.
-
-    Returns:
-        A dict mapping keys to the corresponding table row data
-        fetched. Each row is represented as a tuple of strings. For
-        example:
-
-        {b'Serak': ('Rigel VII', 'Preparer'),
-         b'Zim': ('Irk', 'Invader'),
-         b'Lrrr': ('Omicron Persei 8', 'Emperor')}
-
-        Returned keys are always bytes.  If a key from the keys argument is
-        missing from the dictionary, then that row was not found in the
-        table (and require_all_keys must have been False).
-
-    Raises:
-        IOError: An error occurred accessing the smalltable.
-    """
-    config = None
-    runs = None
-    with open(f"results/{folder}/dictionaries/config.dictionary", 'rb') as config_dictionary_file:
-        config = pickle.load(config_dictionary_file)
-    with open(f"results/{folder}/dictionaries/runs.dictionary", 'rb') as runs_dictionary_file:
-        runs = pickle.load(runs_dictionary_file)
-    print(config)
-    print(runs)
-    df = px.data.gapminder().query("continent=='Oceania'")
-    fig = px.line(df, x="year", y="lifeExp", color='country')
-    fig.show()
-
-def display(folder:str) -> bool:
-    """Fetches rows from a Smalltable.
-
-    Retrieves rows pertaining to the given keys from the Table instance
-    represented by table_handle.  String keys will be UTF-8 encoded.
+    Display the data in a graph
 
     Args:
-        table_handle: An open smalltable.Table instance.
-        keys: A sequence of strings representing the key of each table
-          row to fetch.  String keys will be UTF-8 encoded.
-        require_all_keys: If True only rows with values set for all keys will be
-          returned.
+        folder: the folder to display the data from
+        independent_variable: the independent variable to display the data from
 
     Returns:
-        A dict mapping keys to the corresponding table row data
-        fetched. Each row is represented as a tuple of strings. For
-        example:
-
-        {b'Serak': ('Rigel VII', 'Preparer'),
-         b'Zim': ('Irk', 'Invader'),
-         b'Lrrr': ('Omicron Persei 8', 'Emperor')}
-
-        Returned keys are always bytes.  If a key from the keys argument is
-        missing from the dictionary, then that row was not found in the
-        table (and require_all_keys must have been False).
-
-    Raises:
-        IOError: An error occurred accessing the smalltable.
+        Shows a graph in a web browser
     """
     config = None
     runs = None
@@ -275,8 +213,6 @@ def display(folder:str) -> bool:
             #         n_average = 0
 
                 # compressed_run.append(values)
-            
-
             data_frame = pd.DataFrame(data=computed_run)
             print(data_frame)
             fig = px.line(data_frame, x='pq', y='N', color='functional_acuity',
@@ -345,34 +281,17 @@ def display(folder:str) -> bool:
             #     ))
             fig.show()
 
-def display_new(folder:str, independent_variable:str) -> bool:
-    """Fetches rows from a Smalltable.
+def display(folder:str, independent_variable:str) -> bool:
+    """Display the data in a graph
 
-    Retrieves rows pertaining to the given keys from the Table instance
-    represented by table_handle.  String keys will be UTF-8 encoded.
+    Display the data in a graph
 
     Args:
-        table_handle: An open smalltable.Table instance.
-        keys: A sequence of strings representing the key of each table
-          row to fetch.  String keys will be UTF-8 encoded.
-        require_all_keys: If True only rows with values set for all keys will be
-          returned.
+        folder: the folder to display the data from
+        independent_variable: the independent variable to display the data from
 
     Returns:
-        A dict mapping keys to the corresponding table row data
-        fetched. Each row is represented as a tuple of strings. For
-        example:
-
-        {b'Serak': ('Rigel VII', 'Preparer'),
-         b'Zim': ('Irk', 'Invader'),
-         b'Lrrr': ('Omicron Persei 8', 'Emperor')}
-
-        Returned keys are always bytes.  If a key from the keys argument is
-        missing from the dictionary, then that row was not found in the
-        table (and require_all_keys must have been False).
-
-    Raises:
-        IOError: An error occurred accessing the smalltable.
+        Shows a graph in a web browser
     """
     # import_file = {}
     data_frame = pd.read_csv(f"results/{folder}/summary.tsv", sep='\t', index_col=False)
@@ -390,7 +309,6 @@ def display_new(folder:str, independent_variable:str) -> bool:
             "aspectratio": {"x": 2, "y": 0.5, "z": 0.6}
         })
     fig.show()
-
     # with open(f"results/{folder}/summary.tsv",) as f:
     #     records = csv.DictReader(f)
     #     for row in records:

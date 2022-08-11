@@ -22,33 +22,36 @@ import sim.model.functions as functions
 import sim.model.objects as objects
 
 class Person:
-    """Summary of class here.
+    """The base agent class
 
-    Longer class information...
-    Longer class information...
+    TODO: Add system stability affect attention level
+    If the system is unstable attention should increase, if system is stable attention
+    will decrease, We know what the status of the system is use this to callibrate
+    the system, begining they will be focused, not exausted yet, 4pm things go
+    wrong and they are tired
+
+    TODO: Analygous attentional properties will attach to data analyst
+    Hot vs cold cognition, hot rappid makes more mistakes, cold slower more accurate
+    Eventually check when worrying check all the time, when not check once in a while
+    TODO: Attention/ exaustion/ focus controlls for ever person
+    TODO _: Add Attention
+    TODO: begining they will be focused, not exausted yet, 4pm things go wrong and they are tired
+
+    1.0 / 0.002 = 8.3, total level of energy / minutes = 8.3 total hours of energy
 
     Attributes:
-        likes_spam: A boolean indicating if we like SPAM or not.
-        eggs: An integer count of the eggs we have laid.
+        energy_degradation: float, the amount of energy lost each cycle
+        agent_type: enums.AgentType, the type of agent
+        cognitive_temperature: float, the level of cognition
+        cogtemp_curve: float, the curve of cognition
+        attention_meter: float, the level of attention
+        previous_check: timedelta, the time of the last check
+        noticing_delay: float, the delay of noticing
+        decision_delay: float, the delay of decision making
+        functional_acuity: float, the level of functional acuity
     """
-    # TODO: Add system stability affect attention level
-    # If the system is unstable attention should increase, if system is stable attention
-    # will decrease, We know what the status of the system is use this to callibrate
-    # the system, begining they will be focused, not exausted yet, 4pm things go
-    # wrong and they are tired
-
-    # TODO: Analygous attentional properties will attach to data analyst
-    # Hot vs cold cognition, hot rappid makes more mistakes, cold slower more accurate
-    # Eventually check when worrying check all the time, when not check once in a while
-    # TODO: Attention/ exaustion/ focus controlls for ever person
-    # TODO _: Add Attention
-    # TODO: begining they will be focused, not exausted yet, 4pm things go wrong and they are tired
-
-    # 1.0 / 0.002 = 8.3, total level of energy / minutes = 8.3 total hours of energy
-
     # attention_meter:float = None
     # previous_check:timedelta = None
-
     def __init__(self, agent_type:enums.AgentType):
         self.energy_degradation:float = 0.002
         self.agent_type:enums.AgentType = agent_type
@@ -94,7 +97,7 @@ class Person:
             self.decision_delay = 1 + (1 - self.cognative_temperature)
 
 class RemoteUser(Person):
-    """Summary of class here.
+    """TODO the remote user
 
     Longer class information...
     Longer class information...

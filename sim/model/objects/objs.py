@@ -1,14 +1,4 @@
-"""A one line summary of the module or program, terminated by a period.
-
-Leave one blank line.  The rest of this docstring should contain an
-overall description of the module or program.  Optionally, it may also
-contain a brief description of exported classes and functions and/or usage
-examples.
-
-  Typical usage example:
-
-  foo = ClassFoo()
-  bar = foo.FunctionBar()
+"""Misc objects used in the simulation
 """
 from __future__ import annotations
 from math import sqrt
@@ -24,14 +14,9 @@ if TYPE_CHECKING:
     import sim.model.objects as objects
 
 class CommunicationObject:
-    """Summary of class here.
+    """Used to print messages from each agent
 
-    Longer class information...
-    Longer class information...
-
-    Attributes:
-        likes_spam: A boolean indicating if we like SPAM or not.
-        eggs: An integer count of the eggs we have laid.
+    Used to print messages from each agent
     """
     messages = ""
 
@@ -54,24 +39,24 @@ class CommunicationObject:
         return self.messages
 
 class InstrumentStatus:
-    """Summary of class here.
+    """Determines the status of the instrument
 
-    Longer class information...
-    Longer class information...
+    Object that stores the current status regarding the instrument
 
     Attributes:
-        likes_spam: A boolean indicating if we like SPAM or not.
-        eggs: An integer count of the eggs we have laid.
+        hits: The number of hits
+        misses: The number of misses
+        msg: The message to display
+        is_running: The state of the instrument
+        n_crazy_ivans: The number of crazy ivans
     """
-    # """Object that stores the current status regarding the instrument"""
-
     def __init__(self):
-        self.hits = 0
-        self.misses = 0
-        self.msg = ""
-        self.is_running = enums.InstrumentRunState.STOPPED
+        self.hits:int = 0
+        self.misses:int = 0
+        self.msg:str = ""
+        self.is_running:enums.InstrumentRunState = enums.InstrumentRunState.STOPPED
         # These are counted over all reps and then the mean is display at the end
-        self.n_crazy_ivans = 0
+        self.n_crazy_ivans:int = 0
 
     def start(self):
         """Start the Instrumnet"""
@@ -82,23 +67,28 @@ class InstrumentStatus:
         self.is_running = enums.InstrumentRunState.STOPPED
 
 class Stream:
-    """Summary of class here.
+    """The stream comming from the instrument
 
-    Longer class information...
-    Longer class information...
+    We have a stream (aka. jet) which shifts around in accord with these params.
+    The stream_shift_time_slice is a bit obscure. The idea is that
+
+    Warning: The stream shift amount should be an integer multiple of the beam_shift_amount,
+    otherwisethe likelihood that they overlap (based on acuity) will be reduced.
+    Usually these will be the same
+
+    A crazy ivan is when the stream goes haywire; It should happen very rarely.
 
     Attributes:
-        likes_spam: A boolean indicating if we like SPAM or not.
-        eggs: An integer count of the eggs we have laid.
+        stream_shift_amount: The amount the stream shifts each time slice
+        p_stream_shift: The probability of a stream shift
+        p_crazy_ivan: The probability of a crazy ivan
+        crazy_ivan_shift_amount: The amount the crazy ivan shifts each time slice
+        default_max_cycles: The maximum number of cycles to run before stopping
+        stream_pos: The current position of the stream
+        allow_response_cycle: The number of cycles to allow a response
+        cycle: The current cycle
     """
-    # """We have a stream (aka. jet) which shifts around in accord with these params.
-    # The stream_shift_time_slice is a bit obscure. The idea is that.
 
-    # Warning: The stream shift amount should be an integer multiple of the beam_shift_amount,
-    # otherwisethe likelihood that they overlap (based on acuity) will be reduced.
-    # Usually these will be the same."""
-
-    # A crazy ivan is when the stream goes haywire; It should happen very rarely.
     def __init__(self, config:settings.Config):
         self.stream_shift_amount = config['instrument']['stream_shift_amount']
         self.p_stream_shift = config['instrument']['p_stream_shift']
@@ -111,41 +101,39 @@ class Stream:
         self.cycle:int = 1
 
 class Beam:
-    """Summary of class here.
+    """The beam that is lined up with the stream
 
-    Longer class information...
-    Longer class information...
+    And the beam, which is under the control of the operator (or automation),
+    which can be shifted in accord with these params:
+    You may want to have more or less fine control of the beam vs. the stream's shiftiness
+
+    There are two different and wholly separate senses of acuity:
+    physical_acuity: Whether the beam is physically on target, and functional_acuity:
+    whether the operator can SEE that it is!
+    Nb. Whole scale is -1...+1
+    You want this a little larger than the shift so that it allows for near misses
 
     Attributes:
-        likes_spam: A boolean indicating if we like SPAM or not.
-        eggs: An integer count of the eggs we have laid.
-    """
-    # """And the beam, which is under the control of the operator (or automation),
-    # which can be shifted in accord with these params:"""
-     # You may want to have more or less fine control of the beam vs. the stream's shiftiness
-    beam_shift_amount = 0.0
-
-    # There are two different and wholly separate senses of acuity:
-    # physical_acuity: Whether the beam is physically on target, and functional_acuity:
-    # whether the operator can SEE that it is!
-    # Nb. Whole scale is -1...+1
-    # You want this a little larger than the shift so that it allows for near misses
-    physical_acuity = 0.02
-    beam_pos = 0.0
+        beam_pos: The current position of the beam
+        beam_shift_amount: The amount the beam shifts each time slice
+        physical_acuity: The acuity of the beam
+    """   
 
     def __init__(self, config:settings.Config):
+        self.beam_pos = 0.0
+        self.beam_shift_amount = 0.0
+        self.physical_acuity = 0.02
         self.beam_shift_amount = config['instrument']['beam_shift_amount']
         self.physical_acuity = config['instrument']['physical_acuity']
 
 class DataPoint:
-    """Summary of class here.
+    """Data objects
 
-    Longer class information...
-    Longer class information...
+    Contains the quality of the data from the instrument
 
     Attributes:
-        likes_spam: A boolean indicating if we like SPAM or not.
-        eggs: An integer count of the eggs we have laid.
+        quality: The quality of the data
+        data: The data stored in a 2*2 array TODO
     """
     # """Object to store all the data for each beam point"""
     # TODO: Tik Tak Toe Board
@@ -163,19 +151,35 @@ class DataPoint:
         return str(self.data)
 
 class SampleData:
-    """Summary of class here.
+    """Sample Data Objects
 
-    Longer class information...
-    Longer class information...
+    Store all information about the sample as well as the datapoints
+    Sample attributes are stored in dict sampleTypeMapper
+    Preformance Quality, different natural signal response
+    when data is on peak data * PQ
 
     Attributes:
-        likes_spam: A boolean indicating if we like SPAM or not.
-        eggs: An integer count of the eggs we have laid.
+        compleated: Whether the sample is completed
+        timeout: if the sample has timed out
+        preformance_quality: the quality of the sample
+        importance: the importance of the sample
+        setup_time: how long it takes to set up the sample
+        data: the data points
+        count: the number of data points
+        mean: the mean of the data points
+        m_2: the mean of the data points squared
+        variance: the variance of the data points
+        sdev: the standard deviation of the data points
+        err: the error of the data points
+        count_array: the number of data points in each array
+        err_array: the error of the data points in each array
+        projected_intercept: the projected intercept of the data points
+        wall_hits: the number of wall hits
+        estimated_run_length: the estimated run length of the data points
+        duration: the duration of the data points
+        running: the state of the sample
+        error_time_array: the error of the time array
     """
-    # """Store all information about the sample as well as the datapoints
-    # Sample attributes are stored in dict sampleTypeMapper
-    # Preformance Quality, different natural signal response
-    # when data is on peak data * PQ"""
     # TODO: make weights affect rescheduling
     # QQQ: What was this N shaped dynamics
     def __init__(self, preformance_quality:float,
@@ -236,7 +240,6 @@ class SampleData:
         self.duration:timedelta = timedelta(seconds=0)
         self.estimated_run_length = timedelta(seconds=0)
 
-
     def file_string(self) -> str:
         """Return a string that can be written to a file"""
         return (f'{self.preformance_quality}\t{self.importance}\t{self.mean:.15f}\t'+
@@ -260,22 +263,15 @@ class SampleData:
             f"[default dim]intercept:[not dim]{(self.projected_intercept if self.count != 0 else 0.000):.3f}")
 
 class AMI:
-    """Summary of class here.
+    """Contains the data of the samples
 
-    Longer class information...
-    Longer class information...
+    FFF: AMI only gets a subset of samples
+    AMI is different than data pipeline
 
-    Attributes:
-        likes_spam: A boolean indicating if we like SPAM or not.
-        eggs: An integer count of the eggs we have laid.
+    TODO: Wan-Lin's discomfort: seperate PQ and Importance
+    Were using PQ as double meaning, one is quality of sample,
+    also using as inverse proxy as importance
     """
-    # """Contains the data of the samples"""
-    # FFF: AMI only gets a subset of samples
-    # AMI is different than data pipeline
-
-    # TODO: Wan-Lin's discomfort: seperate PQ and Importance
-    # Were using PQ as double meaning, one is quality of sample,
-    # also using as inverse proxy as importance
     samples:List[SampleData] = []
     random_samples:bool = None
 
@@ -356,15 +352,15 @@ class AMI:
         return return_string
 
 class Agenda:
-    """Summary of class here.
+    """The timeline of events for the experiment
 
-    Longer class information...
     High Level Schedule of events for acheiving the goal
-    Longer class information...
 
     Attributes:
-        likes_spam: A boolean indicating if we like SPAM or not.
-        eggs: An integer count of the eggs we have laid.
+        experimental_time: The time the experiment will take
+        number_of_samples: The number of samples to take
+        event_timeline: The events in the timeline
+        experiment_status: The status of the experiment
     """
     experimental_time:timedelta = timedelta(0)
     number_of_samples:int = 0
@@ -401,15 +397,17 @@ class Agenda:
         return ''.join(map(str, self.event_timeline))
 
 class Event:
-    """Summary of class here.
+    """Single events for a sample
 
-    Longer class information...
-    Longer class information...
     Object to specify the information from each event(run)
 
     Attributes:
-        likes_spam: A boolean indicating if we like SPAM or not.
-        eggs: An integer count of the eggs we have laid.
+        run_number: The run number of the event
+        start_time: The time the event started
+        end_time: The time the event ended
+        duration: The duration of the event
+        sample: The sample that the event is for
+        time_out: If the event was a time out
     """
     def __init__(self, run_number:int, start_time:timedelta, end_time:timedelta, sample:SampleData, time_out:bool):
         self.run_number:int = run_number

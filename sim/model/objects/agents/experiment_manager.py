@@ -1,18 +1,15 @@
-"""The agents represented in the model
+"""The experiment manager agent
 
-In the model, there are three primary agents responsible for the operation of the
-instrument. The Operator is directly in controll of the beamline of the instrument.
-The Data Analyst observes the AMI and determines when the data is good enough to
-stop the run as well as gives updates to the Experiment Manager when there is a problem.
-The Experiment Manager is responsible for the overall control of the experiment and
-communicates with both the Operator and the Data Analyst to understand the state of
-the Experiment as well as make changes at a high level to improve the quality and
-efficiency of the experiment.
+The experiment manager agent is responsible for managing the experiment.
+This is the main agent that ensures that the experiment is running and
+that the data is being collected. The experiment manager is also responsible
+for changing the error and ensuring that the data is being collected
+within the given timeframe.
 
   Typical usage example:
 
-  DA = DataAnalyst()
-  DA.check_if_enough_data_to_analyse(context)
+  EM = ExperimentManager()
+  EM.check_if_enough_data_to_analyse(context)
 
   bar = foo.FunctionBar()
 """
@@ -24,14 +21,13 @@ import sim.model.settings as settings
 import sim.model.objects.agents.Base as Base
 
 class ExperimentManager(Base.Person):
-    """Summary of class here.
+    """Experiment Manager Logic
 
-    Longer class information...
-    Longer class information...
-
-    Attributes:
-        likes_spam: A boolean indicating if we like SPAM or not.
-        eggs: An integer count of the eggs we have laid.
+    The experiment manager agent is responsible for managing the experiment.
+    This is the main agent that ensures that the experiment is running and
+    that the data is being collected. The experiment manager is also responsible
+    for changing the error and ensuring that the data is being collected
+    within the given timeframe.
     """
     # """High level GAP Goal Agenda Plan"""
     previous_transition_check:timedelta = None
