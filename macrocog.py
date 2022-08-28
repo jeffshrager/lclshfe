@@ -136,7 +136,7 @@ def run():
             print(" time_remaining = "+str(time_remaining))
             # This will be NEGATIVE iff there's a shortfall
             projected_seconds_overtime = time_remaining - estimated_total_time_for_remaining_samples
-            print(" projected_seconds_overtime="+str(projected_seconds_overtime)+" [+ is short (under-run=good), - is long (over-run=bad)")
+            print(" projected_seconds_overtime="+str(projected_seconds_overtime)+" [+ is short (under-run=good), - is long (over-run=bad)]")
             # This should be calculated, but at the moment, it's just hacked to five minutes
             seconds_saved_from_error_threshold_001_delta = 300 
             #seconds_saved_from_error_threshold_001_delta = (last_run_length/2)/((0.01-error_threshold)*1000)
