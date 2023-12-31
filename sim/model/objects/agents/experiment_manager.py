@@ -86,11 +86,11 @@ class ExperimentManager(base.Person):
 
 
             for s, sample in enumerate(context.ami.samples):
-                if sample.compleated is False:
+                if sample.completed is False:
                     sample.estimated_run_length = timedelta(seconds=(sample.duration.total_seconds() + round((((1+s)*pq_delta) * estimated_delta_seconds_per_pq))))
 
 
-            estimated_run_length_map = [timedelta(seconds=(sample.duration.total_seconds() + round((((1+s)*pq_delta) * estimated_delta_seconds_per_pq)))) for s, sample in enumerate(context.ami.samples) if sample.compleated is False]
+            estimated_run_length_map = [timedelta(seconds=(sample.duration.total_seconds() + round((((1+s)*pq_delta) * estimated_delta_seconds_per_pq)))) for s, sample in enumerate(context.ami.samples) if sample.completed is False]
             
             
             

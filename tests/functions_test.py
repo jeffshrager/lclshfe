@@ -20,7 +20,7 @@ import sim.model.enums as enum
 #             'instrument': {'tanh_curve': [False]}
 #         }
 #         test_AMI:objects.AMI = objects.AMI(setting.Config(Test))
-#         test_AMI.samples[0].compleated = True
+#         test_AMI.samples[0].completed = True
 #         assert function.calculate_roi(test_AMI) == 0.5
 
 class TestConfigFunctions:

@@ -44,7 +44,7 @@ def rgb(p):# <-- percentage as parameter
 def calculate_roi(ami:objects.AMI) -> str:
     """Determine the retun of investment data / time.
 
-    Goes through each sample and determines if they all were compleated.
+    Goes through each sample and determines if they all were completed.
     If they were, the ROI would be 100%, if not the roi percent
     is calculated.
 
@@ -56,7 +56,7 @@ def calculate_roi(ami:objects.AMI) -> str:
         A string that is the ROI of the experiment. In percent.
     """
     # TODO: Precision calculation - goes into ROI
-    return (sum(sample.compleated for sample in ami.samples) / len(ami.samples
+    return (sum(sample.completed for sample in ami.samples) / len(ami.samples
     ) if len(ami.samples) > 0 else 0)
 
 def update_dict(d, u):
@@ -204,7 +204,7 @@ def generate_table(context:objects.Context) -> Panel:
     for index, sample in enumerate(context.ami.samples):
         values = sample.get_stats()
         table.add_row(
-            f"{'[green dim]' if sample.compleated else ('[bold green]' if sample.running else '[default dim]')}{str(index): >2} |N:", f" [default not dim]{len(sample.data): >6}", "[dim]-", f"{values[0]}", f"{values[1]}", f"{values[2]}", f"{values[3]}", f"{values[4]}", f"{values[5]}", f"{values[6]}", f"{values[7]}", f"{values[8]}", f"{values[9]}"
+            f"{'[green dim]' if sample.completed else ('[bold green]' if sample.running else '[default dim]')}{str(index): >2} |N:", f" [default not dim]{len(sample.data): >6}", "[dim]-", f"{values[0]}", f"{values[1]}", f"{values[2]}", f"{values[3]}", f"{values[4]}", f"{values[5]}", f"{values[6]}", f"{values[7]}", f"{values[8]}", f"{values[9]}"
         )
     return Panel(table, box=box.SIMPLE)
 

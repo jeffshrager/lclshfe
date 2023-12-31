@@ -159,7 +159,7 @@ class SampleData:
     when data is on peak data * PQ
 
     Attributes:
-        compleated: Whether the sample is completed
+        completed: Whether the sample is completed
         timeout: if the sample has timed out
         preformance_quality: the quality of the sample
         importance: the importance of the sample
@@ -184,7 +184,7 @@ class SampleData:
     # QQQ: What was this N shaped dynamics
     def __init__(self, preformance_quality:float,
             importance:enums.SampleImportance, setup_time:enums.SampleType):
-        self.compleated:bool = False
+        self.completed:bool = False
         self.timeout:bool = False
         self.preformance_quality:float = preformance_quality
         self.importance:enums.SampleImportance = importance
@@ -225,7 +225,7 @@ class SampleData:
 
     def reset(self):
         """Reset the data"""
-        self.compleated = False
+        self.completed = False
         self.timeout = False
         self.data = []
         self.count = 0.0
@@ -347,8 +347,8 @@ class AMI:
         return_string = ""
         for index, sample in enumerate(self.samples):
             # pq, mean, err, var, dev
-            return_string += f"{'[green dim]' if sample.compleated else ('[bold green]' if sample.running else '[default dim]')}{str(index): >2} |N: [default not dim]{len(sample.data): >6} [dim]- {sample.get_stats()}\n"
-            # return_string += f"{'[default dim]' if not sample.compleated else ('[green bold not dim]' if sample.running else '[green dim]')}{str(index): >2} |N: [default not dim]{len(sample.data): >6} [dim]- {sample.get_stats()}\n"
+            return_string += f"{'[green dim]' if sample.completed else ('[bold green]' if sample.running else '[default dim]')}{str(index): >2} |N: [default not dim]{len(sample.data): >6} [dim]- {sample.get_stats()}\n"
+            # return_string += f"{'[default dim]' if not sample.completed else ('[green bold not dim]' if sample.running else '[green dim]')}{str(index): >2} |N: [default not dim]{len(sample.data): >6} [dim]- {sample.get_stats()}\n"
         return return_string
 
 class Agenda:
@@ -383,7 +383,7 @@ class Agenda:
 
     def finished(self):
         """Finished experiment"""
-        self.status = "compleated"
+        self.status = "completed"
 
     def __str__(self):
         return f"Experimental Time: {self.experimental_time}"

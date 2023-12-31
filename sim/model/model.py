@@ -61,7 +61,7 @@ def run(config:settings.Config, live:Live, job_progress:Progress, overall_progre
         if run_started_tracker and config['settings']['ask_to_continue']['sample']:
                 Prompt.ask("[cyan]continue?['magenta'](y/n)", default="y")
                 run_started_tracker = False
-        context.agent_da.check_if_experiment_is_compleated(context)
+        context.agent_da.check_if_experiment_is_completed(context)
         context.current_time += context['step_through_time']
         job_progress.update(config['run_number'], advance=config['step_through_time'].total_seconds())
         completed = sum(task.completed for task in job_progress.tasks)

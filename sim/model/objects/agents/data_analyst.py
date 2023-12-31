@@ -60,17 +60,17 @@ class DataAnalyst(base.Person):
         if current_sample.err <= self.target_error:
             context.printer(f"DA: Data from run {context.instrument.run_number} [green]is good[/green]", f"DA: Data from run {context.instrument.run_number} is good")
             context.agenda.add_event(context.instrument.run_number, context.instrument.run_start_time, context.current_time, current_sample, False)
-            current_sample.compleated = True
+            current_sample.completed = True
             self.projected_intercept = None
             return True
         context.printer(f"DA: [yellow]More data needed from run[/yellow] {context.instrument.run_number}", f"DA: More data needed from run {context.instrument.run_number}")
         return False
 
-    def check_if_experiment_is_compleated(self, context:objects.Context):
-        """Check if experiment is compleated"""
+    def check_if_experiment_is_completed(self, context:objects.Context):
+        """Check if experiment is completed"""
         current_sample = None
         for index, sample_goal in enumerate(context.ami.samples):
-            if not sample_goal.compleated:
+            if not sample_goal.completed:
                 current_sample = index
                 break
         if current_sample is None:

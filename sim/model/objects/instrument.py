@@ -225,7 +225,7 @@ class CXI(Instrument):
         self.last_data_update = context.current_time
         self.stream_status.cycle = 0
         for index, sample_goal in enumerate(context.ami.samples):
-            if not sample_goal.compleated and not sample_goal.timeout:
+            if not sample_goal.completed and not sample_goal.timeout:
                 self.current_sample = index
                 break
         if context['settings']['save_type'][0] == enums.SaveType.DETAILED:

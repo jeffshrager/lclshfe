@@ -74,7 +74,7 @@ class Person:
     def update(self, context:objects.Context):
         """Calculate agents attention and focus each cycle
 
-        Goes through each sample and determines if they all were compleated.
+        Goes through each sample and determines if they all were completed.
         If they were, the ROI would be 100%, if not the roi percent
         is calculated.
 
