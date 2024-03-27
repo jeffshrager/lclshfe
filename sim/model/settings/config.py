@@ -117,7 +117,7 @@ class Config:
             },
         },
         'instrument': {
-            'tanh_curve': True,
+            'tanh_curve': False,
             'data_per_second': 100,
             'time_out_value': 600000,
             'stream_shift_amount': 0.05,
@@ -126,7 +126,7 @@ class Config:
             'crazy_ivan_shift_amount': 0.2,
             'beam_shift_amount': 0.1,
             'physical_acuity': 0.2,
-            'sample_transition_time': timedelta(minutes=1),
+            'sample_transition_time': timedelta(minutes=0),
         },
         }
         self.override_dictionary = override_dictionary

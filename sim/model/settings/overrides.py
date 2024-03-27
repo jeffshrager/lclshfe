@@ -14,6 +14,86 @@ from datetime import timedelta
 import sim.model.enums as enum
 import sim.model.objects as objects
 
+default = {
+    'settings': {
+        'name':['default'],
+        'save_type':[enum.SaveType.DETAILED],
+        'strict_time': True,
+        'ask_to_continue': {
+            'sample': True,
+            'run': True,
+    }},
+    'experimental_time': [timedelta(minutes=20)],
+    'samples': {'samples': [
+        [objects.SampleData(0.90, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.80, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.70, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.60, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE)
+        ]
+    ],},
+}
+fa_all = {
+    'settings': {
+        'name':['mar12'],
+        'save_type':[enum.SaveType.DETAILED],
+        'strict_time': False,
+        },
+    'reps': [x for x in range(3)],
+    'operator': {
+        'functional_acuity': [0.05, 0.15, 0.25],
+        },
+    'experimental_time': [timedelta(minutes=20)],
+    'samples': {'samples': [
+        [objects.SampleData(0.90, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.80, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.70, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.60, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE)
+        ]
+    ],},
+}
+fa_05 = {
+    'settings': {
+        'name':['default'],
+        'save_type':[enum.SaveType.DETAILED],
+        'strict_time': True,
+        'ask_to_continue': {
+            'sample': True,
+            'run': True,
+    }},
+    'reps': [x for x in range(3)],
+    'operator': {
+        'functional_acuity': [0.5]},
+    'experimental_time': [timedelta(minutes=20)],
+    'samples': {'samples': [
+        [objects.SampleData(0.90, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.80, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.70, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.60, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE)
+        ]
+    ],},
+}
+fa_10 = {
+    'settings': {
+        'name':['default'],
+        'save_type':[enum.SaveType.DETAILED],
+        'strict_time': True,
+        'ask_to_continue': {
+            'sample': True,
+            'run': True,
+    }},
+    'reps': [x for x in range(3)],
+    'operator': {
+        'functional_acuity': [1.0]},
+    'experimental_time': [timedelta(minutes=20)],
+    'samples': {'samples': [
+        [objects.SampleData(0.90, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.80, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.70, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
+         objects.SampleData(0.60, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE)
+        ]
+    ],},
+}
+# --------------------------------------------------------------------------------------------------
 over180 = {
     'settings': {'name':['over180'],'save_type':[enum.SaveType.COLLAPSED], 'cycle_sleep_time': 0.0,},
     'reps': [x for x in range(2)],
@@ -59,7 +139,7 @@ macro_test = {
 }
 # --------------------------------------------------------------------------------------------------
 fnc_ond_tanh_true_cog_true = {
-    'settings': {'name':['fnc_ond_tanh_true_cog_true'],'save_type':[enum.SaveType.COLLAPSED]},
+    'settings': {'name':['fnc_ond_tanh_true_cog_true'],'save_type':[enum.SaveType.DETAILED]},
     'reps': [x for x in range(3)],
     'operator': {
         'functional_acuity': [0.1, 0.3, 0.5, 0.7, 0.9, 1.0],
@@ -300,20 +380,23 @@ ErrorChangeTest = {
 ADJ_True_Stop_True = {
     'settings': {
         'name':['ADJ_True_Stop_True_10'],
-        'save_type':[enum.SaveType.COLLAPSED],
+        'save_type':[enum.SaveType.DETAILED],
         'display': True,
+        'cycle_sleep_time': 0,
         'strict_time': True,
         'ask_to_continue': {
             'sample': False,
+            'run': False,
         }},
     'reps': [x for x in range(9)],
     'experiment_manager': {
+        'experimental_time_to_prediction': [True],
         'adjust_error': [True],
     },
     'operator': {
         'functional_acuity': [0.1],
         'noticing_delay': [1.0]},
-    'experimental_time': [timedelta(minutes=10)],
+    'experimental_time': [timedelta(minutes=90)],
     'samples': {'samples': [
         [objects.SampleData(0.90, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
          objects.SampleData(0.85, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
@@ -323,7 +406,7 @@ ADJ_True_Stop_True = {
     ],},
     'cognative_degredation': [False],
     'instrument': {
-        'tanh_curve': [False],
+        'tanh_curve': [True],
         'sample_transition_time': [timedelta(seconds=1)]}
 }
 ADJ_False_Stop_True = {
@@ -350,7 +433,7 @@ ADJ_False_Stop_True = {
          objects.SampleData(0.75, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE),
          objects.SampleData(0.70, enum.SampleImportance.IMPORTANT, enum.SampleType.TAPE)]
     ],},
-    'cognative_degredation': [False],
+    'cognative_degredation': [True],
     'instrument': {
         'tanh_curve': [False],
         'sample_transition_time': [timedelta(seconds=1)]}
@@ -358,14 +441,17 @@ ADJ_False_Stop_True = {
 ADJ_True_Stop_False = {
     'settings': {
         'name':['ADJ_True_Stop_False_10'],
-        'save_type':[enum.SaveType.COLLAPSED],
-        'display': False,
+        'save_type':[enum.SaveType.DETAILED],
+        'display': True,
+        'cycle_sleep_time': 0,
         'strict_time': False,
         'ask_to_continue': {
-            'sample': False,
+            'sample': True,
+            'run': True,
         }},
     'reps': [x for x in range(9)],
     'experiment_manager': {
+        'experimental_time_to_prediction': [True],
         'adjust_error': [True],
     },
     'operator': {

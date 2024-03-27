@@ -13,7 +13,7 @@ from scipy.stats import linregress
 import sim.model.enums as enums
 import sim.model.objects as objects
 import sim.model.settings as settings
-import sim.model.objects.agents.base as base
+import sim.model.objects.agents.Base as base
 
 class DataAnalyst(base.Person):
     """The Data Analyst will be able to predict the error of the current sample

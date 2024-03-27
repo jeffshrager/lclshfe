@@ -18,7 +18,7 @@ from datetime import timedelta
 import sim.model.enums as enums
 import sim.model.objects as objects
 import sim.model.settings as settings
-import sim.model.objects.agents.base as base
+import sim.model.objects.agents.Base as base
 
 class ExperimentManager(base.Person):
     """Experiment Manager Logic
@@ -60,7 +60,7 @@ class ExperimentManager(base.Person):
             context.config.default_dictionary['experimental_time'] = timedelta(seconds=sum([sample.estimated_run_length.total_seconds() for sample in context.ami.samples]))
         context.printer('EM: sort samples by PQ in decending order',
          'EM: sort samples by PQ in decending order')
-        context.ami.sort_samples()
+        # context.ami.sort_samples()
 
     def start_instrument(self, context:objects.Context):
         """determine if the output of the instrument is good"""

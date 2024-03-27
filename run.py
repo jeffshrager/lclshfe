@@ -14,11 +14,22 @@ import sim
 
 def main() -> int:
     """Run the Jig"""
+    # sim.jig(sim.overrides.ADJ_True_Stop_True, True, 'noticing_delay')
+    # sim.jig(sim.overrides.ADJ_True_Stop_False, True, 'noticing_delay')
+
+    # sim.jig(sim.overrides.default, True, 'noticing_delay')
+    # sim.jig(sim.overrides.fa_all, True, 'functional_acuity')
+    # sim.jig(sim.overrides.fa_05, True, 'functional_acuity')
+    # sim.jig(sim.overrides.fa_10, True, 'functional_acuity')
+
+
+
     # TODO: Fix Suppressed
+    # sim.jig(sim.overrides.default, True, 'noticing_delay')
     sim.jig(sim.overrides.ADJ_True_Stop_True, True, 'noticing_delay')
-    sim.jig(sim.overrides.ADJ_False_Stop_True, True, 'noticing_delay')
-    sim.jig(sim.overrides.ADJ_True_Stop_False, True, 'noticing_delay')
-    sim.jig(sim.overrides.ADJ_False_Stop_False, True, 'noticing_delay')
+    # sim.jig(sim.overrides.ADJ_False_Stop_True, True, 'noticing_delay')
+    # sim.jig(sim.overrides.ADJ_True_Stop_False, True, 'noticing_delay')
+    # sim.jig(sim.overrides.ADJ_False_Stop_False, True, 'noticing_delay')
     # sim.jig(sim.overrides.TF, True, 'noticing_delay')
     # sim.jig(sim.overrides.FT, True, 'noticing_delay')
     # sim.jig(sim.overrides.FF, True, 'noticing_delay')
@@ -29,7 +40,7 @@ def main() -> int:
     # sim.stats('Poster3/1659726202.022182', 'noticing_delay')
     # sim.display('fnc_ond1_tanh_false_cog_false/1658879734.700448', 'functional_acuity')
 
-    # sim.display('Poster3/1659726202.022182', 'noticing_delay')
+    # sim.display('mar12/1710275813.543448', 'functional_acuity')
     # sim.stats('fnc_ond1_tanh_false_cog_false_30mins_for_tomorow/1659508987.5486', 'functional_acuity')
     return 0
 

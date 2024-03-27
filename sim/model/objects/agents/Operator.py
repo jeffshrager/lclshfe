@@ -12,7 +12,7 @@ that the data is being maximized and that the beam is not lost.
 import sim.model.enums as enums
 import sim.model.objects as objects
 import sim.model.settings as settings
-import sim.model.objects.agents.base as base
+import sim.model.objects.agents.Base as base
 
 class Operator(base.Person):
     """The operator extends the base class Person
