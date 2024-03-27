@@ -1,11 +1,11 @@
-# Todo:
-#    -- Where exact beam|jet match is tested with ==, replace with a more "perceptually" accurate model
-
+import csv
 from scipy.stats import sem
 import numpy
 import random
 import time
-from datetime import datetime, date
+import plotly.express as px
+from datetime import datetime, date, timedelta
+import pandas as pd
 
 # random.seed(datetime.now())
 random.seed(a=None, version=2)
@@ -205,10 +205,61 @@ class Stream:
             Status.msg = Status.msg + ">>"
             return beam_pos + Beam.beam_shift_amount
 
+class Event:
+    """Stores all the information about each experiment run"""
+    run_start:datetime
+    run_end:datetime
+    translated_position:datetime
+    run_duration:timedelta
+    thickness:float
+
+    def __init__(self, run_start:datetime, run_duration:timedelta):
+        self.run_start = run_start
+        self.run_end = run_start + run_duration
+        self.run_duration = run_duration
+        # Thickness is centered, moving each position x + (duration / 2)
+        self.translated_position = run_start + run_duration / 2
+        self.thickness = run_duration.total_seconds()/100
+
+    def __str__(self):
+        return (f"Start Time: {self.run_start}, "+
+		        f"Duration: {self.run_duration}, "+
+		        f"Translated Position: {self.translated_position}, "+
+		        f"Thickness: {self.thickness}")
+
+def runTable():
+    # Set path with run csv files
+    PATH = "run_tables"
+
+    with open(f"{PATH}/cxilx6320.csv",'r', encoding="utf-8") as f:
+        reader = csv.reader(f)
+        headers = next(reader)
+        data = [{h:x for (h,x) in zip(headers,row)} for row in reader]
+    
+    events = []
+    for entry in data:
+        if "RunStart" in entry:
+            events.append(Event(datetime.strptime(entry["RunStart"], '%b/%d/%Y %H:%M:%S'),
+                            timedelta(seconds=int(entry["RunDuration"].split('.')[0]),
+                                    milliseconds=int(entry["RunDuration"].split('.')[1]))))
+        if "Duration of run" in entry:
+            events.append(Event(datetime.strptime(entry["run start"], '%b/%d/%Y %H:%M:%S'),
+                            timedelta(seconds=int(entry["Duration of run"].split('.')[0]),
+                                    milliseconds=int(entry["Duration of run"].split('.')[1]))))
+    total_duration = timedelta(0, 0, 0)
+    event:Event
+    for event in events:
+        total_duration += event.run_duration
+    return total_duration.total_seconds()
+
+DATA_PER_SECOND = 36
 
 def run(show_f):  # _f is a flag
     default_reps = 30
-    button_distances = 100
+    # button_distances = 10
+    button_distances = 10
+    functional_accuity_list = pd.DataFrame([])
+    title_string = ""
 
     f = open("results/r" + str(time.time()) + ".tsv", "w")
     if show_f:
@@ -223,10 +274,12 @@ def run(show_f):  # _f is a flag
         f"Functional Acuity = {Operation.functional_acuity} stream_shift_amount= {Stream.stream_shift_amount}, "
         f"p_stream_shift={Stream.p_stream_shift}, beam_shift_amount={Beam.beam_shift_amount}, "
         f"p_crazy_ivan={Stream.p_crazy_ivan}")
+    title_string = f"Functional Acuity = {Operation.functional_acuity} stream_shift_amount= {Stream.stream_shift_amount}, p_stream_shift={Stream.p_stream_shift}, beam_shift_amount={Beam.beam_shift_amount}, p_crazy_ivan={Stream.p_crazy_ivan}"
     f.write("operator_response_delay\tmean\tsem\tn_crazy_ivans\n")
 
     for local_button_distance in range(button_distances):
-        Operation.button_distance = 4 + local_button_distance
+        Operation.button_distance = 1 + local_button_distance
+        # 4 + local_button_distance
         Status.n_crazy_ivans = 0
         results = []
         for rep in range(reps):
@@ -238,6 +291,13 @@ def run(show_f):  # _f is a flag
                     f"============================================\nHits={Status.hits}, Misses={Status.misses}, "
                     f"Win fraction={frac}\n")
             results = results + [frac]
+        functional_accuity_list = pd.concat([functional_accuity_list, pd.DataFrame.from_records([{
+                                                "Fraction Hits":format(numpy.mean(results), '.2f'),
+                                                "Operator Response Time (cycles)": Operation.button_distance,
+                                                "Data Per Second (Constant)": DATA_PER_SECOND,
+                                                "Data Captured (RunTime * DPS * Hits)": f"{format(runTable() * DATA_PER_SECOND * numpy.mean(results), '.2f')}"
+                                                }])])
+        # .append(format(numpy.mean(results), '.2f'))
         print(
             f"@ button_distance={Operation.button_distance} mean hit fraction = "
             f"{format(numpy.mean(results), '.2f')} [se={format(sem(results), '.2f')}], "
@@ -245,6 +305,13 @@ def run(show_f):  # _f is a flag
         f.write(
             f"{Operation.button_distance}\t{format(numpy.mean(results), '.2f')}\t{format(sem(results), '.2f')}\t{Status.n_crazy_ivans / reps}\n")
     f.close()
+
+    fig = px.line(functional_accuity_list, x="Operator Response Time (cycles)", y="Fraction Hits", title=title_string, hover_data=["Data Per Second (Constant)", "Data Captured (RunTime * DPS * Hits)"])
+    fig.update_traces(mode="markers+lines")
+    fig.update_layout(hovermode="x unified")
+    fig.update_yaxes(autorange="reversed")
+
+    fig.show()
 
 
 # If display is true, we only do one rep and only allow it to run 1000 cycles
